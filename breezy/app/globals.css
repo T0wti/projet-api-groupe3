@@ -1,0 +1,10 @@
+@import "tailwindcss/preflight"
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Vous pourrez ajouter vos variables CSS personnalisées ici plus tard */
+body {
+  @apply bg-slate-950 text-slate-200;
+}
