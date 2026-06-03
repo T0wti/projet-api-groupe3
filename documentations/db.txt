@@ -1,0 +1,71 @@
+UserService :
+-- Table des informations de compte
+CREATE TABLE users (
+    id UUID PRIMARY KEY, -- Même UUID que l'auth
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    bio TEXT,
+    avatar_url VARCHAR(255),
+    language_preference VARCHAR(10) DEFAULT 'fr', -- Interface multi-langues (Fx22)
+    theme_preference VARCHAR(20) DEFAULT 'light' -- Thème personnalisé (Fx23)
+);
+
+ProfilService:
+    follows:
+        {
+            "_id": "ObjectId",
+            "followerId": "UUID", // L'utilisateur qui suit
+            "followingId": "UUID", // L'utilisateur suivi
+            "createdAt": "ISODate"
+        }
+
+    user_likes:
+        {
+            "_id": "ObjectId",
+            "userId": "UUID", // L'utilisateur qui a cliqué sur "Like"
+            "postId": "ObjectId", // Le post concerné (Post Service)
+            "createdAt": "ISODate"
+        }
+    user_counters
+        {
+            "_id": "ObjectId",
+            "userId": "UUID",
+            "followersCount": 0,
+            "followingCount": 0,
+            "postsCount": 0
+        }
+
+
+Post Service 
+    {
+        "_id": "ObjectId",
+        "authorId": "UUID",
+        "authorUsername": "string", // Dénormalisé pour un affichage rapide sans jointure inter-services
+        "content": "string", // Validé à 280 caractères maximum
+        "media": { // Fx18 & Fx19 (Optionnel)
+            "type": "string", // "image" ou "video"
+            "url": "string"
+        },
+        "tags": ["string"], // Fx12 (ex: ["web", "breezy"])
+        "likesCount": 0, // Mis à jour de manière asynchrone via les actions du Profil Service
+        "commentsCount": 0,
+        "createdAt": "ISODate",
+        "updatedAt": "ISODate"
+        "parentPost": "ObjectId"
+    }
+
+Auth Service
+    AUTH_USERS {
+        uuid id PK
+        uuid user_id
+        string password_hash
+        string role
+        boolean is_banned
+        timestamp last_login
+    }
+    REFRESH_TOKENS {
+        uuid id PK
+        uuid user_id
+        string token
+        timestamp expires_at
+    }
