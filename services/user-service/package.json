@@ -1,10 +1,11 @@
 {
   "name": "user-service",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Breezy User Service",
+  "main": "src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
   },
   "keywords": [],
   "author": "",
@@ -16,11 +17,6 @@
     "pg": "^8.21.0"
   },
   "devDependencies": {
-    "@types/express": "^5.0.6",
-    "@types/node": "^25.9.1",
-    "@types/pg": "^8.20.0",
-    "nodemon": "^3.1.14",
-    "ts-node": "^10.9.2",
-    "typescript": "^6.0.3"
+    "nodemon": "^3.1.14"
   }
 }

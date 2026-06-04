@@ -1,26 +1,66 @@
-version: '3.8'
-
 services:
-  auth-db:
-    image: mongo:latest
-    container_name: breezy-auth-db
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-
-  post-db:
-    image: postgres:latest
-    container_name: breezy-post-db
+  # ==========================================
+  # USER SERVICE (PostgreSQL)
+  # ==========================================
+  user-db:
+    image: postgres:15-alpine
+    container_name: breezy-user-db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: breezy_posts
+      POSTGRES_DB: breezy_user_db
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - user_db_data:/var/lib/postgresql/data
 
+  user-service:
+    build:
+      context: ./services/user-service
+      dockerfile: Dockerfile
+    container_name: breezy-user-service
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - DATABASE_URL=postgresql://postgres:password@user-db:5432/breezy_user_db
+    volumes:
+      - ./services/user-service:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - user-db
+
+  # ==========================================
+  # POST SERVICE (MongoDB)
+  # ==========================================
+  post-db:
+    image: mongo:6.0
+    container_name: breezy-post-db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - "27017:27017"
+    volumes:
+      - post_db_data:/data/db
+
+  post-service:
+    build:
+      context: ./services/post-service
+      dockerfile: Dockerfile
+    container_name: breezy-post-service
+    ports:
+      - "3003:3003"
+    environment:
+      - PORT=3003
+      - MONGO_URI=mongodb://root:password@post-db:27017/breezy_post_db?authSource=admin
+    volumes:
+      - ./services/post-service:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - post-db
+
+# Persistent storage pour éviter de perdre tes données à chaque extinction
 volumes:
-  mongo_data:
-  postgres_data:
+  user_db_data:
+  post_db_data:
