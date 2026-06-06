@@ -85,7 +85,46 @@ services:
       - ./services/profil-service:/app
       - /app/node_modules
 
+  # ==========================================
+  # AUTH SERVICE (PostgreSQL)
+  # ==========================================
+  auth-db:
+    image: postgres:15-alpine
+    container_name: breezy-auth-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: breezy_auth_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+
+  auth-service:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    container_name: breezy-auth-service
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - DATABASE_URL=postgresql://postgres:password@auth-db:5432/breezy_auth_db
+      - JWT_SECRET=change_this_secret_in_production
+      - JWT_REFRESH_SECRET=change_this_refresh_secret_in_production
+      - JWT_EXPIRES_IN=15m
+      - JWT_REFRESH_EXPIRES_IN=7d
+      - USER_SERVICE_URL=http://user-service:3001
+    depends_on:
+      - auth-db
+      - user-service
+    volumes:
+      - ./services/auth-service:/app
+      - /app/node_modules
+
+
 volumes:
   user_db_data:
   post_db_data:
   profil_db_data:
+  auth_db_data:
