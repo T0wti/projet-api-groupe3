@@ -2,8 +2,12 @@ import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import Post from '../models/post.model';
 
+// Helper function to validate MongoDB ObjectId
 const isValidObjectId = (id: string) => mongoose.Types.ObjectId.isValid(id);
 
+/**
+ * Create a new post or reply
+ */
 export const createPost = async (req: Request, res: Response) => {
   const { authorId, authorUsername, content, media, tags, parentPost } = req.body;
 
@@ -23,6 +27,7 @@ export const createPost = async (req: Request, res: Response) => {
 
     const savedPost = await newPost.save();
 
+    // If this post is a reply increment the parents comments count
     if (parentPost && isValidObjectId(parentPost)) {
       await Post.findByIdAndUpdate(parentPost, { $inc: { commentsCount: 1 } });
     }
@@ -33,6 +38,9 @@ export const createPost = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Retrieve all main posts (excluding replies)
+ */
 export const getAllMainPosts = async (_req: Request, res: Response) => {
   try {
     const posts = await Post.find({ parentPost: null }).sort({ createdAt: -1 }); // Pour le moment on filtrr que les parents pour le get all a voir si on garde ça ?
@@ -42,6 +50,9 @@ export const getAllMainPosts = async (_req: Request, res: Response) => {
   }
 };
 
+/**
+ * Retrieve a specific post along with all its direct replies
+ */
 export const getPostWithReplies = async (req: Request, res: Response) => {
   const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   if (!isValidObjectId(id)) {
@@ -59,6 +70,9 @@ export const getPostWithReplies = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Retrieve only the replies for a given post
+ */
 export const getRepliesForPost = async (req: Request, res: Response) => {
   const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   if (!isValidObjectId(id)) {
@@ -73,6 +87,9 @@ export const getRepliesForPost = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Update an existing post
+ */
 export const updatePost = async (req: Request, res: Response) => {
   const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const { content, media, tags } = req.body;
@@ -99,6 +116,9 @@ export const updatePost = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Delete a post
+ */
 export const deletePost = async (req: Request, res: Response) => {
 const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   if (!isValidObjectId(id)) {

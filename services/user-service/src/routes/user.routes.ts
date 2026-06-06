@@ -1,19 +1,19 @@
 import { Router } from 'express';
 import {
-  createUserProfile,
-  getUserProfile,
-  updateUserProfile,
-  deleteUserProfile,
+  createUserInfos,
+  getUserInfos,
+  updateUserInfos,
+  deleteUserInfos,
   setBanStatus,
   updateUserRole,
 } from '../controllers/user.controller';
 
 const router = Router();
 
-router.post('/', createUserProfile);
-router.get('/:id', getUserProfile);
-router.put('/:id', updateUserProfile);
-router.delete('/:id', deleteUserProfile);
+router.post('/', createUserInfos);
+router.get('/:id', getUserInfos);
+router.put('/:id', updateUserInfos);
+router.delete('/:id', deleteUserInfos);
 router.patch('/:id/ban', setBanStatus);
 router.patch('/:id/role', updateUserRole);
 

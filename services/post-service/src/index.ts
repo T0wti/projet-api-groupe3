@@ -14,6 +14,7 @@ if (!mongoUri) {
   process.exit(1);
 }
 
+// Establish connection to MongoDB
 mongoose
   .connect(mongoUri)
   .then(() => console.log('Connected to MongoDB for the Post Service'))

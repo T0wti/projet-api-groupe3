@@ -1,12 +1,22 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
+/**
+ * Allowed media types for a post
+ * A post can contain either an image, a video, or no media
+ */
 export type MediaType = 'image' | 'video' | null;
 
+/**
+ * Media object structure attached to a post.
+ */
 export interface Media {
   type: MediaType;
   url: string | null;
 }
 
+/**
+ * TypeScript interface representing a Post document in MongoDB.
+ */
 export interface IPost extends Document {
   authorId: string;
   authorUsername: string;
@@ -20,6 +30,9 @@ export interface IPost extends Document {
   updatedAt: Date;
 }
 
+/**
+ * Mongoose schema definition for posts.
+ */
 const PostSchema = new Schema<IPost>(
   {
     authorId: { type: String, required: true },
