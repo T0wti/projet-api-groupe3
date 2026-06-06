@@ -60,7 +60,32 @@ services:
     depends_on:
       - post-db
 
-# Persistent storage pour éviter de perdre tes données à chaque extinction
+  # ==========================================
+  # PROFIL SERVICE (MongoDB)
+  # ==========================================
+  profil-db:
+    image: mongo:6.0
+    container_name: breezy-profil-db
+    ports:
+      - "27018:27017"
+    volumes:
+      - profil_db_data:/data/db
+
+  profil-service:
+    build: ./services/profil-service
+    container_name: breezy-profil-service
+    ports:
+      - "3004:3004"
+    environment:
+      - MONGO_URI=mongodb://profil-db:27017/profil-service
+      - PORT=3004
+    depends_on:
+      - profil-db
+    volumes:
+      - ./services/profil-service:/app
+      - /app/node_modules
+
 volumes:
   user_db_data:
   post_db_data:
+  profil_db_data:
