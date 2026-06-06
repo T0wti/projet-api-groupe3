@@ -1,3 +1,5 @@
+-- Create the users table if it does not already exist
+
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
@@ -6,7 +8,6 @@ CREATE TABLE IF NOT EXISTS users (
     is_banned BOOLEAN NOT NULL DEFAULT false,
     language_preference VARCHAR(10) NOT NULL DEFAULT 'fr',
     theme_preference VARCHAR(20) NOT NULL DEFAULT 'light',
-    deleted_at TIMESTAMP DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

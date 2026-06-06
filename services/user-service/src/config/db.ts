@@ -9,6 +9,12 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
+/**
+ * Initialize database schema (idempotent setup)
+ * - Reads SQL file
+ * - Executes it to ensure tables exist
+ * - Retries if the database is not ready yet
+ */
 const initDatabase = async (): Promise<void> => {
   let retries = 5;
   while (retries) {

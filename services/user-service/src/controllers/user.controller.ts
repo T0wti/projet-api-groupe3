@@ -1,7 +1,10 @@
 import { Request, Response } from 'express';
 import pool from '../config/db';
 
-export const createUserProfile = async (req: Request, res: Response) => {
+/**
+ * Create a new user in the database
+ */
+export const createUserInfos = async (req: Request, res: Response) => {
   const { id, username, email, role } = req.body;
 
   if (!id || !username || !email) {
@@ -21,7 +24,10 @@ export const createUserProfile = async (req: Request, res: Response) => {
   }
 };
 
-export const getUserProfile = async (req: Request, res: Response) => {
+/**
+ * Retrieve a user by ID
+ */
+export const getUserInfos = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
@@ -37,20 +43,24 @@ export const getUserProfile = async (req: Request, res: Response) => {
   }
 };
 
-export const updateUserProfile = async (req: Request, res: Response) => {
+/**
+ * Update user information (language, theme, username)
+ */
+export const updateUserInfos = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { language_preference, theme_preference } = req.body;
+  const { language_preference, theme_preference, username } = req.body;
 
   try {
     const query = `
       UPDATE users
       SET language_preference = COALESCE($1, language_preference),
           theme_preference = COALESCE($2, theme_preference),
+          username = COALESCE($3, username),
           updated_at = CURRENT_TIMESTAMP
-      WHERE id = $3
+      WHERE id = $4
       RETURNING *;
     `;
-    const result = await pool.query(query, [language_preference, theme_preference, id]);
+    const result = await pool.query(query, [language_preference, theme_preference, username, id]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'User not found.' });
@@ -62,7 +72,10 @@ export const updateUserProfile = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteUserProfile = async (req: Request, res: Response) => {
+/**
+ * Delete a user
+ */
+export const deleteUserInfos = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
@@ -78,6 +91,9 @@ export const deleteUserProfile = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Update user ban status (admin action)
+ */
 export const setBanStatus = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { is_banned } = req.body;
@@ -105,6 +121,9 @@ export const setBanStatus = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Update user role (admin action)
+ */
 export const updateUserRole = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { role } = req.body;
