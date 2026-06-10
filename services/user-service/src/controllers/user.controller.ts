@@ -1,11 +1,18 @@
 import { Request, Response } from 'express';
+import { Role } from '@prisma/client';
 import prisma from '../config/db';
+
+const VALID_ROLES = Object.values(Role);
 
 export const createUserInfos = async (req: Request, res: Response) => {
   const { id, username, email, role } = req.body;
 
   if (!id || !username || !email) {
     return res.status(400).json({ message: 'Required fields missing (id, username, email).' });
+  }
+
+  if (role !== undefined && !VALID_ROLES.includes(role)) {
+    return res.status(400).json({ message: `role must be one of: ${VALID_ROLES.join(', ')}` });
   }
 
   try {
@@ -71,27 +78,27 @@ export const deleteUserInfos = async (req: Request<{ id: string }>, res: Respons
   }
 };
 
-export const setBanStatus = async (req: Request<{ id: string }>, res: Response) => {
-  const { id } = req.params;
-  const { is_banned } = req.body;
+// export const setBanStatus = async (req: Request<{ id: string }>, res: Response) => {
+//   const { id } = req.params;
+//   const { is_banned } = req.body;
 
-  if (typeof is_banned !== 'boolean') {
-    return res.status(400).json({ message: 'The is_banned field must be a boolean.' });
-  }
+//   if (typeof is_banned !== 'boolean') {
+//     return res.status(400).json({ message: 'The is_banned field must be a boolean.' });
+//   }
 
-  try {
-    const user = await prisma.user.update({
-      where: { id },
-      data: { isBanned: is_banned },
-    });
-    return res.status(200).json(user);
-  } catch (error) {
-    if ((error as { code?: string }).code === 'P2025') {
-      return res.status(404).json({ message: 'User not found.' });
-    }
-    return res.status(500).json({ error: (error as Error).message });
-  }
-};
+//   try {
+//     const user = await prisma.user.update({
+//       where: { id },
+//       data: { isBanned: is_banned },
+//     });
+//     return res.status(200).json(user);
+//   } catch (error) {
+//     if ((error as { code?: string }).code === 'P2025') {
+//       return res.status(404).json({ message: 'User not found.' });
+//     }
+//     return res.status(500).json({ error: (error as Error).message });
+//   }
+// };
 
 export const updateUserRole = async (req: Request<{ id: string }>, res: Response) => {
   const { id } = req.params;
@@ -99,6 +106,10 @@ export const updateUserRole = async (req: Request<{ id: string }>, res: Response
 
   if (!role) {
     return res.status(400).json({ message: 'The role field is required.' });
+  }
+
+  if (!VALID_ROLES.includes(role)) {
+    return res.status(400).json({ message: `role must be one of: ${VALID_ROLES.join(', ')}` });
   }
 
   try {

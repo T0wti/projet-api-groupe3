@@ -4,7 +4,7 @@ import {
   getUserInfos,
   updateUserInfos,
   deleteUserInfos,
-  setBanStatus,
+  //setBanStatus,
   updateUserRole,
 } from '../controllers/user.controller';
 
@@ -14,7 +14,7 @@ router.post('/', createUserInfos);
 router.get('/:id', getUserInfos);
 router.put('/:id', updateUserInfos);
 router.delete('/:id', deleteUserInfos);
-router.patch('/:id/ban', setBanStatus);
+//router.patch('/:id/ban', setBanStatus);
 router.patch('/:id/role', updateUserRole);
 
 export default router;
