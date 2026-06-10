@@ -1,5 +1,6 @@
 "use client"; // We are adding local UI state (isReplying), so this becomes a Client Component
 
+import Avatar from "@/components/ui/Avatar";
 import { useState } from 'react';
 import { Post } from '@/types/post';
 
@@ -25,8 +26,8 @@ export default function PostCard({ post, onLike, onReply }: PostCardProps) {
     <article className="border-b border-gray-200 p-4 hover:bg-gray-50 transition-colors">
       <div className="flex gap-3">
         {/* Avatar */}
-        <div className="flex-shrink-0">
-          <img src={post.author.avatarUrl} alt={post.author.username} className="w-10 h-10 rounded-full" />
+        <div className="shrink-0">
+          <Avatar src={post.author.avatarUrl} alt={post.author.username} size="md" />
         </div>
 
         {/* Post Content */}

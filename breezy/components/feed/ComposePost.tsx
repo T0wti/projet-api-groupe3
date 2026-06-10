@@ -1,6 +1,7 @@
 "use client"; // Required because we use React state and event listeners
 
 import { useState } from 'react';
+import Avatar from '@/components/ui/Avatar';
 
 // 1. Define the props this component expects
 // TODO: Change this when API WORKS
@@ -26,10 +27,10 @@ export default function ComposePost({ onPost }: ComposePostProps) {
   return (
     <div className="border-b border-gray-200 p-4">
       <div className="flex gap-3">
-        <img 
-          src="https://i.pravatar.cc/150?u=current_user" 
+        <Avatar 
+          src="https://i.pravatar.cc/150?u=current" 
           alt="My Avatar" 
-          className="w-10 h-10 rounded-full"
+          size="md" 
         />
         <form onSubmit={handleSubmit} className="flex-1">
           <textarea

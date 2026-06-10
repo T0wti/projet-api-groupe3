@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Avatar from '@/components/ui/Avatar';
 
 export default function Sidebar() {
   const navItems = [
@@ -14,7 +15,7 @@ export default function Sidebar() {
     <aside className="hidden md:flex flex-col w-20 lg:w-62.5 h-screen sticky top-0 px-2 lg:px-6 py-4 border-r border-gray-200">
       {/* Brand Logo */}
       <Link href="/" className="flex items-center gap-2 mb-8 p-3 hover:bg-gray-100 rounded-full w-max">
-        <span className="font-black text-2xl text-teal-700 tracking-tighter hidden lg:block">CHIRP</span>
+        <span className="font-black text-2xl text-teal-700 tracking-tighter hidden lg:block">Breezy</span>
         <span className="font-black text-2xl text-teal-700 block lg:hidden">C</span>
       </Link>
 
@@ -40,7 +41,7 @@ export default function Sidebar() {
 
       {/* User Mini Profile at bottom (Placeholder) */}
       <div className="mt-auto flex items-center gap-3 p-3 hover:bg-gray-100 rounded-full cursor-pointer w-max lg:w-full transition-colors">
-        <img src="https://i.pravatar.cc/150?u=current" alt="Avatar" className="w-10 h-10 rounded-full" />
+        <Avatar src="https://i.pravatar.cc/150?u=current" alt="Avatar" size="md" />
         <div className="hidden lg:block">
           <p className="font-bold text-sm">VibrantLife</p>
           <p className="text-gray-500 text-sm">@vibrantlife</p>
