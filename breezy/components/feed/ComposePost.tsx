@@ -2,14 +2,25 @@
 
 import { useState } from 'react';
 
-export default function ComposePost() {
+// 1. Define the props this component expects
+// TODO: Change this when API WORKS
+interface ComposePostProps {
+  onPost: (content: string) => void;
+}
+
+// 2. Destructure the onPost function from props
+export default function ComposePost({ onPost }: ComposePostProps) {
   const [content, setContent] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submitting post:", content);
-    // TODO: Later, this will call the backend API (axios) to create a post
-    setContent(''); // Clear the input after posting
+    if (content.trim().length === 0) return;
+
+    // 3. Pass the content up to the parent component
+    onPost(content); 
+    
+    // 4. Clear the input box
+    setContent(''); 
   };
 
   return (

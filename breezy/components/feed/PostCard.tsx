@@ -1,56 +1,101 @@
-import Image from 'next/image';
+"use client"; // We are adding local UI state (isReplying), so this becomes a Client Component
+
+import { useState } from 'react';
 import { Post } from '@/types/post';
 
 interface PostCardProps {
   post: Post;
+  onLike: () => void;
+  onReply: (content: string) => void;
 }
 
-export default function PostCard({ post }: PostCardProps) {
+export default function PostCard({ post, onLike, onReply }: PostCardProps) {
+  // Local state just to toggle the reply input box open and closed
+  const [isReplying, setIsReplying] = useState(false);
+  const [replyText, setReplyText] = useState('');
+
+  const submitReply = () => {
+    if (replyText.trim().length === 0) return;
+    onReply(replyText); // Send the text UP to HomeFeed
+    setReplyText('');   // Clear the input
+    setIsReplying(false); // Close the reply box
+  };
+
   return (
     <article className="border-b border-gray-200 p-4 hover:bg-gray-50 transition-colors">
       <div className="flex gap-3">
         {/* Avatar */}
-        <div className="shrink-0">
-          <img 
-            src={post.author.avatarUrl} 
-            alt={post.author.username} 
-            className="w-10 h-10 rounded-full"
-          />
+        <div className="flex-shrink-0">
+          <img src={post.author.avatarUrl} alt={post.author.username} className="w-10 h-10 rounded-full" />
         </div>
 
         {/* Post Content */}
         <div className="flex-1">
-          {/* Header */}
           <div className="flex items-center gap-1 text-sm">
             <span className="font-bold text-gray-900">{post.author.name}</span>
             <span className="text-gray-500">@{post.author.username}</span>
-            <span className="text-gray-500">· {post.createdAt}</span>
           </div>
 
-          {/* Text Content */}
-          <p className="mt-1 text-gray-900 text-[15px] whitespace-pre-wrap">
-            {post.content}
-          </p>
+          <p className="mt-1 text-gray-900 text-[15px] whitespace-pre-wrap">{post.content}</p>
 
-          {/* Optional Image */}
-          {post.imageUrl && (
-            <div className="mt-3 rounded-2xl overflow-hidden border border-gray-200">
-              <img src={post.imageUrl} alt="Post media" className="w-full h-auto object-cover" />
-            </div>
-          )}
-
-          {/* Action Buttons (Placeholders for Fx6, Fx7) */}
+          {/* Action Buttons */}
           <div className="flex items-center justify-between mt-3 text-gray-500 max-w-md">
-            <button className="flex items-center gap-2 hover:text-blue-500 transition-colors">
+            
+            {/* REPLY BUTTON */}
+            <button 
+              onClick={() => setIsReplying(!isReplying)}
+              className="flex items-center gap-2 hover:text-blue-500 transition-colors"
+            >
               <span>💬</span> {post.commentsCount}
             </button>
+
+            {/* REPOST BUTTON (Placeholder) */}
             <button className="flex items-center gap-2 hover:text-green-500 transition-colors">
               <span>🔁</span> {post.repostsCount}
             </button>
-            <button className="flex items-center gap-2 hover:text-red-500 transition-colors">
-              <span>❤️</span> {post.likesCount}
+
+            {/* LIKE BUTTON */}
+            <button 
+              onClick={onLike}
+              // If isLiked is true, make it red. Otherwise, keep it gray.
+              className={`flex items-center gap-2 transition-colors ${post.isLiked ? 'text-red-500' : 'hover:text-red-500'}`}
+            >
+              <span>{post.isLiked ? '❤️' : '🤍'}</span> {post.likesCount}
             </button>
+
           </div>
+
+          {/* HIDDEN REPLY BOX: Only shows if isReplying is true */}
+          {isReplying && (
+            <div className="mt-4 flex gap-2">
+              <input 
+                type="text"
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                placeholder="Post your reply..."
+                className="flex-1 bg-transparent border-b border-gray-300 outline-none focus:border-teal-500 py-1"
+              />
+              <button 
+                onClick={submitReply}
+                disabled={!replyText.trim()}
+                className="bg-teal-600 text-white px-4 py-1 rounded-full text-sm font-bold disabled:opacity-50"
+              >
+                Reply
+              </button>
+            </div>
+          )}
+
+          {/* DISPLAY REPLIES (If any exist) */}
+          {post.replies && post.replies.length > 0 && (
+            <div className="mt-4 pl-4 border-l-2 border-gray-200 space-y-3">
+              {post.replies.map((reply) => (
+                <div key={reply.id} className="text-sm">
+                  <span className="font-bold mr-2">{reply.author.name}</span>
+                  <span className="text-gray-700">{reply.content}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </article>
