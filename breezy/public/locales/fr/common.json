@@ -23,5 +23,9 @@
   "compose_post": {
     "placeholder": "Quoi de neuf ?",
     "submit_button": "Publier"
+  },
+  "post_card": {
+    "reply_placeholder": "Répondre à ce post...",
+    "reply_button": "Répondre"
   }
 }
