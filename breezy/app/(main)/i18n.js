@@ -12,7 +12,11 @@ i18n
   .use(initReactI18next)
   .init({
     fallbackLng: 'fr', // Langue par défaut si la langue du navigateur n'est pas dispo
+    load: 'languageOnly',
     debug: true,       // Pratique en développement pour voir ce qui se passe dans la console
+    
+    ns: ['common'],          
+    defaultNS: 'common',
     
     backend: {
       // Chemin d'accès à vos fichiers JSON
