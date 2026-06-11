@@ -15,7 +15,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         On desktop, max-width matches the mockup's central feed width.
         pb-20 adds padding to the bottom on mobile so the bottom nav doesn't cover posts.
       */}
-      <main className="flex-1 w-full sm:max-w-[600px] pb-20 md:pb-0">
+      <main className="flex-1 w-full sm:max-w-150 pb-20 md:pb-0">
         {children}
       </main>
 

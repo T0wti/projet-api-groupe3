@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Avatar from '@/components/ui/Avatar';
+import Button from '@/components/ui/Button';
 
 // 1. Define the props this component expects
 // TODO: Change this when API WORKS
@@ -45,13 +46,13 @@ export default function ComposePost({ onPost }: ComposePostProps) {
               {/* Media icons placeholders */}
               <span>🖼️</span> 
             </div>
-            <button 
+            <Button 
               type="submit"
               disabled={content.trim().length === 0}
               className="bg-teal-600 hover:bg-teal-700 text-white font-bold py-1.5 px-4 rounded-full disabled:opacity-50"
             >
               Post
-            </button>
+            </Button>
           </div>
         </form>
       </div>

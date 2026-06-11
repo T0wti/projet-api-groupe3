@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Avatar from '@/components/ui/Avatar';
+import Button from '@/components/ui/Button';
 
 export default function Sidebar() {
   const navItems = [
@@ -34,10 +35,10 @@ export default function Sidebar() {
       </nav>
 
       {/* Primary Action Button */}
-      <button className="mt-6 bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-full w-12.5 h-12.5 lg:w-full lg:h-auto flex items-center justify-center transition-colors">
+      <Button className="mt-6" variant="primary" size="lg">
         <span className="hidden lg:block">Post</span>
         <span className="block lg:hidden">+</span>
-      </button>
+      </Button>
 
       {/* User Mini Profile at bottom (Placeholder) */}
       <div className="mt-auto flex items-center gap-3 p-3 hover:bg-gray-100 rounded-full cursor-pointer w-max lg:w-full transition-colors">

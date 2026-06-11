@@ -20,7 +20,7 @@ export default function Avatar({ src, alt, size = 'md' }: AvatarProps) {
     <img 
       src={src || defaultAvatar} 
       alt={alt} 
-      className={`${sizeClasses[size]} rounded-full object-cover bg-gray-200 flex-shrink-0`}
+      className={`${sizeClasses[size]} rounded-full object-cover bg-gray-200 shrink-0`}
       // object-cover ensures non-square images don't get stretched
       // bg-gray-200 provides a nice fallback background while the image loads
     />
