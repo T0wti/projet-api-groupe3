@@ -10,9 +10,9 @@ const JWT_EXPIRES_IN         = process.env.JWT_EXPIRES_IN         || '15m';
 const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
 const USER_SERVICE_URL       = process.env.USER_SERVICE_URL       || 'http://user-service:3001';
 
-const generateTokens = (userId: string, email: string) => {
+const generateTokens = (userId: string, email: string, role: string) => {
   const accessToken = jwt.sign(
-    { user_id: userId, email },
+    { user_id: userId, email, role },
     JWT_SECRET,
     { expiresIn: JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'] }
   );
@@ -23,6 +23,22 @@ const generateTokens = (userId: string, email: string) => {
   );
   return { accessToken, refreshToken };
 };
+
+const fetchUserRole = async (userId: string): Promise<string> => {
+  try {
+    const response = await fetch(`${USER_SERVICE_URL}/api/users/${userId}`);
+
+    if (!response.ok) {
+      return 'user';
+    }
+
+    const data = (await response.json()) as { role?: string };
+    return typeof data.role === 'string' ? data.role : 'user';
+  } catch {
+    return 'user';
+  }
+};
+
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   const { username, email, password } = req.body;
@@ -49,7 +65,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     body: JSON.stringify({ id: userId, username, email, role: 'user' }),
   });
 
-  const { accessToken, refreshToken } = generateTokens(userId, email);
+  const { accessToken, refreshToken } = generateTokens(userId, email, 'user');
 
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7);
@@ -86,7 +102,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     data: { lastLogin: new Date() },
   });
 
-  const { accessToken, refreshToken } = generateTokens(user.userId, user.email);
+  const role = await fetchUserRole(user.userId);
+  const { accessToken, refreshToken } = generateTokens(user.userId, user.email, role);
 
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7);
@@ -120,10 +137,11 @@ export const refresh = async (req: Request, res: Response): Promise<void> => {
 
     const user = await prisma.authUser.findUnique({
       where: { userId: decoded.user_id },
-      select: { email: true },
+      select: { email: true},
     });
 
-    const { accessToken } = generateTokens(decoded.user_id, user!.email);
+    const role = await fetchUserRole(decoded.user_id);
+    const { accessToken } = generateTokens(decoded.user_id, user!.email, role);
 
     res.status(200).json({ accessToken });
   } catch {
