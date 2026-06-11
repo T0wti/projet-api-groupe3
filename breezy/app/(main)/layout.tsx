@@ -1,6 +1,7 @@
 import Sidebar from '@/components/layout/Sidebar';
 import MobileBottomNav from '@/components/layout/MobileBottomNav';
 import RightSidebar from '@/components/layout/RightSidebar'; // Import the new right sidebar
+import I18nProvider from './I18nProvider';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
