@@ -122,6 +122,32 @@ services:
       - ./services/auth-service:/app
       - /app/node_modules
 
+ # ==========================================
+  # API GATEWAY
+  # ==========================================
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    container_name: breezy-api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - JWT_SECRET=change_this_secret_in_production
+      - CORS_ORIGIN=http://localhost:3000
+      - AUTH_SERVICE_URL=http://auth-service:5000
+      - USER_SERVICE_URL=http://user-service:3001
+      - POST_SERVICE_URL=http://post-service:3003
+      - PROFIL_SERVICE_URL=http://profil-service:3004
+    depends_on:
+      - auth-service
+      - user-service
+      - post-service
+      - profil-service
+    volumes:
+      - ./services/api-gateway:/usr/src/app
+      - /usr/src/app/node_modules
 
 volumes:
   user_db_data:
