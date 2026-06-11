@@ -10,9 +10,6 @@
     },
     "post_button": "Publier"
   },
-  "mobile_nav": {
-    "home": "Accueil"
-  },
   "right_sidebar": {
     "search_placeholder": "Rechercher",
     "who_to_follow": {
@@ -22,5 +19,9 @@
     "trending": {
       "title": "Tendances"
     }
+  },
+  "compose_post": {
+    "placeholder": "Quoi de neuf ?",
+    "submit_button": "Publier"
   }
 }
