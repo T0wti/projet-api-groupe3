@@ -1,0 +1,53 @@
+import Link from 'next/link';
+import Avatar from '@/components/ui/Avatar';
+import Button from '@/components/ui/Button';
+
+export default function Sidebar() {
+  const navItems = [
+    { name: 'Home', icon: '🏠', href: '/' },
+    { name: 'Explore', icon: '🔍', href: '#' },
+    { name: 'Notifications', icon: '🔔', href: '#' },
+    { name: 'Messages', icon: '✉️', href: '#' },
+    { name: 'Profile', icon: '👤', href: '#' },
+    { name: 'More', icon: '⋯', href: '#' },
+  ];
+
+  return (
+    <aside className="hidden md:flex flex-col w-20 lg:w-62.5 h-screen sticky top-0 px-2 lg:px-6 py-4 border-r border-gray-200">
+      {/* Brand Logo */}
+      <Link href="/" className="flex items-center gap-2 mb-8 p-3 hover:bg-gray-100 rounded-full w-max">
+        <span className="font-black text-2xl text-teal-700 tracking-tighter hidden lg:block">Breezy</span>
+        <span className="font-black text-2xl text-teal-700 block lg:hidden">C</span>
+      </Link>
+
+      {/* Navigation Links */}
+      <nav className="flex flex-col gap-2">
+        {navItems.map((item) => (
+          <Link 
+            key={item.name} 
+            href={item.href}
+            className="flex items-center gap-4 text-xl p-3 hover:bg-gray-100 rounded-full transition-colors w-max lg:w-full"
+          >
+            <span>{item.icon}</span>
+            <span className="hidden lg:block font-semibold">{item.name}</span>
+          </Link>
+        ))}
+      </nav>
+
+      {/* Primary Action Button */}
+      <Button className="mt-6" variant="primary" size="lg">
+        <span className="hidden lg:block">Post</span>
+        <span className="block lg:hidden">+</span>
+      </Button>
+
+      {/* User Mini Profile at bottom (Placeholder) */}
+      <div className="mt-auto flex items-center gap-3 p-3 hover:bg-gray-100 rounded-full cursor-pointer w-max lg:w-full transition-colors">
+        <Avatar src="https://i.pravatar.cc/150?u=current" alt="Avatar" size="md" />
+        <div className="hidden lg:block">
+          <p className="font-bold text-sm">VibrantLife</p>
+          <p className="text-gray-500 text-sm">@vibrantlife</p>
+        </div>
+      </div>
+    </aside>
+  );
+}
