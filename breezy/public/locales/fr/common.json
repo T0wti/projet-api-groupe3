@@ -1,0 +1,16 @@
+{
+  "sidebar": {
+    "nav": {
+      "home": "Accueil",
+      "explore": "Explorer",
+      "notifications": "Notifications",
+      "messages": "Messages",
+      "profile": "Profil",
+      "more": "Plus"
+    },
+    "post_button": "Publier"
+  },
+  "mobile_nav": {
+    "home": "Accueil"
+  }
+}
