@@ -30,6 +30,7 @@ export const routeTable: RouteRule[] = [
 
   // Posts
   { method: 'post', path: '/api/posts', target: 'post', auth: 'required' },
+  { method: 'get', path: '/api/posts/tags/:tag', target: 'post', auth: 'required' },
   { method: 'get', path: '/api/posts', target: 'post', auth: 'required' },
   { method: 'get', path: '/api/posts/:id', target: 'post', auth: 'required' },
   { method: 'get', path: '/api/posts/:id/replies', target: 'post', auth: 'required' },
@@ -42,6 +43,7 @@ export const routeTable: RouteRule[] = [
   { method: 'post', path: '/api/profile/likes', target: 'profil', auth: 'required' },
   { method: 'delete', path: '/api/profile/likes', target: 'profil', auth: 'required' },
 
+  { method: 'get', path: '/api/profile/post/:postId/likers', target: 'profil', auth: 'required' },
   { method: 'get', path: '/api/profile/:userId/followers', target: 'profil', auth: 'required' },
   { method: 'get', path: '/api/profile/:userId/following', target: 'profil', auth: 'required' },
   { method: 'get', path: '/api/profile/:userId/likes', target: 'profil', auth: 'required' },
