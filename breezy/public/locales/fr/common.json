@@ -1,4 +1,8 @@
 {
+  "home_page": {
+    "title": "Accueil",
+    "empty_message": "Aucun post à afficher. Essayez de suivre des comptes pour voir du contenu ici."
+  },
   "sidebar": {
     "nav": {
       "home": "Accueil",

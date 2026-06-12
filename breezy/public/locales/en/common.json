@@ -1,4 +1,8 @@
 {
+  "home_page": {
+    "title": "Home",
+    "empty_message": "No posts to display. Try following some accounts to see content here."
+  },
   "sidebar": {
     "nav": {
       "home": "Home",
