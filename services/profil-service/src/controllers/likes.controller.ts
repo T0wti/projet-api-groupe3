@@ -12,18 +12,14 @@ export const likePost = async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
-  let userLikes = await UserLikes.findOne({ user_id });
-
-  if (userLikes) {
-    if (userLikes.post_id.includes(post_id)) {
+  try {
+    await UserLikes.create({ user_id, post_id });
+  } catch (err: any) {
+    if (err.code === 11000) {
       res.status(409).json({ message: 'Post already liked' });
       return;
     }
-    userLikes.post_id.push(post_id);
-    await userLikes.save();
-  } else {
-    userLikes = new UserLikes({ user_id, post_id: [post_id] });
-    await userLikes.save();
+    throw err;
   }
 
   res.status(200).json({ message: 'Post liked successfully' });
@@ -40,15 +36,12 @@ export const unlikePost = async (req: Request, res: Response): Promise<void> => 
     return;
   }
 
-  const userLikes = await UserLikes.findOne({ user_id });
+  const deleted = await UserLikes.findOneAndDelete({ user_id, post_id });
 
-  if (!userLikes || !userLikes.post_id.includes(post_id)) {
+  if (!deleted) {
     res.status(404).json({ message: 'Like not found' });
     return;
   }
-
-  userLikes.post_id = userLikes.post_id.filter((id) => id !== post_id);
-  await userLikes.save();
 
   res.status(200).json({ message: 'Post unliked successfully' });
 };
@@ -59,10 +52,24 @@ export const unlikePost = async (req: Request, res: Response): Promise<void> => 
 export const getUserLikes = async (req: Request, res: Response): Promise<void> => {
   const { userId } = req.params;
 
-  const userLikes = await UserLikes.findOne({ user_id: userId });
+  const docs = await UserLikes.find({ user_id: userId }).select('post_id');
 
   res.status(200).json({
     user_id: userId,
-    liked_posts: userLikes ? userLikes.post_id : [],
+    liked_posts: docs.map((d) => d.post_id),
+  });
+};
+
+  /**
+   * Get all users who liked a post
+   */
+export const getPostLikers = async (req: Request, res: Response): Promise<void> => {
+  const { postId } = req.params;
+
+  const docs = await UserLikes.find({ post_id: postId }).select('user_id');
+
+  res.status(200).json({
+    post_id: postId,
+    likers: docs.map((d) => d.user_id),
   });
 };

@@ -18,18 +18,14 @@ export const followUser = async (req: Request, res: Response): Promise<void> => 
     return;
   }
 
-  let follows = await Follows.findOne({ follower_id });
-
-  if (follows) {
-    if (follows.following_id.includes(following_id)) {
+  try {
+    await Follows.create({ follower_id, following_id });
+  } catch (err: any) {
+    if (err.code === 11000) {
       res.status(409).json({ message: 'Already following this user' });
       return;
     }
-    follows.following_id.push(following_id);
-    await follows.save();
-  } else {
-    follows = new Follows({ follower_id, following_id: [following_id] });
-    await follows.save();
+    throw err;
   }
 
   await UserCounters.findOneAndUpdate(
@@ -58,15 +54,12 @@ export const unfollowUser = async (req: Request, res: Response): Promise<void> =
     return;
   }
 
-  const follows = await Follows.findOne({ follower_id });
+  const deleted = await Follows.findOneAndDelete({ follower_id, following_id });
 
-  if (!follows || !follows.following_id.includes(following_id)) {
+  if (!deleted) {
     res.status(404).json({ message: 'Follow relationship not found' });
     return;
   }
-
-  follows.following_id = follows.following_id.filter((id) => id !== following_id);
-  await follows.save();
 
   await UserCounters.findOneAndUpdate(
     { user_id: follower_id },
@@ -98,8 +91,8 @@ export const getFollowers = async (req: Request, res: Response): Promise<void> =
 export const getFollowing = async (req: Request, res: Response): Promise<void> => {
   const { userId } = req.params;
 
-  const followDoc = await Follows.findOne({ follower_id: userId });
-  const following = followDoc ? followDoc.following_id : [];
+  const docs = await Follows.find({ follower_id: userId }).select('following_id');
+  const following = docs.map((d) => d.following_id);
 
   res.status(200).json({ user_id: userId, following });
 };

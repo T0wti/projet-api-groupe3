@@ -22,7 +22,6 @@ export interface IPost extends Document {
   authorUsername: string;
   content: string;
   media: Media;
-  tags: string[];
   likesCount: number;
   commentsCount: number;
   parentPost: mongoose.Types.ObjectId | null;
@@ -46,7 +45,6 @@ const PostSchema = new Schema<IPost>(
       },
       url: { type: String, default: null }
     },
-    tags: [{ type: String }],
     likesCount: { type: Number, default: 0 },
     commentsCount: { type: Number, default: 0 },
     parentPost: { type: Schema.Types.ObjectId, ref: 'Post', default: null }
