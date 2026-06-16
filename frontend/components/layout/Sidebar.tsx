@@ -4,9 +4,12 @@ import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import Avatar from '@/components/ui/Avatar';
 import Button from '@/components/ui/Button';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Sidebar() {
   const { t } = useTranslation('common');
+  const { user, logout } = useAuth();
+
   const navItems = [
     { key: 'home', icon: '🏠', href: '/' },
     { key: 'explore', icon: '🔍', href: '#' },
@@ -27,8 +30,8 @@ export default function Sidebar() {
       {/* Navigation Links */}
       <nav className="flex flex-col gap-2">
         {navItems.map((item) => (
-          <Link 
-            key={item.key} 
+          <Link
+            key={item.key}
             href={item.href}
             className="flex items-center gap-4 text-xl p-3 hover:bg-gray-100 rounded-full transition-colors w-max lg:w-full">
             <span>{item.icon}</span>
@@ -43,13 +46,23 @@ export default function Sidebar() {
         <span className="block lg:hidden">+</span>
       </Button>
 
-      {/* User Mini Profile at bottom (Placeholder) */}
-      <div className="mt-auto flex items-center gap-3 p-3 hover:bg-gray-100 rounded-full cursor-pointer w-max lg:w-full transition-colors">
-        <Avatar src="https://i.pravatar.cc/150?u=current" alt="Avatar" size="md" />
-        <div className="hidden lg:block">
-          <p className="font-bold text-sm">VibrantLife</p>
-          <p className="text-gray-500 text-sm">@vibrantlife</p>
+      {/* User section at bottom */}
+      <div className="mt-auto flex flex-col gap-1">
+        <div className="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-full cursor-pointer w-max lg:w-full transition-colors">
+          <Avatar src="https://i.pravatar.cc/150?u=current" alt="Avatar" size="md" />
+          <div className="hidden lg:block overflow-hidden">
+            <p className="font-bold text-sm truncate">{user?.username ?? '...'}</p>
+            <p className="text-gray-500 text-sm truncate">@{user?.username?.toLowerCase() ?? ''}</p>
+          </div>
         </div>
+
+        <button
+          onClick={logout}
+          className="flex items-center gap-4 p-3 rounded-full transition-colors text-gray-500 hover:bg-red-50 hover:text-red-500 w-max lg:w-full"
+        >
+          <span className="text-xl">🚪</span>
+          <span className="hidden lg:block font-semibold text-sm">{t('sidebar.logout_button')}</span>
+        </button>
       </div>
     </aside>
   );

@@ -1,26 +1,41 @@
-"use client";
+'use client';
 
 import React, { useEffect, useState } from 'react';
-import i18n from './i18n'; 
-import { I18nextProvider } from 'react-i18next';
+import i18n from 'i18next';
+import { I18nextProvider, initReactI18next } from 'react-i18next';
+import Backend from 'i18next-http-backend';
+import LanguageDetector from 'i18next-browser-languagedetector';
 
 export default function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [mounted, setMounted] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Ce useEffect s'exécute uniquement une fois sur le navigateur client
   useEffect(() => {
-    setMounted(true);
+    if (i18n.isInitialized) {
+      setIsInitialized(true);
+      return;
+    }
+
+    i18n
+      .use(Backend)
+      .use(LanguageDetector)
+      .use(initReactI18next)
+      .init({
+        fallbackLng: 'fr',
+        load: 'languageOnly',
+        debug: process.env.NODE_ENV === 'development',
+        ns: ['common', 'auth'],
+        defaultNS: 'common',
+        backend: {
+          loadPath: '/locales/{{lng}}/{{ns}}.json',
+        },
+        interpolation: {
+          escapeValue: false,
+        },
+      })
+      .then(() => setIsInitialized(true));
   }, []);
 
-  // Tant que nous sommes sur le serveur, on renvoie "null" 
-  // (Rien n'est généré sur le serveur, donc aucune clé brute ne peut entrer en conflit)
-  if (!mounted) {
-    return null; 
-  }
+  if (!isInitialized) return null;
 
-  return (
-    <I18nextProvider i18n={i18n}>
-      {children}
-    </I18nextProvider>
-  );
+  return <I18nextProvider i18n={i18n}>{children}</I18nextProvider>;
 }

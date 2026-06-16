@@ -1,16 +1,32 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api',
+  // All calls go through Next.js — proxy.ts injects the Authorization header
+  baseURL: '/api',
 });
 
-// Interceptor to automatically attach JWT token to requests
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token && config.headers) {
-    config.headers.Authorization = `Bearer ${token}`;
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const original = error.config;
+
+    if (error.response?.status === 401 && !original._retry) {
+      original._retry = true;
+
+      // Ask the Next.js refresh Route Handler to rotate the access token cookie
+      const refreshRes = await fetch('/api/auth/refresh', { method: 'POST' });
+
+      if (refreshRes.ok) {
+        // Cookie updated server-side — proxy.ts will inject the new token on retry
+        return api(original);
+      }
+
+      // Refresh failed — redirect to login
+      window.location.href = '/auth';
+    }
+
+    return Promise.reject(error);
   }
-  return config;
-});
+);
 
 export default api;
