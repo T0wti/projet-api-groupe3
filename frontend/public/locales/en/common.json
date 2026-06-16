@@ -1,4 +1,4 @@
-{
+﻿{
   "home_page": {
     "title": "Home",
     "empty_message": "No posts to display. Try following some accounts to see content here."
@@ -12,7 +12,8 @@
       "profile": "Profile",
       "more": "More"
     },
-    "post_button": "Post"
+    "post_button": "Post",
+    "logout_button": "Log out"
   },
   "right_sidebar": {
     "search_placeholder": "Search",

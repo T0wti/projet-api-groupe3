@@ -1,4 +1,4 @@
-{
+﻿{
   "home_page": {
     "title": "E rēfara",
     "empty_message": "Kahore he tātā’ura’a e hō’ata. Tāmata i te pe’e i te tahi mau 'āfata rorouira nō te 'ite i te mau parau i ’onei."
@@ -12,7 +12,8 @@
       "profile": "Pāpa’ira’a parau",
       "more": "Hā’uti ā"
     },
-    "post_button": "Piha’iho"
+    "post_button": "Piha’iho",
+    "logout_button": "Haere atu"
   },
   "right_sidebar": {
     "search_placeholder": "Paha’imi...",

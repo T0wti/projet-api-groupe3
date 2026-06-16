@@ -1,4 +1,4 @@
-{
+﻿{
   "home_page": {
     "title": "בית",
     "empty_message": "אין פוסטים להצגה. נסה לעקוב אחר חשבונות כדי לראות תוכן כאן."
@@ -12,7 +12,8 @@
       "profile": "פרופיל",
       "more": "עוד"
     },
-    "post_button": "פרסם"
+    "post_button": "פרסם",
+    "logout_button": "התנתקות"
   },
   "right_sidebar": {
     "search_placeholder": "חיפוש",
