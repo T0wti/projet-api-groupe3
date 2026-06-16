@@ -61,17 +61,17 @@ services:
       - post-db
 
   # ==========================================
-  # PROFIL SERVICE (MongoDB)
+  # PROFILE SERVICE (MongoDB)
   # ==========================================
-  profil-db:
+  profile-db:
     image: mongo:6.0
-    container_name: breezy-profil-db
+    container_name: breezy-profile-db
     ports:
       - "27018:27017"
     volumes:
       - profile_db_data:/data/db
 
-  profil-service:
+  profile-service:
     build: ./backend/services/profile-service
     container_name: breezy-profile-service
     ports:
@@ -80,7 +80,7 @@ services:
       - MONGO_URI=mongodb://profile-db:27017/profile-service
       - PORT=3004
     depends_on:
-      - profil-db
+      - profile-db
     volumes:
       - ./backend/services/profile-service:/app
       - /app/node_modules
@@ -136,15 +136,15 @@ services:
       - PORT=8080
       - JWT_SECRET=change_this_secret_in_production
       - CORS_ORIGIN=http://localhost:3000
-      - AUTH_SERVICE_URL=http://auth-service:5000
+      - AUTH_SERVICE_URL=http://auth-service:5001
       - USER_SERVICE_URL=http://user-service:3001
       - POST_SERVICE_URL=http://post-service:3003
-      - PROFIL_SERVICE_URL=http://profil-service:3004
+      - PROFILE_SERVICE_URL=http://profile-service:3004
     depends_on:
       - auth-service
       - user-service
       - post-service
-      - profil-service
+      - profile-service
     volumes:
       - ./backend/services/api-gateway:/usr/src/app
       - /usr/src/app/node_modules

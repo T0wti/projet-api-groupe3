@@ -1,0 +1,12 @@
+{
+  "name": "projet-api-groupe3",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend/services/api-gateway",
+    "backend/services/auth-service",
+    "backend/services/post-service",
+    "backend/services/profile-service",
+    "backend/services/user-service"
+  ]
+}
