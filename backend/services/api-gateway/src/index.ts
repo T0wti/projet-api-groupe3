@@ -1,5 +1,6 @@
 import express, { RequestHandler } from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import { PORT, CORS_ORIGIN, SERVICE_TARGETS } from './config/env';
 import { authenticate, requireAuth } from './middlewares/authenticate';
@@ -9,7 +10,8 @@ import { routeTable } from './routes/routeTable';
 
 const app = express();
 
-app.use(cors({ origin: CORS_ORIGIN }));
+app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
+app.use(cookieParser());
 app.use(morgan('dev'));
 
 for (const rule of routeTable) {
