@@ -5,6 +5,7 @@ import {
   getPostWithReplies,
   getRepliesForPost,
   getPostsByTag,
+  searchPosts,
   updatePost,
   deletePost
 } from '../controllers/posts.controller';
@@ -13,6 +14,7 @@ const router = Router();
 
 router.post('/', createPost);
 router.get('/', getAllMainPosts);
+router.get('/search', searchPosts);
 router.get('/tags/:tag', getPostsByTag); 
 router.get('/:id', getPostWithReplies);
 router.get('/:id/replies', getRepliesForPost);

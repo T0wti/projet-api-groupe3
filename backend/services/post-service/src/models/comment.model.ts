@@ -44,7 +44,9 @@ const commentSchema = new Schema<IComment>(
   }
 );
 
-commentSchema.index({ post_id: 1, createdAt: -1 }); // commentaires d'un post
-commentSchema.index({ parent_comment_id: 1 }); // réponses à un commentaire
+commentSchema.index({ content: 'text' });
+
+commentSchema.index({ post_id: 1, createdAt: -1 }); // Comment of a post
+commentSchema.index({ parent_comment_id: 1 }); // response to a comment
 
 export const Comment = model<IComment>('Comment', commentSchema);

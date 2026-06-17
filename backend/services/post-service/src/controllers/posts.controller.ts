@@ -191,3 +191,29 @@ const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     return res.status(500).json({ error: (error as Error).message });
   }
 };
+
+/**
+ * Search posts by content or tag
+ */
+export const searchPosts = async (req: Request, res: Response) => {
+  const q = (req.query.q as string | undefined)?.trim();
+  if (!q) return res.status(400).json({ message: 'Query parameter "q" is required.' });
+
+  try {
+    const [byText, tagDocs] = await Promise.all([
+      Post.find(
+        { $text: { $search: q } },
+        { score: { $meta: 'textScore' } }
+      ).sort({ score: { $meta: 'textScore' } }),
+      Tag.find({ tag: q.toLowerCase() }).select('post_id'),
+    ]);
+
+    const textIds = new Set(byText.map((p) => p._id.toString()));
+    const tagPostIds = tagDocs.map((t) => t.post_id).filter((id) => !textIds.has(id.toString()));
+    const byTag = tagPostIds.length > 0 ? await Post.find({ _id: { $in: tagPostIds } }) : [];
+
+    return res.status(200).json(await attachPostTags([...byText, ...byTag]));
+  } catch (error) {
+    return res.status(500).json({ error: (error as Error).message });
+  }
+};
