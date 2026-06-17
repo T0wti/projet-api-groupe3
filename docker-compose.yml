@@ -24,8 +24,6 @@ services:
       context: ./backend/services/user-service
       dockerfile: Dockerfile
     container_name: breezy-user-service
-    ports:
-      - "3001:3001"
     environment:
       - PORT=3001
       - DATABASE_URL=postgresql://postgres:password@user-db:5432/breezy_user_db
@@ -55,8 +53,6 @@ services:
       context: ./backend/services/post-service
       dockerfile: Dockerfile
     container_name: breezy-post-service
-    ports:
-      - "3003:3003"
     environment:
       - PORT=3003
       - MONGO_URI=mongodb://root:password@post-db:27017/breezy_post_db?authSource=admin
@@ -80,8 +76,6 @@ services:
   profile-service:
     build: ./backend/services/profile-service
     container_name: breezy-profile-service
-    ports:
-      - "3004:3004"
     environment:
       - MONGO_URI=mongodb://profile-db:27017/profile-service
       - PORT=3004
@@ -115,8 +109,6 @@ services:
       context: ./backend/services/auth-service
       dockerfile: Dockerfile
     container_name: breezy-auth-service
-    ports:
-      - "5001:5001"
     environment:
       - PORT=5001
       - DATABASE_URL=postgresql://postgres:password@auth-db:5432/breezy_auth_db
