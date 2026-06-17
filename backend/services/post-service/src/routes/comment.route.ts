@@ -4,6 +4,7 @@ import {
   getCommentsForPost,
   getRepliesForComment,
   getCommentsByTag,
+  searchComments,
   updateComment,
   deleteComment,
 } from '../controllers/comment.controller';
@@ -11,6 +12,7 @@ import {
 const router = Router();
 
 router.post('/', createComment);
+router.get('/search', searchComments);
 router.get('/tags/:tag', getCommentsByTag);
 router.get('/post/:postId', getCommentsForPost);
 router.get('/:id/replies', getRepliesForComment);

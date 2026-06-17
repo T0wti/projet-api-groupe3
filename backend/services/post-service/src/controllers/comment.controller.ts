@@ -146,3 +146,30 @@ export const deleteComment = async (req: Request, res: Response) => {
     return res.status(500).json({ error: (error as Error).message });
   }
 };
+
+/**
+ * Search comments by content or tag
+ */
+export const searchComments = async (req: Request, res: Response) => {
+  const q = (req.query.q as string | undefined)?.trim();
+  if (!q) return res.status(400).json({ message: 'Query parameter "q" is required.' });
+
+  try {
+    const [byText, tagDocs] = await Promise.all([
+      Comment.find(
+        { $text: { $search: q } },
+        { score: { $meta: 'textScore' } }
+      ).sort({ score: { $meta: 'textScore' } }),
+      CommentTag.find({ tag: q.toLowerCase() }).select('comment_id'),
+    ]);
+
+    const textIds = new Set(byText.map((c) => c._id.toString()));
+    const tagCommentIds = tagDocs.map((t) => t.comment_id).filter((id) => !textIds.has(id.toString()));
+    const byTag = tagCommentIds.length > 0 ? await Comment.find({ _id: { $in: tagCommentIds } }) : [];
+
+    return res.status(200).json(await attachCommentTags([...byText, ...byTag]));
+  } catch (error) {
+    return res.status(500).json({ error: (error as Error).message });
+  }
+};
+
