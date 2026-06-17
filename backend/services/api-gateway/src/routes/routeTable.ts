@@ -74,4 +74,9 @@ export const routeTable: RouteRule[] = [
   { method: 'get', path: '/api/profile/:userId', target: 'profile', auth: 'required', selfParam: 'userId', bypassRoles: ['admin'] },
   { method: 'put', path: '/api/profile/:userId', target: 'profile', auth: 'required', selfParam: 'userId', bypassRoles: ['admin'] },
   { method: 'delete', path: '/api/profile/:userId', target: 'profile', auth: 'required', selfParam: 'userId', bypassRoles: ['admin'] },
+  
+  // Media
+  { method: 'post', path: '/api/media', target: 'media', auth: 'required' },
+  { method: 'delete', path: '/api/media/:objectName', target: 'media', auth: 'required' },
+
 ];
