@@ -2,51 +2,49 @@
 
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
+import { Home, Search, Bell, Mail, User, MoreHorizontal, LogOut, Wind, Plus } from 'lucide-react';
 import Avatar from '@/components/ui/Avatar';
 import Button from '@/components/ui/Button';
 import { useAuth } from '@/context/AuthContext';
+
+const NAV_ITEMS = [
+  { key: 'home',          icon: Home,          href: '/' },
+  { key: 'explore',       icon: Search,        href: '#' },
+  { key: 'notifications', icon: Bell,          href: '#' },
+  { key: 'messages',      icon: Mail,          href: '#' },
+  { key: 'profile',       icon: User,          href: '#' },
+  { key: 'more',          icon: MoreHorizontal,href: '#' },
+];
 
 export default function Sidebar() {
   const { t } = useTranslation('common');
   const { user, logout } = useAuth();
 
-  const navItems = [
-    { key: 'home', icon: '🏠', href: '/' },
-    { key: 'explore', icon: '🔍', href: '#' },
-    { key: 'notifications', icon: '🔔', href: '#' },
-    { key: 'messages', icon: '✉️', href: '#' },
-    { key: 'profile', icon: '👤', href: '#' },
-    { key: 'more', icon: '⋯', href: '#' },
-  ];
-
   return (
-    <aside className="hidden md:flex flex-col w-20 lg:w-62.5 h-screen sticky top-0 px-2 lg:px-6 py-4 border-r border-gray-200">
-      {/* Brand Logo */}
+    <aside className="hidden md:flex flex-col shrink-0 w-20 lg:w-64 xl:w-72 h-screen sticky top-0 px-2 lg:px-6 py-4 border-r border-gray-200 bg-white">
+      {/* Brand */}
       <Link href="/" className="flex items-center gap-2 mb-8 p-3 hover:bg-gray-100 rounded-full w-max">
-        <span className="font-black text-2xl text-teal-700 tracking-tighter hidden lg:block">Breezy</span>
-        <span className="font-black text-2xl text-teal-700 block lg:hidden">C</span>
+        <Wind size={28} className="text-brand shrink-0" />
+        <span className="font-black text-2xl text-brand tracking-tighter hidden lg:block">Breezy</span>
       </Link>
 
-      {/* Navigation Links */}
-      <nav className="flex flex-col gap-2">
-        {navItems.map((item) => (
-          <Link
-            key={item.key}
-            href={item.href}
-            className="flex items-center gap-4 text-xl p-3 hover:bg-gray-100 rounded-full transition-colors w-max lg:w-full">
-            <span>{item.icon}</span>
-            <span className="hidden lg:block font-semibold">{t(`sidebar.nav.${item.key}`)}</span>
+      {/* Navigation */}
+      <nav className="flex flex-col gap-1">
+        {NAV_ITEMS.map(({ key, icon: Icon, href }) => (
+          <Link key={key} href={href} className="nav-link">
+            <Icon size={22} className="shrink-0" />
+            <span className="hidden lg:block font-semibold">{t(`sidebar.nav.${key}`)}</span>
           </Link>
         ))}
       </nav>
 
-      {/* Primary Action Button */}
+      {/* Post button */}
       <Button className="mt-6" variant="primary" size="lg">
+        <Plus size={20} className="block lg:hidden" />
         <span className="hidden lg:block">{t('sidebar.post_button')}</span>
-        <span className="block lg:hidden">+</span>
       </Button>
 
-      {/* User section at bottom */}
+      {/* User + logout */}
       <div className="mt-auto flex flex-col gap-1">
         <div className="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-full cursor-pointer w-max lg:w-full transition-colors">
           <Avatar src={`https://i.pravatar.cc/150?u=${user?.id ?? 'anon'}`} alt="Avatar" size="md" />
@@ -58,9 +56,9 @@ export default function Sidebar() {
 
         <button
           onClick={logout}
-          className="flex items-center gap-4 p-3 rounded-full transition-colors text-gray-500 hover:bg-red-50 hover:text-red-500 w-max lg:w-full"
+          className="nav-link text-gray-500 hover:bg-red-50 hover:text-red-500"
         >
-          <span className="text-xl">🚪</span>
+          <LogOut size={22} className="shrink-0" />
           <span className="hidden lg:block font-semibold text-sm">{t('sidebar.logout_button')}</span>
         </button>
       </div>
