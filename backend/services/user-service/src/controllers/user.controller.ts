@@ -43,7 +43,7 @@ export const getUserInfos = async (req: Request<{ id: string }>, res: Response) 
 
 export const updateUserInfos = async (req: Request<{ id: string }>, res: Response) => {
   const { id } = req.params;
-  const { language_preference, theme_preference, username } = req.body;
+  const { language_preference, theme_preference, username, avatar_url, email } = req.body;
 
   try {
     const user = await prisma.user.update({
@@ -52,6 +52,8 @@ export const updateUserInfos = async (req: Request<{ id: string }>, res: Respons
         languagePreference: language_preference ?? undefined,
         themePreference: theme_preference ?? undefined,
         username: username ?? undefined,
+        avatarUrl: avatar_url ?? undefined,
+        email: email ?? undefined,
       },
     });
 
