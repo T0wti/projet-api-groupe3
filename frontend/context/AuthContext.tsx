@@ -43,6 +43,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const profileRes = await fetch(`/api/users/${payload.user_id}`);
       if (profileRes.ok) {
         setUser(await profileRes.json());
+      } else {
+        // Profile missing in user-service — use JWT payload as fallback
+        setUser({ id: payload.user_id, email: payload.email, username: payload.email.split('@')[0], role: payload.role });
       }
     } catch {
       // Network error — leave user as null
