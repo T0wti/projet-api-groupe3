@@ -39,9 +39,9 @@ jobs:
       POST_MONGO_URI: ${{ secrets.POST_MONGO_URI }}
       POST_DB_PASSWORD: ${{ secrets.POST_DB_PASSWORD }}
 
-      # --- profil-service ---
-      PROFIL_PORT: ${{ vars.PROFIL_PORT }}
-      PROFIL_MONGO_URI: ${{ secrets.PROFIL_MONGO_URI }}
+      # --- profile-service ---
+      PROFILE_PORT: ${{ vars.PROFILE_PORT }}
+      PROFILE_MONGO_URI: ${{ secrets.PROFILE_MONGO_URI }}
 
       # --- auth-service ---
       AUTH_PORT: ${{ vars.AUTH_PORT }}
