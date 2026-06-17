@@ -15,8 +15,15 @@ export interface BackendUser {
   email: string;
   role: string;
   isBanned: boolean;
+  avatarUrl?: string | null;
   languagePreference: string;
   themePreference: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface BackendPublicUser {
+  id: string;
+  username: string;
+  avatarUrl?: string | null;
 }

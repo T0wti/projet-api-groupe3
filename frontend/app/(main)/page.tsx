@@ -14,7 +14,7 @@ import {
   unlikePost,
   createComment,
 } from '@/lib/api/posts';
-import { fetchUserById } from '@/lib/api/users';
+import { fetchPublicUserById } from '@/lib/api/users';
 
 export default function HomeFeed() {
   const { user, isLoading: authLoading } = useAuth();
@@ -46,7 +46,7 @@ export default function HomeFeed() {
         const otherAuthorIds = [...new Set(
           backendPosts.map((p) => p.authorId).filter((id) => id !== user!.id)
         )];
-        const profiles = await Promise.allSettled(otherAuthorIds.map(fetchUserById));
+        const profiles = await Promise.allSettled(otherAuthorIds.map(fetchPublicUserById));
         const authorMap = new Map<string, string>();
         profiles.forEach((result, i) => {
           if (result.status === 'fulfilled') {
