@@ -13,6 +13,11 @@ services:
       - "5432:5432"
     volumes:
       - user_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   user-service:
     build:
@@ -28,7 +33,8 @@ services:
       - ./backend/services/user-service:/usr/src/app
       - /usr/src/app/node_modules
     depends_on:
-      - user-db
+      user-db:
+        condition: service_healthy
 
   # ==========================================
   # POST SERVICE (MongoDB)
@@ -99,7 +105,11 @@ services:
       - "5433:5432"
     volumes:
       - auth_db_data:/var/lib/postgresql/data
-
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   auth-service:
     build:
       context: ./backend/services/auth-service
@@ -116,11 +126,54 @@ services:
       - JWT_REFRESH_EXPIRES_IN=7d
       - USER_SERVICE_URL=http://user-service:3001
     depends_on:
-      - auth-db
-      - user-service
+      auth-db:
+        condition: service_healthy
+      user-service:
+        condition: service_started
+
     volumes:
       - ./backend/services/auth-service:/app
       - /app/node_modules
+
+  # ==========================================
+  # MINIO (stockage objet pour les médias)
+  # ==========================================
+  minio:
+    image: minio/minio
+    container_name: breezy-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+
+  # ==========================================
+  # MEDIA SERVICE
+  # ==========================================
+  media-service:
+    build:
+      context: ./backend/services/media-service
+      dockerfile: Dockerfile
+    container_name: breezy-media-service
+    ports:
+      - "3005:3005"
+    environment:
+      - PORT=3005
+      - MINIO_ENDPOINT=minio
+      - MINIO_PORT=9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin123
+      - MINIO_BUCKET=breezy-media
+      - MINIO_PUBLIC_URL=http://localhost:9000
+    depends_on:
+      - minio
+    volumes:
+      - ./backend/services/media-service:/usr/src/app
+      - /usr/src/app/node_modules
 
  # ==========================================
   # API GATEWAY
@@ -140,11 +193,13 @@ services:
       - USER_SERVICE_URL=http://user-service:3001
       - POST_SERVICE_URL=http://post-service:3003
       - PROFILE_SERVICE_URL=http://profile-service:3004
+      - MEDIA_SERVICE_URL=http://media-service:3005
     depends_on:
       - auth-service
       - user-service
       - post-service
       - profile-service
+      - media-service
     volumes:
       - ./backend/services/api-gateway:/usr/src/app
       - /usr/src/app/node_modules
@@ -154,3 +209,4 @@ volumes:
   post_db_data:
   profile_db_data:
   auth_db_data:
+  minio_data:
