@@ -51,9 +51,9 @@ jobs:
       AUTH_JWT_REFRESH_SECRET: ${{ secrets.AUTH_JWT_REFRESH_SECRET }}
 
       # --- api-gateway ---
-      GATEWAY_PORT: ${{ vars.API_GATEWAY_PORT }}
-      GATEWAY_JWT_SECRET: ${{ secrets.API_GATEWAY_JWT_SECRET }}
-      GATEWAY_CORS_ORIGIN: ${{ vars.API_GATEWAY_CORS_ORIGIN }}
+      API_GATEWAY_PORT: ${{ vars.API_GATEWAY_PORT }}
+      API_GATEWAY_JWT_SECRET: ${{ secrets.API_GATEWAY_JWT_SECRET }}
+      API_GATEWAY_CORS_ORIGIN: ${{ vars.API_GATEWAY_CORS_ORIGIN }}
 
     steps:
       - name: Checkout du code
