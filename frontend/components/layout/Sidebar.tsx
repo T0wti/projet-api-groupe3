@@ -49,7 +49,7 @@ export default function Sidebar() {
       {/* User section at bottom */}
       <div className="mt-auto flex flex-col gap-1">
         <div className="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-full cursor-pointer w-max lg:w-full transition-colors">
-          <Avatar src="https://i.pravatar.cc/150?u=current" alt="Avatar" size="md" />
+          <Avatar src={`https://i.pravatar.cc/150?u=${user?.id ?? 'anon'}`} alt="Avatar" size="md" />
           <div className="hidden lg:block overflow-hidden">
             <p className="font-bold text-sm truncate">{user?.username ?? '...'}</p>
             <p className="text-gray-500 text-sm truncate">@{user?.username?.toLowerCase() ?? ''}</p>

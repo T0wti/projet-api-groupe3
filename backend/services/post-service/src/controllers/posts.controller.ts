@@ -10,10 +10,11 @@ const isValidObjectId = (id: string) => mongoose.Types.ObjectId.isValid(id);
  * Create a new post or reply
  */
 export const createPost = async (req: Request, res: Response) => {
-  const { authorId, content, media, tags, parentPost } = req.body;
+  const authorId = req.headers['x-user-id'] as string;
+  const { content, media, tags, parentPost } = req.body;
 
   if (!authorId || !content) {
-    return res.status(400).json({ message: 'authorId and content are required.' });
+    return res.status(400).json({ message: 'Authenticated user and content are required.' });
   }
 
   try {
