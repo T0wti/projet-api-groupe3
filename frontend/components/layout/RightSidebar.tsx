@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 export default function RightSidebar() {
   const { t } = useTranslation('common');
   return (
-    <aside className="hidden lg:block shrink-0 w-80 xl:w-96 pl-8 py-4 sticky top-0 h-screen overflow-y-auto">
+    <aside className="hidden lg:block shrink-0 w-80 xl:w-96 pl-8 py-4 sticky top-0 h-screen overflow-y-auto px-8">
       {/* Search */}
       <div className="search-bar mb-6">
         <Search size={16} className="text-gray-400 shrink-0" />

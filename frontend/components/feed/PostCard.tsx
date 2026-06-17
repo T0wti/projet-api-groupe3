@@ -25,7 +25,7 @@ export default function PostCard({ post, onLike, onReply }: PostCardProps) {
   };
 
   return (
-    <article className="border-b border-gray-200 p-4 hover:bg-gray-50 transition-colors">
+    <article className="bg-white border border-gray-200 p-4 hover:bg-gray-50 transition-colors rounded-lg">
       <div className="flex gap-3">
         <div className="shrink-0">
           <Avatar src={post.author.avatarUrl} alt={post.author.username} size="md" />
