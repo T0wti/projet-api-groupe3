@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   createUserInfos,
+  getPublicUserSummary,
   getUserInfos,
   updateUserInfos,
   deleteUserInfos,
@@ -11,6 +12,7 @@ import {
 const router = Router();
 
 router.post('/', createUserInfos);
+router.get('/:id/public', getPublicUserSummary);
 router.get('/:id', getUserInfos);
 router.put('/:id', updateUserInfos);
 router.delete('/:id', deleteUserInfos);

@@ -1,5 +1,6 @@
 "use client"; // We are adding local UI state (isReplying), so this becomes a Client Component
 
+import Link from 'next/link';
 import Avatar from "@/components/ui/Avatar";
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -29,15 +30,17 @@ export default function PostCard({ post, onLike, onReply }: PostCardProps) {
       <div className="flex gap-3">
         {/* Avatar */}
         <div className="shrink-0">
-          <Avatar src={post.author.avatarUrl} alt={post.author.username} size="md" />
+          <Link href={`/profile/${post.author.id}`} aria-label={`Voir le profil de ${post.author.username}`}>
+            <Avatar src={post.author.avatarUrl} alt={post.author.username} size="md" />
+          </Link>
         </div>
 
         {/* Post Content */}
         <div className="flex-1">
-          <div className="flex items-center gap-1 text-sm">
+          <Link href={`/profile/${post.author.id}`} className="flex items-center gap-1 text-sm w-max">
             <span className="font-bold text-gray-900">{post.author.name}</span>
             <span className="text-gray-500">@{post.author.username}</span>
-          </div>
+          </Link>
 
           <p className="mt-1 text-gray-900 text-[15px] whitespace-pre-wrap">{post.content}</p>
 
