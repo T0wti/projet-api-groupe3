@@ -9,10 +9,11 @@ const isValidObjectId = (id: string) => mongoose.Types.ObjectId.isValid(id);
  * Like a post
  */
 export const likePost = async (req: Request, res: Response) => {
-  const { user_id, post_id } = req.body;
+  const user_id = req.headers['x-user-id'] as string;
+  const { post_id } = req.body;
 
   if (!user_id || !post_id) {
-    return res.status(400).json({ message: 'user_id and post_id are required.' });
+    return res.status(400).json({ message: 'Authenticated user and post_id are required.' });
   }
 
   if (!isValidObjectId(post_id)) {
@@ -36,10 +37,11 @@ export const likePost = async (req: Request, res: Response) => {
  * Unlike a post
  */
 export const unlikePost = async (req: Request, res: Response) => {
-  const { user_id, post_id } = req.body;
+  const user_id = req.headers['x-user-id'] as string;
+  const { post_id } = req.body;
 
   if (!user_id || !post_id) {
-    return res.status(400).json({ message: 'user_id and post_id are required.' });
+    return res.status(400).json({ message: 'Authenticated user and post_id are required.' });
   }
 
   try {

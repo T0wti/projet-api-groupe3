@@ -9,10 +9,11 @@ const isValidObjectId = (id: string) => mongoose.Types.ObjectId.isValid(id);
  * Create a comment on a post (or a reply to another comment)
  */
 export const createComment = async (req: Request, res: Response) => {
-  const { post_id, user_id, content, parent_comment_id } = req.body;
+  const user_id = req.headers['x-user-id'] as string;
+  const { post_id, content, parent_comment_id } = req.body;
 
   if (!post_id || !user_id || !content) {
-    return res.status(400).json({ message: 'post_id, user_id and content are required.' });
+    return res.status(400).json({ message: 'post_id, content, and authenticated user are required.' });
   }
 
   if (!isValidObjectId(post_id)) {
