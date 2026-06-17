@@ -65,7 +65,7 @@ jobs:
         # ⚠️ Inutile tant que le compose n'utilise pas ${VAR} — voir note ci-dessus.
         run: |
           missing=0
-          for var in AUTH_PORT AUTH_DATABASE_URL AUTH_JWT_SECRET USER_PORT USER_DATABASE_URL POST_PORT POST_MONGO_URI PROFIL_PORT PROFIL_MONGO_URI GATEWAY_PORT; do
+          for var in AUTH_PORT AUTH_DATABASE_URL AUTH_JWT_SECRET USER_PORT USER_DATABASE_URL POST_PORT POST_MONGO_URI PROFILE_PORT PROFILE_MONGO_URI GATEWAY_PORT; do
             if [ -z "${!var}" ]; then
               echo "❌ Secret manquant ou vide : $var"
               missing=1
