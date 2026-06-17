@@ -7,10 +7,12 @@ import Post from '../models/post.model';
 const isValidObjectId = (id: string) => mongoose.Types.ObjectId.isValid(id);
 
 export const createComment = async (req: Request, res: Response) => {
-  const { post_id, user_id, content, parent_comment_id, tags } = req.body;
+  const user_id = req.headers['x-user-id'] as string;
+  const { post_id, content, parent_comment_id, tags } = req.body;
+
 
   if (!post_id || !user_id || !content) {
-    return res.status(400).json({ message: 'post_id, user_id and content are required.' });
+    return res.status(400).json({ message: 'post_id, content, and authenticated user are required.' });
   }
   if (!isValidObjectId(post_id)) return res.status(400).json({ message: 'post_id is invalid.' });
   if (parent_comment_id && !isValidObjectId(parent_comment_id)) {

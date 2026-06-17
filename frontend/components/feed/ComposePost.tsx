@@ -4,36 +4,34 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Avatar from '@/components/ui/Avatar';
 import Button from '@/components/ui/Button';
+import { useAuth } from '@/context/AuthContext';
 
 // 1. Define the props this component expects
 // TODO: Change this when API WORKS
 interface ComposePostProps {
-  onPost: (content: string) => void;
+  onPost: (content: string) => Promise<void>;
+  isPosting?: boolean;
 }
 
-// 2. Destructure the onPost function from props
-export default function ComposePost({ onPost }: ComposePostProps) {
+export default function ComposePost({ onPost, isPosting = false }: ComposePostProps) {
   const { t } = useTranslation('common');
+  const { user } = useAuth();
   const [content, setContent] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (content.trim().length === 0) return;
-
-    // 3. Pass the content up to the parent component
-    onPost(content); 
-    
-    // 4. Clear the input box
-    setContent(''); 
+    if (content.trim().length === 0 || isPosting) return;
+    await onPost(content);
+    setContent('');
   };
 
   return (
     <div className="border-b border-gray-200 p-4">
       <div className="flex gap-3">
-        <Avatar 
-          src="https://i.pravatar.cc/150?u=current" 
-          alt="My Avatar" 
-          size="md" 
+        <Avatar
+          src={`https://i.pravatar.cc/150?u=${user?.id ?? 'anon'}`}
+          alt="My Avatar"
+          size="md"
         />
         <form onSubmit={handleSubmit} className="flex-1">
           <textarea
@@ -48,12 +46,12 @@ export default function ComposePost({ onPost }: ComposePostProps) {
               {/* Media icons placeholders */}
               <span>🖼️</span> 
             </div>
-            <Button 
+            <Button
               type="submit"
-              disabled={content.trim().length === 0}
+              disabled={content.trim().length === 0 || isPosting}
               className="bg-teal-600 hover:bg-teal-700 text-white font-bold py-1.5 px-4 rounded-full disabled:opacity-50"
             >
-              {t('compose_post.submit_button')}
+              {isPosting ? '...' : t('compose_post.submit_button')}
             </Button>
           </div>
         </form>

@@ -10,18 +10,23 @@ interface AccessTokenPayload {
 }
 
 export const authenticate = (req: Request, res: Response, next: NextFunction): void => {
+  // Scrub any spoofed identity headers from the incoming request
   delete req.headers['x-user-id'];
   delete req.headers['x-user-email'];
   delete req.headers['x-user-role'];
 
-  const authHeader = req.headers.authorization;
+  // Accept token from HttpOnly cookie (browser) or Authorization header (API clients)
+  const cookieToken  = (req.cookies as Record<string, string> | undefined)?.breezy_access;
+  const bearerToken  = req.headers.authorization?.startsWith('Bearer ')
+    ? req.headers.authorization.slice('Bearer '.length)
+    : undefined;
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  const token = cookieToken ?? bearerToken;
+
+  if (!token) {
     next();
     return;
   }
-
-  const token = authHeader.slice('Bearer '.length);
 
   try {
     const payload = jwt.verify(token, JWT_SECRET) as AccessTokenPayload;
@@ -33,9 +38,13 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
 
     req.user = { id: payload.user_id, email: payload.email, role: payload.role };
 
-    req.headers['x-user-id'] = payload.user_id;
+    // Forward verified identity to downstream services via trusted headers
+    req.headers['x-user-id']    = payload.user_id;
     req.headers['x-user-email'] = payload.email;
-    req.headers['x-user-role'] = payload.role;
+    req.headers['x-user-role']  = payload.role;
+
+    // Keep Authorization header so downstream services that read it still work
+    req.headers['authorization'] = `Bearer ${token}`;
 
     next();
   } catch {
@@ -48,6 +57,5 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction): vo
     res.status(401).json({ message: 'Authentication required' });
     return;
   }
-
   next();
 };

@@ -61,7 +61,7 @@ services:
       - post-db
 
   # ==========================================
-  # PROFIL SERVICE (MongoDB)
+  # PROFILE SERVICE (MongoDB)
   # ==========================================
   profile-db:
     image: mongo:6.0
@@ -136,7 +136,7 @@ services:
       - PORT=8080
       - JWT_SECRET=change_this_secret_in_production
       - CORS_ORIGIN=http://localhost:3000
-      - AUTH_SERVICE_URL=http://auth-service:5000
+      - AUTH_SERVICE_URL=http://auth-service:5001
       - USER_SERVICE_URL=http://user-service:3001
       - POST_SERVICE_URL=http://post-service:3003
       - PROFILE_SERVICE_URL=http://profile-service:3004

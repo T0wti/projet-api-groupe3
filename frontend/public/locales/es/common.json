@@ -1,4 +1,4 @@
-{
+﻿{
   "home_page": {
     "title": "Inicio",
     "empty_message": "No hay publicaciones para mostrar. Intenta seguir algunas cuentas para ver contenido aquí."
@@ -12,7 +12,8 @@
       "profile": "Perfil",
       "more": "Más"
     },
-    "post_button": "Publicar"
+    "post_button": "Publicar",
+    "logout_button": "Cerrar sesión"
   },
   "right_sidebar": {
     "search_placeholder": "Buscar",

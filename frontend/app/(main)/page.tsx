@@ -1,75 +1,133 @@
-"use client"; // Required because we are managing State here now
+"use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import ComposePost from '@/components/feed/ComposePost';
 import PostCard from '@/components/feed/PostCard';
-import { MOCK_POSTS } from '@/lib/utils/mockData';
-import { Post, Reply } from '@/types/post';
+import { useAuth } from '@/context/AuthContext';
+import { Post, Reply, mapBackendPost, mapBackendComment } from '@/types/post';
+import {
+  fetchPosts,
+  fetchUserLikedPostIds,
+  createPost,
+  likePost,
+  unlikePost,
+  createComment,
+} from '@/lib/api/posts';
+import { fetchUserById } from '@/lib/api/users';
 
 export default function HomeFeed() {
-  // 1. Initialize state with our fake data
-  const [posts, setPosts] = useState<Post[]>(MOCK_POSTS);
+  const { user, isLoading: authLoading } = useAuth();
   const { t } = useTranslation('common');
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isPosting, setIsPosting] = useState(false);
+  const [postError, setPostError] = useState<string | null>(null);
 
-  // 2. Create a function to handle creating a new post
-  // TODO - Later, this will call the backend API to create a post and get the full post object back 
-  // (with ID, timestamps, etc). For now, we'll just create a fake post object on the frontend.
-  const handleAddNewPost = (content: string) => {
-    // Create a fake post object. Later, this will be created by your database.
-    const newPost: Post = {
-      id: Date.now().toString(), // Generate a fake unique ID based on time
-      author: {
-        id: 'u_current',
-        name: 'VibrantLife', // Pretend we are this user for now
-        username: 'VibrantLife',
-        avatarUrl: 'https://i.pravatar.cc/150?u=current',
-      },
-      content: content,
-      likesCount: 0,
-      commentsCount: 0,
-      repostsCount: 0,
-      createdAt: 'Just now',
-    };
+  useEffect(() => {
+    // Wait for auth to resolve before doing anything
+    if (authLoading) return;
 
-    // 3. Update the state: Put the new post at the FRONT of the array, followed by the old posts
-    setPosts([newPost, ...posts]);
+    if (!user) {
+      setIsLoading(false);
+      return;
+    }
+
+    async function loadFeed() {
+      try {
+        const [backendPosts, likedIds] = await Promise.all([
+          fetchPosts(),
+          fetchUserLikedPostIds(user!.id),
+        ]);
+        const likedSet = new Set(likedIds);
+
+        // Fetch usernames for authors that are not the current user
+        const otherAuthorIds = [...new Set(
+          backendPosts.map((p) => p.authorId).filter((id) => id !== user!.id)
+        )];
+        const profiles = await Promise.allSettled(otherAuthorIds.map(fetchUserById));
+        const authorMap = new Map<string, string>();
+        profiles.forEach((result, i) => {
+          if (result.status === 'fulfilled') {
+            authorMap.set(otherAuthorIds[i], result.value.username);
+          }
+        });
+
+        setPosts(backendPosts.map((bp) => mapBackendPost(bp, likedSet, user!, authorMap)));
+      } catch {
+        setError('Failed to load posts.');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadFeed();
+  }, [user, authLoading]);
+
+  const handleAddNewPost = async (content: string) => {
+    if (!user) return;
+    setIsPosting(true);
+    setPostError(null);
+    try {
+      const bp = await createPost(content);
+      const newPost = mapBackendPost(bp, new Set(), user);
+      setPosts((prev) => [newPost, ...prev]);
+    } catch (err: any) {
+      setPostError(err?.response?.data?.message ?? 'Failed to publish post.');
+    } finally {
+      setIsPosting(false);
+    }
   };
 
-  const handleToggleLike = (postId: string) => {
-    setPosts(posts.map(post => {
-      if (post.id === postId) {
-        const currentlyLiked = post.isLiked || false;
-        return {
-          ...post,
-          isLiked: !currentlyLiked,
-          likesCount: currentlyLiked ? post.likesCount - 1 : post.likesCount + 1
-        };
+  const handleToggleLike = async (postId: string) => {
+    const post = posts.find((p) => p.id === postId);
+    if (!post) return;
+
+    const wasLiked = post.isLiked ?? false;
+
+    // Optimistic update
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId
+          ? { ...p, isLiked: !wasLiked, likesCount: wasLiked ? p.likesCount - 1 : p.likesCount + 1 }
+          : p
+      )
+    );
+
+    try {
+      if (wasLiked) {
+        await unlikePost(postId);
+      } else {
+        await likePost(postId);
       }
-      return post;
-    }));
+    } catch {
+      // Revert on error
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === postId
+            ? { ...p, isLiked: wasLiked, likesCount: wasLiked ? p.likesCount + 1 : p.likesCount - 1 }
+            : p
+        )
+      );
+    }
   };
 
-  // HOW IT WORKS: We create a fake reply object, find the correct post, 
-  // and inject the reply into its 'replies' array.
-  const handleReply = (postId: string, replyContent: string) => {
-    const newReply: Reply = {
-      id: Date.now().toString(),
-      author: { id: 'u_current', name: 'VibrantLife', username: 'VibrantLife', avatarUrl: 'https://i.pravatar.cc/150?u=current' },
-      content: replyContent,
-    };
-
-    setPosts(posts.map(post => {
-      if (post.id === postId) {
-        const existingReplies = post.replies || [];
-        return {
-          ...post,
-          replies: [...existingReplies, newReply],
-          commentsCount: post.commentsCount + 1
-        };
-      }
-      return post;
-    }));
+  const handleReply = async (postId: string, replyContent: string) => {
+    if (!user) return;
+    try {
+      const bc = await createComment(postId, replyContent);
+      const newReply: Reply = mapBackendComment(bc, user);
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === postId
+            ? { ...p, replies: [...(p.replies ?? []), newReply], commentsCount: p.commentsCount + 1 }
+            : p
+        )
+      );
+    } catch {
+      // silently fail
+    }
   };
 
   return (
@@ -78,7 +136,19 @@ export default function HomeFeed() {
         <h1 className="text-xl font-bold">{t('home_page.title')}</h1>
       </header>
 
-      <ComposePost onPost={handleAddNewPost} />
+      <ComposePost onPost={handleAddNewPost} isPosting={isPosting} />
+
+      {postError && (
+        <p className="text-center text-red-500 py-2 px-4 text-sm">{postError}</p>
+      )}
+
+      {isLoading && (
+        <p className="text-center text-gray-400 py-8">Loading...</p>
+      )}
+
+      {error && (
+        <p className="text-center text-red-500 py-8">{error}</p>
+      )}
 
       <section>
         {posts.map((post) => {
@@ -87,9 +157,8 @@ export default function HomeFeed() {
             <PostCardAny
               key={post.id}
               post={post}
-              // We pass the functions DOWN to the child component here
               onLike={() => handleToggleLike(post.id)}
-              onReply={(content: any) => handleReply(post.id, content)}
+              onReply={(content: string) => handleReply(post.id, content)}
             />
           );
         })}

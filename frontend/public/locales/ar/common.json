@@ -1,4 +1,4 @@
-{
+﻿{
   "home_page": {
     "title": "الرئيسية",
     "empty_message": "ما كانش منشورات باش تبان. سيّي تتبع حسابات باش تشوف المحتوى هنايا."
@@ -12,7 +12,8 @@
       "profile": "البروفايل",
       "more": "بزاف"
     },
-    "post_button": "انشر"
+    "post_button": "انشر",
+    "logout_button": "تسجيل الخروج"
   },
   "right_sidebar": {
     "search_placeholder": "حوس هنا...",

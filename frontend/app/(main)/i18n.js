@@ -11,7 +11,7 @@ i18n
   // Connecte i18next à React
   .use(initReactI18next)
   .init({
-    fallbackLng: 'fr', // Langue par défaut si la langue du navigateur n'est pas dispo
+    fallbackLng: 'en', // Langue par défaut si la langue du navigateur n'est pas dispo
     load: 'languageOnly',
     debug: true,       // Pratique en développement pour voir ce qui se passe dans la console
     
@@ -28,4 +28,4 @@ i18n
     },
   });
 
-export default i18n;
+export default i18n;  
