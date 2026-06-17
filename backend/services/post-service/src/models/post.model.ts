@@ -19,7 +19,6 @@ export interface Media {
  */
 export interface IPost extends Document {
   authorId: string;
-  authorUsername: string;
   content: string;
   media: Media;
   likesCount: number;
@@ -51,5 +50,7 @@ const PostSchema = new Schema<IPost>(
     timestamps: true
   }
 );
+
+PostSchema.index({ content: 'text' });
 
 export default mongoose.model<IPost>('Post', PostSchema);
