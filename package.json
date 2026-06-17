@@ -2,6 +2,6 @@
   "name": "projet-api-groupe3",
   "private": true,
   "scripts": {
-    "seed:all": "npm --prefix backend/services/user-service run seed && npm --prefix backend/services/auth-service run seed && npm --prefix backend/services/profile-service run seed && npm --prefix backend/services/post-service run seed"
+    "seed:all": "docker compose up -d user-db auth-db post-db profile-db user-service auth-service profile-service post-service && docker compose exec -T user-service npm run seed && docker compose exec -T auth-service npm run seed && docker compose exec -T profile-service npm run seed && docker compose exec -T post-service npm run seed"
   }
 }

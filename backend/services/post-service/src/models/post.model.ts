@@ -19,7 +19,6 @@ export interface Media {
  */
 export interface IPost extends Document {
   authorId: string;
-  authorUsername: string;
   content: string;
   media: Media;
   likesCount: number;
