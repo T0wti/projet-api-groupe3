@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import userRoutes from './routes/user.routes';
+import { errorHandler } from './middlewares/errorHandler.middleware';
 import './config/db';
 
 dotenv.config();
@@ -10,6 +11,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/users', userRoutes);
+
+app.use(errorHandler);  
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3001;
 app.listen(PORT, () => {
