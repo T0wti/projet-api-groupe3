@@ -1,0 +1,147 @@
+name: Build & Check Docker Images (Backend)
+
+# Déclenchement : à chaque push et pull request sur main
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-check:
+    runs-on: ubuntu-latest
+
+    # ----------------------------------------------------------------
+    # ⚠️ IMPORTANT : ces secrets sont injectés dans l'environnement du
+    # job, mais TANT QUE le docker-compose.yml contient des valeurs en
+    # dur (ex: "password", "5001", "change_this_secret_in_production"),
+    # docker compose ne va PAS les lire. Il faut que le compose référence
+    # ${AUTH_PORT}, ${AUTH_DATABASE_URL}, etc. pour que ces variables
+    # remplacent réellement les valeurs en dur.
+    #
+    # En l'état, ce bloc `env:` ne sert qu'à préparer le terrain : le
+    # jour où tu remplaces les valeurs en dur du compose par des ${VAR},
+    # tout sera déjà branché côté CI sans rien à changer ici.
+    # ----------------------------------------------------------------
+    env:
+      # Règle de répartition : ports et URLs publiques → vars. (non sensible)
+      #                        mots de passe, JWT, chaînes de connexion → secrets.
+      # (une DATABASE_URL/MONGO_URI contient un mot de passe en clair dans
+      # l'URL elle-même, donc elle reste un secret même si elle inclut un port)
+
+      # --- user-service ---
+      USER_PORT: ${{ vars.USER_PORT }}
+      USER_DATABASE_URL: ${{ secrets.USER_DATABASE_URL }}
+      USER_DB_PASSWORD: ${{ secrets.USER_DB_PASSWORD }}
+
+      # --- post-service ---
+      POST_PORT: ${{ vars.POST_PORT }}
+      POST_MONGO_URI: ${{ secrets.POST_MONGO_URI }}
+      POST_DB_PASSWORD: ${{ secrets.POST_DB_PASSWORD }}
+
+      # --- profile-service ---
+      PROFILE_PORT: ${{ vars.PROFILE_PORT }}
+      PROFILE_MONGO_URI: ${{ secrets.PROFILE_MONGO_URI }}
+
+      # --- auth-service ---
+      AUTH_PORT: ${{ vars.AUTH_PORT }}
+      AUTH_DATABASE_URL: ${{ secrets.AUTH_DATABASE_URL }}
+      AUTH_DB_PASSWORD: ${{ secrets.AUTH_DB_PASSWORD }}
+      AUTH_JWT_SECRET: ${{ secrets.AUTH_JWT_SECRET }}
+      AUTH_JWT_REFRESH_SECRET: ${{ secrets.AUTH_JWT_REFRESH_SECRET }}
+
+      # --- api-gateway ---
+      API_GATEWAY_PORT: ${{ vars.API_GATEWAY_PORT }}
+      API_GATEWAY_JWT_SECRET: ${{ secrets.API_GATEWAY_JWT_SECRET }}
+      API_GATEWAY_CORS_ORIGIN: ${{ vars.API_GATEWAY_CORS_ORIGIN }}
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Vérification des secrets requis
+        # Échoue tôt et clairement si un secret attendu n'est pas configuré,
+        # plutôt que de laisser docker compose démarrer avec des valeurs vides.
+        # ⚠️ Inutile tant que le compose n'utilise pas ${VAR} — voir note ci-dessus.
+        run: |
+          missing=0
+          for var in AUTH_PORT AUTH_DATABASE_URL AUTH_JWT_SECRET USER_PORT USER_DATABASE_URL POST_PORT POST_MONGO_URI PROFILE_PORT PROFILE_MONGO_URI API_GATEWAY_PORT; do
+            if [ -z "${!var}" ]; then
+              echo "❌ Secret manquant ou vide : $var"
+              missing=1
+            fi
+          done
+          if [ "$missing" -eq 1 ]; then
+            echo "Configure les secrets manquants dans Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          echo "✅ Tous les secrets attendus sont présents."
+
+      - name: Build de toutes les images via docker-compose
+        # Construit toutes les images définies dans docker-compose.yml
+        # (api-gateway, auth-service, post-service, profile-service, user-service)
+        run: docker compose build
+
+      - name: Démarrage des conteneurs
+        # Lance les services en arrière-plan pour vérifier qu'ils démarrent sans crasher
+        run: docker compose up -d
+
+      - name: Attente du démarrage des services
+        # Petit délai pour laisser le temps aux services de s'initialiser
+        # (à ajuster, ou remplacer par un vrai healthcheck par service si tu en ajoutes)
+        run: sleep 10
+
+      - name: Vérification de l'état des conteneurs
+        # Échoue le job si un conteneur est dans un état autre que "running"
+        run: |
+          if docker compose ps --status exited | grep -q "Exit"; then
+            echo "❌ Un ou plusieurs conteneurs se sont arrêtés de manière inattendue."
+            docker compose ps
+            docker compose logs
+            exit 1
+          fi
+          echo "✅ Tous les conteneurs sont up."
+          docker compose ps
+
+      - name: Logs des conteneurs (debug)
+        # Utile pour diagnostiquer en cas d'échec ou de comportement inattendu
+        if: always()
+        run: docker compose logs
+
+      # ----------------------------------------------------------------
+      # TODO (étape future) : authentification au registry Docker
+      # Exemple pour Docker Hub :
+      # - name: Login Docker Hub
+      #   uses: docker/login-action@v3
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+      #
+      # Exemple pour GitHub Container Registry (ghcr.io) :
+      # - name: Login GHCR
+      #   uses: docker/login-action@v3
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{ github.actor }}
+      #     password: ${{ secrets.GITHUB_TOKEN }}
+      # ----------------------------------------------------------------
+
+      # ----------------------------------------------------------------
+      # TODO (étape future) : tag et push de chaque image construite
+      # Une fois le compose buildé, tu peux tagger et push chaque service.
+      # Exemple (à répéter ou à mettre en matrice pour chaque service) :
+      #
+      # - name: Tag & push api-gateway
+      #   run: |
+      #     docker tag services-api-gateway:latest ghcr.io/<ton-user-ou-org>/api-gateway:latest
+      #     docker push ghcr.io/<ton-user-ou-org>/api-gateway:latest
+      #
+      # Note : le nom d'image généré par docker-compose dépend du nom du
+      # projet et du service (ex: <nom-dossier>-<service>:latest).
+      # Tu peux vérifier le nom exact avec `docker images` après le build.
+      # ----------------------------------------------------------------
+
+      - name: Nettoyage
+        # Arrête et supprime les conteneurs/réseaux créés par ce job
+        if: always()
+        run: docker compose down -v

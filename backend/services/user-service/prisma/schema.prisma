@@ -18,6 +18,7 @@ model User {
   email               String   @unique @db.VarChar(255)
   role                Role     @default(user)
   isBanned            Boolean  @default(false) @map("is_banned")
+  avatarUrl           String?  @map("avatar_url") @db.VarChar(500)
   languagePreference  String   @default("fr") @map("language_preference") @db.VarChar(10)
   themePreference     String   @default("light") @map("theme_preference") @db.VarChar(20)
   createdAt           DateTime @default(now()) @map("created_at")

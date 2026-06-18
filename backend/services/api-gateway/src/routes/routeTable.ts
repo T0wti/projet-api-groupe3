@@ -22,6 +22,8 @@ export const routeTable: RouteRule[] = [
   { method: 'get', path: '/api/auth/verify', target: 'auth', auth: 'public' },
 
   // Users
+  { method: 'get', path: '/api/users/username/:username/public', target: 'user', auth: 'required' },
+  { method: 'get', path: '/api/users/:id/public', target: 'user', auth: 'required' },
   { method: 'get', path: '/api/users/:id', target: 'user', auth: 'required' },
   { method: 'get', path: '/api/users/search', target: 'user', auth: 'required' },
   { method: 'put', path: '/api/users/:id', target: 'user', auth: 'required', selfParam: 'id', bypassRoles: ['admin'] },
@@ -62,6 +64,7 @@ export const routeTable: RouteRule[] = [
 
   // Profile
   { method: 'post', path: '/api/profile/follow', target: 'profile', auth: 'required' },
+  { method: 'post', path: '/api/profile/unfollow', target: 'profile', auth: 'required' },
   { method: 'delete', path: '/api/profile/follow', target: 'profile', auth: 'required' },
   { method: 'post', path: '/api/profile/likes', target: 'profile', auth: 'required' },
   { method: 'delete', path: '/api/profile/likes', target: 'profile', auth: 'required' },
@@ -71,7 +74,12 @@ export const routeTable: RouteRule[] = [
   { method: 'get', path: '/api/profile/:userId/likes', target: 'profile', auth: 'required' },
 
   { method: 'post', path: '/api/profile', target: 'profile', auth: 'required' },
-  { method: 'get', path: '/api/profile/:userId', target: 'profile', auth: 'required', selfParam: 'userId', bypassRoles: ['admin'] },
+  { method: 'get', path: '/api/profile/:userId', target: 'profile', auth: 'required' },
   { method: 'put', path: '/api/profile/:userId', target: 'profile', auth: 'required', selfParam: 'userId', bypassRoles: ['admin'] },
   { method: 'delete', path: '/api/profile/:userId', target: 'profile', auth: 'required', selfParam: 'userId', bypassRoles: ['admin'] },
+  
+  // Media
+  { method: 'post', path: '/api/media', target: 'media', auth: 'required' },
+  { method: 'delete', path: '/api/media/:objectName', target: 'media', auth: 'required' },
+
 ];

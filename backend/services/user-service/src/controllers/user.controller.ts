@@ -41,9 +41,56 @@ export const getUserInfos = async (req: Request<{ id: string }>, res: Response) 
   }
 };
 
+export const getPublicUserSummary = async (req: Request<{ id: string }>, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        username: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    return res.status(200).json(user);
+  } catch (error) {
+    return res.status(500).json({ error: (error as Error).message });
+  }
+};
+
+export const getPublicUserSummaryByUsername = async (req: Request<{ username: string }>, res: Response) => {
+  const { username } = req.params;
+
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        username: { equals: username, mode: 'insensitive' },
+      },
+      select: {
+        id: true,
+        username: true,
+        avatarUrl: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    return res.status(200).json(user);
+  } catch (error) {
+    return res.status(500).json({ error: (error as Error).message });
+  }
+};
+
 export const updateUserInfos = async (req: Request<{ id: string }>, res: Response) => {
   const { id } = req.params;
-  const { language_preference, theme_preference, username } = req.body;
+  const { language_preference, theme_preference, username, avatar_url, email } = req.body;
 
   try {
     const user = await prisma.user.update({
@@ -52,6 +99,8 @@ export const updateUserInfos = async (req: Request<{ id: string }>, res: Respons
         languagePreference: language_preference ?? undefined,
         themePreference: theme_preference ?? undefined,
         username: username ?? undefined,
+        avatarUrl: avatar_url ?? undefined,
+        email: email ?? undefined,
       },
     });
 

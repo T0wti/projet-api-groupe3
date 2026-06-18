@@ -1,5 +1,6 @@
 "use client";
 
+import Link from 'next/link';
 import { useState } from 'react';
 import { MessageCircle, Repeat2, Heart } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +17,7 @@ export default function PostCard({ post, onLike, onReply }: PostCardProps) {
   const { t } = useTranslation('common');
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState('');
+  const profileHref = `/profile/${encodeURIComponent(post.author.username)}`;
 
   const submitReply = () => {
     if (replyText.trim().length === 0) return;
@@ -28,14 +30,16 @@ export default function PostCard({ post, onLike, onReply }: PostCardProps) {
     <article className="bg-white border border-gray-200 p-4 hover:bg-gray-50 transition-colors rounded-lg">
       <div className="flex gap-3">
         <div className="shrink-0">
-          <Avatar src={post.author.avatarUrl} alt={post.author.username} size="md" />
+          <Link href={profileHref} aria-label={`Voir le profil de ${post.author.username}`}>
+            <Avatar src={post.author.avatarUrl} alt={post.author.username} size="md" />
+          </Link>
         </div>
 
         <div className="flex-1">
-          <div className="flex items-center gap-1 text-sm">
+          <Link href={profileHref} className="flex items-center gap-1 text-sm w-max">
             <span className="font-bold text-gray-900">{post.author.name}</span>
             <span className="text-gray-500">@{post.author.username}</span>
-          </div>
+          </Link>
 
           <p className="mt-1 text-gray-900 text-[15px] whitespace-pre-wrap">{post.content}</p>
 

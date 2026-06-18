@@ -6,29 +6,33 @@ services:
     image: postgres:15-alpine
     container_name: breezy-user-db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: breezy_user_db
+      POSTGRES_USER: ${USER_DB_USER}
+      POSTGRES_PASSWORD: ${USER_DB_PASSWORD}
+      POSTGRES_DB: ${USER_DB_NAME}
     ports:
       - "5432:5432"
     volumes:
       - user_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${USER_DB_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   user-service:
     build:
       context: ./backend/services/user-service
       dockerfile: Dockerfile
     container_name: breezy-user-service
-    ports:
-      - "3001:3001"
     environment:
       - PORT=3001
-      - DATABASE_URL=postgresql://postgres:password@user-db:5432/breezy_user_db
+      - DATABASE_URL=postgresql://${USER_DB_USER}:${USER_DB_PASSWORD}@user-db:5432/${USER_DB_NAME}
     volumes:
       - ./backend/services/user-service:/usr/src/app
       - /usr/src/app/node_modules
     depends_on:
-      - user-db
+      user-db:
+        condition: service_healthy
 
   # ==========================================
   # POST SERVICE (MongoDB)
@@ -37,8 +41,8 @@ services:
     image: mongo:6.0
     container_name: breezy-post-db
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_ROOT_USERNAME: ${POST_DB_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${POST_DB_ROOT_PASSWORD}
     ports:
       - "27017:27017"
     volumes:
@@ -49,11 +53,9 @@ services:
       context: ./backend/services/post-service
       dockerfile: Dockerfile
     container_name: breezy-post-service
-    ports:
-      - "3003:3003"
     environment:
       - PORT=3003
-      - MONGO_URI=mongodb://root:password@post-db:27017/breezy_post_db?authSource=admin
+      - MONGO_URI=mongodb://${POST_DB_ROOT_USER}:${POST_DB_ROOT_PASSWORD}@post-db:27017/breezy_post_db?authSource=admin
     volumes:
       - ./backend/services/post-service:/usr/src/app
       - /usr/src/app/node_modules
@@ -74,8 +76,6 @@ services:
   profile-service:
     build: ./backend/services/profile-service
     container_name: breezy-profile-service
-    ports:
-      - "3004:3004"
     environment:
       - MONGO_URI=mongodb://profile-db:27017/profile-service
       - PORT=3004
@@ -92,37 +92,83 @@ services:
     image: postgres:15-alpine
     container_name: breezy-auth-db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: breezy_auth_db
+      POSTGRES_USER: ${AUTH_DB_USER}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
+      POSTGRES_DB: ${AUTH_DB_NAME}
     ports:
       - "5433:5432"
     volumes:
       - auth_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${AUTH_DB_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   auth-service:
     build:
       context: ./backend/services/auth-service
       dockerfile: Dockerfile
     container_name: breezy-auth-service
-    ports:
-      - "5001:5001"
     environment:
       - PORT=5001
-      - DATABASE_URL=postgresql://postgres:password@auth-db:5432/breezy_auth_db
-      - JWT_SECRET=change_this_secret_in_production
-      - JWT_REFRESH_SECRET=change_this_refresh_secret_in_production
+      - DATABASE_URL=postgresql://${AUTH_DB_USER}:${AUTH_DB_PASSWORD}@auth-db:5432/${AUTH_DB_NAME}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
       - JWT_EXPIRES_IN=15m
       - JWT_REFRESH_EXPIRES_IN=7d
       - USER_SERVICE_URL=http://user-service:3001
+      - PROFILE_SERVICE_URL=http://profile-service:3004
     depends_on:
-      - auth-db
-      - user-service
+      auth-db:
+        condition: service_healthy
+      user-service:
+        condition: service_started
     volumes:
       - ./backend/services/auth-service:/app
       - /app/node_modules
 
- # ==========================================
+  # ==========================================
+  # MINIO (stockage objet pour les médias)
+  # ==========================================
+  minio:
+    image: minio/minio
+    container_name: breezy-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+
+  # ==========================================
+  # MEDIA SERVICE
+  # ==========================================
+  media-service:
+    build:
+      context: ./backend/services/media-service
+      dockerfile: Dockerfile
+    container_name: breezy-media-service
+    ports:
+      - "3005:3005"
+    environment:
+      - PORT=3005
+      - MINIO_ENDPOINT=minio
+      - MINIO_PORT=9000
+      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER}
+      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD}
+      - MINIO_BUCKET=breezy-media
+      - MINIO_PUBLIC_URL=http://localhost:9000
+    depends_on:
+      - minio
+    volumes:
+      - ./backend/services/media-service:/usr/src/app
+      - /usr/src/app/node_modules
+
+  # ==========================================
   # API GATEWAY
   # ==========================================
   api-gateway:
@@ -134,17 +180,19 @@ services:
       - "8080:8080"
     environment:
       - PORT=8080
-      - JWT_SECRET=change_this_secret_in_production
+      - JWT_SECRET=${JWT_SECRET}
       - CORS_ORIGIN=http://localhost:3000
       - AUTH_SERVICE_URL=http://auth-service:5001
       - USER_SERVICE_URL=http://user-service:3001
       - POST_SERVICE_URL=http://post-service:3003
       - PROFILE_SERVICE_URL=http://profile-service:3004
+      - MEDIA_SERVICE_URL=http://media-service:3005
     depends_on:
       - auth-service
       - user-service
       - post-service
       - profile-service
+      - media-service
     volumes:
       - ./backend/services/api-gateway:/usr/src/app
       - /usr/src/app/node_modules
@@ -154,3 +202,4 @@ volumes:
   post_db_data:
   profile_db_data:
   auth_db_data:
+  minio_data:

@@ -19,6 +19,7 @@ const NAV_ITEMS = [
 export default function Sidebar() {
   const { t } = useTranslation('common');
   const { user, logout } = useAuth();
+  const profileHref = user ? `/profile/${encodeURIComponent(user.username)}` : '/';
 
   return (
     <aside className="hidden md:flex flex-col shrink-0 w-20 lg:w-64 xl:w-72 h-screen sticky top-0 px-2 lg:px-6 py-4 border-r border-gray-200 bg-white">
@@ -46,13 +47,13 @@ export default function Sidebar() {
 
       {/* User + logout */}
       <div className="mt-auto flex flex-col gap-1">
-        <div className="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-full cursor-pointer w-max lg:w-full transition-colors">
+        <Link href={profileHref} className="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-full cursor-pointer w-max lg:w-full transition-colors">
           <Avatar src={`https://i.pravatar.cc/150?u=${user?.id ?? 'anon'}`} alt="Avatar" size="md" />
           <div className="hidden lg:block overflow-hidden">
             <p className="font-bold text-sm truncate">{user?.username ?? '...'}</p>
             <p className="text-gray-500 text-sm truncate">@{user?.username?.toLowerCase() ?? ''}</p>
           </div>
-        </div>
+        </Link>
 
         <button
           onClick={logout}
