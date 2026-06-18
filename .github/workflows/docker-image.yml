@@ -32,6 +32,8 @@ jobs:
       # --- user-service ---
       USER_PORT: ${{ vars.USER_PORT }}
       USER_DATABASE_URL: ${{ secrets.USER_DATABASE_URL }}
+      USER_DB_USER: ${{ vars.USER_DB_USER }}
+      USER_DB_NAME: ${{ secrets.USER_DB_NAME }}
       USER_DB_PASSWORD: ${{ secrets.USER_DB_PASSWORD }}
 
       # --- post-service ---
@@ -42,10 +44,14 @@ jobs:
       # --- profile-service ---
       PROFILE_PORT: ${{ vars.PROFILE_PORT }}
       PROFILE_MONGO_URI: ${{ secrets.PROFILE_MONGO_URI }}
+      PROFILE_DB_USER: ${{ vars.PROFILE_DB_USER }}
+      PROFILE_DB_PASSWORD: ${{ secrets.PROFILE_DB_PASSWORD }}
 
       # --- auth-service ---
       AUTH_PORT: ${{ vars.AUTH_PORT }}
       AUTH_DATABASE_URL: ${{ secrets.AUTH_DATABASE_URL }}
+      AUTH_DB_USER: ${{ vars.AUTH_DB_USER }}
+      AUTH_DB_NAME: ${{ secrets.AUTH_DB_NAME }}
       AUTH_DB_PASSWORD: ${{ secrets.AUTH_DB_PASSWORD }}
       AUTH_JWT_SECRET: ${{ secrets.AUTH_JWT_SECRET }}
       AUTH_JWT_REFRESH_SECRET: ${{ secrets.AUTH_JWT_REFRESH_SECRET }}
@@ -54,6 +60,11 @@ jobs:
       API_GATEWAY_PORT: ${{ vars.API_GATEWAY_PORT }}
       API_GATEWAY_JWT_SECRET: ${{ secrets.API_GATEWAY_JWT_SECRET }}
       API_GATEWAY_CORS_ORIGIN: ${{ vars.API_GATEWAY_CORS_ORIGIN }}
+
+      # --- minio ---
+      MINIO_ROOT_USER: ${{ vars.MINIO_ROOT_USER }}
+      MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
+
 
     steps:
       - name: Checkout du code
@@ -67,7 +78,7 @@ jobs:
           missing=0
           for var in AUTH_PORT AUTH_DATABASE_URL AUTH_JWT_SECRET USER_PORT USER_DATABASE_URL POST_PORT POST_MONGO_URI PROFILE_PORT PROFILE_MONGO_URI API_GATEWAY_PORT; do
             if [ -z "${!var}" ]; then
-              echo "❌ Secret manquant ou vide : $var"
+              echo "Secret manquant ou vide : $var"
               missing=1
             fi
           done
@@ -75,7 +86,7 @@ jobs:
             echo "Configure les secrets manquants dans Settings → Secrets and variables → Actions."
             exit 1
           fi
-          echo "✅ Tous les secrets attendus sont présents."
+          echo "Tous les secrets attendus sont présents."
 
       - name: Build de toutes les images via docker-compose
         # Construit toutes les images définies dans docker-compose.yml
@@ -95,12 +106,12 @@ jobs:
         # Échoue le job si un conteneur est dans un état autre que "running"
         run: |
           if docker compose ps --status exited | grep -q "Exit"; then
-            echo "❌ Un ou plusieurs conteneurs se sont arrêtés de manière inattendue."
+            echo "Un ou plusieurs conteneurs se sont arrêtés de manière inattendue."
             docker compose ps
             docker compose logs
             exit 1
           fi
-          echo "✅ Tous les conteneurs sont up."
+          echo "Tous les conteneurs sont up."
           docker compose ps
 
       - name: Logs des conteneurs (debug)
