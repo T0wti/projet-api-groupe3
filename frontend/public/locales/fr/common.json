@@ -34,5 +34,6 @@
     "reply_button": "Répondre",
     "show_more": "Voir plus",
     "show_less": "Voir moins"
-  }
+  },
+  "pending": "Chargement..."
 }

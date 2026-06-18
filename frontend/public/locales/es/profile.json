@@ -1,0 +1,16 @@
+{
+  "header_title": "Perfil",
+  "loading_message": "Cargando perfil...",
+  "unavailable_message": "Perfil no disponible.",
+  "error_message": "No se pudo cargar este perfil.",
+  "stats": {
+    "posts": "publicaciones",
+    "followers": "seguidores",
+    "following": "seguidos"
+  },
+  "follow_button": {
+    "follow": "Seguir",
+    "unfollow": "Dejar de seguir"
+  },
+  "empty_posts_message": "Este usuario aún no ha publicado ninguna publicación."
+}
