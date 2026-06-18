@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import { errorHandler } from './middlewares/errorHandler.middleware';
 import postRoutes from './routes/post.routes';
 import commentRoutes from './routes/comment.route';
 import postLikeRoutes from './routes/post-like.routes';
@@ -30,6 +31,8 @@ app.use('/api/posts', postRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/post-likes', postLikeRoutes);
 app.use('/api/comment-likes', commentLikeRoutes);
+
+app.use(errorHandler); 
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3003;
 app.listen(PORT, () => {
