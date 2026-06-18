@@ -185,7 +185,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <main className="w-full max-w-150 border-x border-gray-200 min-h-screen bg-white">
+    <main className="w-full border-x border-gray-200 min-h-screen bg-gray-50">
       <header className="sticky top-0 z-10 border-b border-gray-200 bg-white/90 px-4 py-4 backdrop-blur-md">
         <h1 className="text-xl font-bold text-gray-900">{t('header_title')}</h1>
       </header>
@@ -198,7 +198,7 @@ export default function ProfilePage() {
 
       {!isLoading && !isProfileUnavailable && !error && profileUser && (
         <>
-          <section className="border-b border-gray-200 px-4 py-6">
+          <section className="border-b border-gray-200 px-4 py-6 bg-white">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div className="flex items-start gap-4">
                 <Avatar src={profileUser.avatarUrl} alt={profileUser.username} size="xl" />
@@ -237,7 +237,7 @@ export default function ProfilePage() {
             {profileUser.bio && <p className="mt-4 max-w-2xl whitespace-pre-wrap text-sm text-gray-700">{profileUser.bio}</p>}
           </section>
 
-          <section>
+          <section className="flex flex-col divide-y divide-gray-200 px-10 center mx-auto py-5 space-y-5">
             {posts.length === 0 && (
               <p className="px-4 py-10 text-center text-gray-500">{t('empty_posts_message')}</p>
             )}
