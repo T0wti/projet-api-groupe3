@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { Comment } from '../models/comment.model';
 import { CommentTag } from '../models/comment-tag.model';
 import Post from '../models/post.model';
+import { AppError } from '../utils/AppError';
 
 const isValidObjectId = (id: string) => mongoose.Types.ObjectId.isValid(id);
 
