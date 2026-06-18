@@ -3,7 +3,7 @@ name: Build & Check Docker Images (Backend)
 # Déclenchement : à chaque push et pull request sur main
 on:
   push:
-    branches: [main]
+    branches: [main, feature/update-ci]
   pull_request:
     branches: [main]
 
