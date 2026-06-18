@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { Profile } from '../models/profile.model';
 import { UserCounters } from '../models/userCounters.model';
+import { AppError } from '../utils/AppError';
 
 /**
  * Create a new user profile
@@ -10,14 +11,12 @@ export const createProfile = async (req: Request, res: Response): Promise<void> 
   const { user_id, bio, avatar_url } = req.body;
 
   if (!user_id) {
-    res.status(400).json({ message: 'user_id is required' });
-    return;
+    throw new AppError(400, 'user_id is required');
   }
 
   const existing = await Profile.findOne({ user_id });
   if (existing) {
-    res.status(409).json({ message: 'Profile already exists' });
-    return;
+    throw new AppError(409, 'Profile already exists');
   }
 
   const profile = new Profile({ user_id, bio, avatar_url });
@@ -36,8 +35,7 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
 
   const profile = await Profile.findOne({ user_id: userId });
   if (!profile) {
-    res.status(404).json({ message: 'Profile not found' });
-    return;
+    throw new AppError(404, 'Profile not found');
   }
 
   const counters = await UserCounters.findOne({ user_id: userId });
@@ -61,8 +59,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
   );
 
   if (!profile) {
-    res.status(404).json({ message: 'Profile not found' });
-    return;
+    throw new AppError(404, 'Profile not found');
   }
 
   res.status(200).json(profile);
@@ -76,8 +73,7 @@ export const deleteProfile = async (req: Request, res: Response): Promise<void> 
 
   const profile = await Profile.findOneAndDelete({ user_id: userId });
   if (!profile) {
-    res.status(404).json({ message: 'Profile not found' });
-    return;
+    throw new AppError(404, 'Profile not found');
   }
 
   await UserCounters.deleteOne({ user_id: userId });

@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import { errorHandler } from './middlewares/errorHandler.middleware';
 import profileRoutes from './routes/profile.routes';
 import followsRoutes from './routes/follows.routes';
 
@@ -24,6 +25,8 @@ mongoose.connect(MONGO_URI)
 
 app.use('/api/profile', profileRoutes);
 app.use('/api/profile', followsRoutes);
+
+app.use(errorHandler); 
 
 const PORT = process.env.PORT || 3004;
 app.listen(PORT, () => {
