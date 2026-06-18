@@ -32,7 +32,7 @@ export default function Sidebar() {
       {/* Navigation */}
       <nav className="flex flex-col gap-1">
         {NAV_ITEMS.map(({ key, icon: Icon, href }) => (
-          <Link key={key} href={href} className="nav-link">
+          <Link key={key} href={key === 'profile' ? profileHref : href} className="nav-link">
             <Icon size={22} className="shrink-0" />
             <span className="hidden lg:block font-semibold">{t(`sidebar.nav.${key}`)}</span>
           </Link>

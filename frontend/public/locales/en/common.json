@@ -31,6 +31,8 @@
   },
   "post_card": {
     "reply_placeholder": "Post your reply...",
-    "reply_button": "Reply"
+    "reply_button": "Reply",
+    "show_more": "Show more",
+    "show_less": "Show less"
   }
 }

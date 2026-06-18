@@ -17,7 +17,14 @@ export default function PostCard({ post, onLike, onReply }: PostCardProps) {
   const { t } = useTranslation('common');
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState('');
+  const [expanded, setExpanded] = useState(false);
   const profileHref = `/profile/${encodeURIComponent(post.author.username)}`;
+
+  const TRUNCATE_LIMIT = 140;
+  const isTruncatable = post.content.length > TRUNCATE_LIMIT;
+  const displayContent = isTruncatable && !expanded
+    ? post.content.slice(0, TRUNCATE_LIMIT) + '…'
+    : post.content;
 
   const submitReply = () => {
     if (replyText.trim().length === 0) return;
@@ -35,13 +42,21 @@ export default function PostCard({ post, onLike, onReply }: PostCardProps) {
           </Link>
         </div>
 
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <Link href={profileHref} className="flex items-center gap-1 text-sm w-max">
             <span className="font-bold text-gray-900">{post.author.name}</span>
             <span className="text-gray-500">@{post.author.username}</span>
           </Link>
 
-          <p className="mt-1 text-gray-900 text-[15px] whitespace-pre-wrap">{post.content}</p>
+          <p className="mt-1 text-gray-900 text-[15px] whitespace-pre-wrap wrap-break-word">{displayContent}</p>
+          {isTruncatable && (
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="text-brand text-sm font-semibold mt-1 hover:underline"
+            >
+              {expanded ? t('post_card.show_less') : t('post_card.show_more')}
+            </button>
+          )}
 
           {/* Actions */}
           <div className="flex items-center gap-8 mt-3">
