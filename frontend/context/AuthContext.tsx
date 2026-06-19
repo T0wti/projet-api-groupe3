@@ -8,6 +8,7 @@ export interface AuthUser {
   email: string;
   username: string;
   role: string;
+  avatarUrl?: string | null;
 }
 
 interface AuthContextValue {
@@ -16,9 +17,21 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<void>;
   register: (username: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  updateUser: (partial: Partial<AuthUser>) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+async function fetchAvatarUrl(userId: string): Promise<string | null> {
+  try {
+    const res = await fetch(`/api/profile/${userId}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.avatar_url ?? null;
+  } catch {
+    return null;
+  }
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -29,9 +42,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     restoreSession();
   }, []);
 
+  function updateUser(partial: Partial<AuthUser>) {
+    setUser((prev) => (prev ? { ...prev, ...partial } : prev));
+  }
+
   async function restoreSession() {
     try {
-      // Gateway reads breezy_access cookie, verifies it, returns payload
       const res = await fetch('/api/auth/verify');
       if (!res.ok) {
         setIsLoading(false);
@@ -39,12 +55,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       const { payload } = await res.json();
 
-      // Fetch full profile (username etc.) from user-service via gateway
-      const profileRes = await fetch(`/api/users/${payload.user_id}`);
-      if (profileRes.ok) {
-        setUser(await profileRes.json());
+      const userRes = await fetch(`/api/users/${payload.user_id}`);
+      if (userRes.ok) {
+        const userData = await userRes.json();
+        const avatarUrl = await fetchAvatarUrl(payload.user_id);
+        setUser({ ...userData, avatarUrl: avatarUrl ?? userData.avatarUrl });
       } else {
-        // Profile missing in user-service — use JWT payload as fallback
         setUser({ id: payload.user_id, email: payload.email, username: payload.email.split('@')[0], role: payload.role });
       }
     } catch {
@@ -66,9 +82,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       : {};
     if (!res.ok) throw new Error(data.message || 'Login failed');
 
-    // Cookies are set by auth-service in the response — fetch the profile
-    const profileRes = await fetch(`/api/users/${data.userId}`);
-    if (profileRes.ok) setUser(await profileRes.json());
+    const userRes = await fetch(`/api/users/${data.userId}`);
+    if (userRes.ok) {
+      const userData = await userRes.json();
+      const avatarUrl = await fetchAvatarUrl(data.userId);
+      setUser({ ...userData, avatarUrl: avatarUrl ?? userData.avatarUrl });
+    }
 
     router.push('/');
   }
@@ -85,21 +104,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       : {};
     if (!res.ok) throw new Error(data.message || 'Registration failed');
 
-    const profileRes = await fetch(`/api/users/${data.userId}`);
-    if (profileRes.ok) setUser(await profileRes.json());
+    const userRes = await fetch(`/api/users/${data.userId}`);
+    if (userRes.ok) setUser(await userRes.json());
 
     router.push('/');
   }
 
   async function logout() {
-    // Cookie (breezy_refresh) sent automatically — auth-service clears both cookies
     await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
     setUser(null);
     router.push('/auth');
   }
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
