@@ -43,17 +43,19 @@ export function mapBackendPost(
   bp: BackendPost,
   likedIds: Set<string>,
   currentUser: AuthUser,
-  authorMap: Map<string, string> = new Map()
+  authorMap: Map<string, string> = new Map(),
+  avatarMap: Map<string, string | null | undefined> = new Map(),
 ): Post {
   const isCurrentUser = bp.authorId === currentUser.id;
   const username = isCurrentUser
     ? currentUser.username
     : (authorMap.get(bp.authorId) ?? bp.authorId);
+  const avatarUrl = isCurrentUser ? currentUser.avatarUrl : avatarMap.get(bp.authorId);
   const author: User = {
     id: bp.authorId,
     name: username,
     username,
-    avatarUrl: `https://i.pravatar.cc/150?u=${bp.authorId}`,
+    avatarUrl,
   };
 
   return {
@@ -74,8 +76,8 @@ export function mapBackendComment(bc: BackendComment, currentUser: AuthUser): Re
   return {
     id: bc._id,
     author: isCurrentUser
-      ? { id: currentUser.id, name: currentUser.username, username: currentUser.username, avatarUrl: `https://i.pravatar.cc/150?u=${currentUser.id}` }
-      : { id: bc.user_id, name: bc.user_id, username: bc.user_id, avatarUrl: `https://i.pravatar.cc/150?u=${bc.user_id}` },
+      ? { id: currentUser.id, name: currentUser.username, username: currentUser.username, avatarUrl: currentUser.avatarUrl }
+      : { id: bc.user_id, name: bc.user_id, username: bc.user_id, avatarUrl: undefined },
     content: bc.content,
   };
 }
