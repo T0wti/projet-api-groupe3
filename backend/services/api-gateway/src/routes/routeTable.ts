@@ -20,6 +20,9 @@ export const routeTable: RouteRule[] = [
   { method: 'post', path: '/api/auth/refresh', target: 'auth', auth: 'public' },
   { method: 'post', path: '/api/auth/logout', target: 'auth', auth: 'public' },
   { method: 'get', path: '/api/auth/verify', target: 'auth', auth: 'public' },
+  { method: 'patch', path: '/api/auth/password', target: 'auth', auth: 'required' },
+  { method: 'patch', path: '/api/auth/email', target: 'auth', auth: 'required' },
+
 
   // Users
   { method: 'get', path: '/api/users/username/:username/public', target: 'user', auth: 'required' },
