@@ -8,6 +8,7 @@ import {
   deleteUserInfos,
   //setBanStatus,
   updateUserRole,
+  searchUsers,   
 } from '../controllers/user.controller';
 
 const router = Router();
