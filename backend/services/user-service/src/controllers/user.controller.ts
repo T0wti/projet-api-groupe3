@@ -78,7 +78,7 @@ export const getPublicUserSummaryByUsername = async (req: Request<{ username: st
 
 export const updateUserInfos = async (req: Request<{ id: string }>, res: Response) => {
   const { id } = req.params;
-  const { language_preference, theme_preference, username, avatar_url, email } = req.body;
+  const { language_preference, theme_preference, username, avatar_url } = req.body;
 
   try {
     const user = await prisma.user.update({
@@ -88,7 +88,6 @@ export const updateUserInfos = async (req: Request<{ id: string }>, res: Respons
         themePreference: theme_preference ?? undefined,
         username: username ?? undefined,
         avatarUrl: avatar_url ?? undefined,
-        email: email ?? undefined,
       },
     });
 

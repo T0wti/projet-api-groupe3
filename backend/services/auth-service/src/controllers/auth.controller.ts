@@ -245,3 +245,87 @@ export const verifyToken = async (req: Request, res: Response): Promise<void> =>
     throw new AppError(401, 'Invalid or expired token');
   }
 };
+
+export const changePassword = async (req: Request, res: Response): Promise<void> => {
+  const userId = req.headers['x-user-id'] as string;
+  const { currentPassword, newPassword } = req.body;
+
+  if (!userId) {
+    throw new AppError(401, 'Authentication required');
+  }
+  if (!currentPassword || !newPassword) {
+    throw new AppError(400, 'currentPassword and newPassword are required');
+  }
+
+  const user = await prisma.authUser.findUnique({ where: { userId } });
+  if (!user) {
+    throw new AppError(404, 'User not found');
+  }
+
+  const isValid = await bcrypt.compare(currentPassword, user.passwordHash);
+  if (!isValid) {
+    throw new AppError(401, 'Current password is incorrect');
+  }
+
+  const passwordIssues = getPasswordIssues(newPassword);
+  if (passwordIssues.length > 0) {
+    throw new AppError(400, 'Password does not meet security requirements.');
+  }
+
+  const newPasswordHash = await bcrypt.hash(newPassword, 10);
+  await prisma.authUser.update({ where: { userId }, data: { passwordHash: newPasswordHash } });
+
+  // Disconnect all the existent session
+  await prisma.refreshToken.deleteMany({ where: { userId } });
+  clearAuthCookies(res);
+
+  res.status(200).json({ message: 'Password updated successfully. Please log in again.' });
+};
+
+export const changeEmail = async (req: Request, res: Response): Promise<void> => {
+  const userId = req.headers['x-user-id'] as string;
+  const { newEmail, currentPassword } = req.body;
+
+  if (!userId) {
+    throw new AppError(401, 'Authentication required');
+  }
+  if (!newEmail || !currentPassword) {
+    throw new AppError(400, 'newEmail and currentPassword are required');
+  }
+
+  const normalizedEmail = newEmail.trim().toLowerCase();
+  if (!isValidEmail(normalizedEmail)) {
+    throw new AppError(400, 'Invalid email format.');
+  }
+
+  const user = await prisma.authUser.findUnique({ where: { userId } });
+  if (!user) {
+    throw new AppError(404, 'User not found');
+  }
+
+  const isValid = await bcrypt.compare(currentPassword, user.passwordHash);
+  if (!isValid) {
+    throw new AppError(401, 'Current password is incorrect');
+  }
+
+  const existing = await prisma.authUser.findUnique({ where: { email: normalizedEmail } });
+  if (existing && existing.userId !== userId) {
+    throw new AppError(409, 'Email already in use');
+  }
+
+  await prisma.authUser.update({ where: { userId }, data: { email: normalizedEmail } });
+
+  const userRes = await fetch(`${USER_SERVICE_URL}/api/users/${userId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: normalizedEmail }),
+  });
+
+  if (!userRes.ok) {
+    // rollback pour garder les deux DB synchronisées
+    await prisma.authUser.update({ where: { userId }, data: { email: user.email } });
+    throw new AppError(502, 'Failed to update user profile email');
+  }
+
+  res.status(200).json({ message: 'Email updated successfully.' });
+};
