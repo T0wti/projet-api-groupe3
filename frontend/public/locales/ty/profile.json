@@ -1,0 +1,16 @@
+{
+  "header_title": "Profil",
+  "loading_message": "Fa'ahou i te profil...",
+  "unavailable_message": "Aore te profil.",
+  "error_message": "Aore e mana no te fa'ahou i tei'a profil.",
+  "stats": {
+    "posts": "fa'aite'ite'araa",
+    "followers": "ia aru ia'na",
+    "following": "ia aru atu"
+  },
+  "follow_button": {
+    "follow": "Aru",
+    "unfollow": "Ārahi ore"
+  },
+  "empty_posts_message": "Aore te tao'a ua fa'aite'ite'ahia e tei'a feia."
+}

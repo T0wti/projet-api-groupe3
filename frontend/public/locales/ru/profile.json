@@ -1,0 +1,16 @@
+{
+  "header_title": "Профиль",
+  "loading_message": "Загрузка профиля...",
+  "unavailable_message": "Профиль недоступен.",
+  "error_message": "Не удалось загрузить этот профиль.",
+  "stats": {
+    "posts": "публикации",
+    "followers": "подписчики",
+    "following": "подписки"
+  },
+  "follow_button": {
+    "follow": "Подписаться",
+    "unfollow": "Отписаться"
+  },
+  "empty_posts_message": "Этот пользователь ещё ничего не опубликовал."
+}

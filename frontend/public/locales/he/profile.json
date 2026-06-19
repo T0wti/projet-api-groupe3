@@ -1,0 +1,16 @@
+{
+  "header_title": "פרופיל",
+  "loading_message": "טוען פרופיל...",
+  "unavailable_message": "הפרופיל אינו זמין.",
+  "error_message": "לא ניתן לטעון פרופיל זה.",
+  "stats": {
+    "posts": "פוסטים",
+    "followers": "עוקבים",
+    "following": "עוקב אחרי"
+  },
+  "follow_button": {
+    "follow": "עקוב",
+    "unfollow": "הפסק לעקוב"
+  },
+  "empty_posts_message": "משתמש זה עדיין לא פרסם אף פוסט."
+}

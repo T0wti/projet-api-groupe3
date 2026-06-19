@@ -1,0 +1,16 @@
+{
+  "header_title": "الملف الشخصي",
+  "loading_message": "جارٍ تحميل الملف الشخصي...",
+  "unavailable_message": "الملف الشخصي غير متاح.",
+  "error_message": "تعذّر تحميل هذا الملف الشخصي.",
+  "stats": {
+    "posts": "منشورات",
+    "followers": "متابعون",
+    "following": "متابَعون"
+  },
+  "follow_button": {
+    "follow": "متابعة",
+    "unfollow": "إلغاء المتابعة"
+  },
+  "empty_posts_message": "لم ينشر هذا المستخدم أي منشور بعد."
+}
