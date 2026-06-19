@@ -24,3 +24,8 @@ export async function unfollowUser(followerId: string, followingId: string): Pro
     following_id: followingId,
   });
 }
+
+export async function updateProfile(userId: string, data: { bio?: string; avatar_url?: string }): Promise<BackendProfile> {
+  const res = await api.put<BackendProfile>(`/profile/${userId}`, data);
+  return res.data;
+}
