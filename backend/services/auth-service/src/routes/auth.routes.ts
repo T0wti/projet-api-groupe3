@@ -5,6 +5,8 @@ import {
   refresh,
   logout,
   verifyToken,
+  changePassword, 
+  changeEmail,
 } from '../controllers/auth.controller';
 
 const router = Router();
