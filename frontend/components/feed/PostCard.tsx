@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { MessageCircle, Repeat2, Heart } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Avatar from "@/components/ui/Avatar";
+import { useAuth } from '@/context/AuthContext';
 import { Post } from '@/types/post';
 
 interface PostCardProps {
@@ -15,10 +16,12 @@ interface PostCardProps {
 
 export default function PostCard({ post, onLike, onReply }: PostCardProps) {
   const { t } = useTranslation('common');
+  const { user } = useAuth();
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState('');
   const [expanded, setExpanded] = useState(false);
   const profileHref = `/profile/${encodeURIComponent(post.author.username)}`;
+  const avatarSrc = post.author.id === user?.id ? (user.avatarUrl ?? post.author.avatarUrl) : post.author.avatarUrl;
 
   const TRUNCATE_LIMIT = 140;
   const isTruncatable = post.content.length > TRUNCATE_LIMIT;
@@ -38,7 +41,7 @@ export default function PostCard({ post, onLike, onReply }: PostCardProps) {
       <div className="flex gap-3">
         <div className="shrink-0">
           <Link href={profileHref} aria-label={`Voir le profil de ${post.author.username}`}>
-            <Avatar src={post.author.avatarUrl} alt={post.author.username} size="md" />
+            <Avatar src={avatarSrc} alt={post.author.username} size="md" />
           </Link>
         </div>
 

@@ -41,8 +41,8 @@ services:
     image: mongo:6.0
     container_name: breezy-post-db
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${POST_DB_ROOT_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${POST_DB_ROOT_PASSWORD}
+      MONGO_INITDB_ROOT_USERNAME: ${POST_DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${POST_DB_PASSWORD}
     ports:
       - "27017:27017"
     volumes:
@@ -55,7 +55,7 @@ services:
     container_name: breezy-post-service
     environment:
       - PORT=3003
-      - MONGO_URI=mongodb://${POST_DB_ROOT_USER}:${POST_DB_ROOT_PASSWORD}@post-db:27017/breezy_post_db?authSource=admin
+      - MONGO_URI=mongodb://${POST_DB_USER}:${POST_DB_PASSWORD}@post-db:27017/breezy_post_db?authSource=admin
     volumes:
       - ./backend/services/post-service:/usr/src/app
       - /usr/src/app/node_modules
@@ -68,6 +68,9 @@ services:
   profile-db:
     image: mongo:6.0
     container_name: breezy-profile-db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${PROFILE_DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${PROFILE_DB_PASSWORD}
     ports:
       - "27018:27017"
     volumes:
@@ -77,7 +80,7 @@ services:
     build: ./backend/services/profile-service
     container_name: breezy-profile-service
     environment:
-      - MONGO_URI=mongodb://profile-db:27017/profile-service
+      - MONGO_URI=mongodb://${PROFILE_DB_USER}:${PROFILE_DB_PASSWORD}@profile-db:27017/profile-service?authSource=admin
       - PORT=3004
     depends_on:
       - profile-db

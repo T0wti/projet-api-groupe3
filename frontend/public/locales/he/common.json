@@ -29,11 +29,17 @@
     "placeholder": "מה חדש?",
     "submit_button": "פרסם"
   },
-  "post_card": {
+    "post_card": {
     "reply_placeholder": "הגב לפוסט זה...",
     "reply_button": "הגב",
     "show_more": "הצג עוד",
-    "show_less": "הצג פחות"
+    "show_less": "הצג פחות
   },
-  "pending": "טוען..."
+  "pending": "טוען...",
+  "profile": {
+    "no_bio": "אין ביוגרפיה עדיין.",
+    "edit_bio": "ערוך ביוגרפיה",
+    "save": "שמור",
+    "cancel": "בטל"
+  }
 }

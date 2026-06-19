@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import { errorHandler } from './middlewares/errorHandler.middleware';
 import mediaRoutes from './routes/media.routes';
 import { ensureBucket } from './config/minio';
 
@@ -15,6 +16,8 @@ ensureBucket()
   });
 
 app.use('/api/media', mediaRoutes);
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3005;
 app.listen(PORT, () => {

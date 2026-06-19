@@ -30,7 +30,7 @@ export default function ComposePost({ onPost, isPosting = false }: ComposePostPr
     <div className="border-b border-gray-200 p-4 px-12">
       <div className="flex gap-3">
         <Avatar
-          src={`https://i.pravatar.cc/150?u=${user?.id ?? 'anon'}`}
+          src={user?.avatarUrl}
           alt="My Avatar"
           size="md"
         />

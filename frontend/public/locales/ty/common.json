@@ -35,5 +35,11 @@
     "show_more": "Hō'ata hou",
     "show_less": "Hō'ata iti"
   },
-  "pending": "E tā’ata..."
+  "pending": "E tā'ata...",
+  "profile": {
+    "no_bio": "Aita pāpa'ira'a parau.",
+    "edit_bio": "Huri i te pāpa'ira'a parau",
+    "save": "Fa'atāpura'a",
+    "cancel": "Ha'uti"
+  }
 }

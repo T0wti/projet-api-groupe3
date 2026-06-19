@@ -3,6 +3,9 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { randomUUID } from 'crypto';
 import prisma from '../config/db';
+import { isValidEmail, getPasswordIssues, isValidUsername } from '../utils/validators';
+import { AppError } from '../utils/AppError';
+
 
 const JWT_SECRET             = process.env.JWT_SECRET             || 'secret';
 const JWT_REFRESH_SECRET     = process.env.JWT_REFRESH_SECRET     || 'refresh_secret';
@@ -77,34 +80,44 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   const { username, email, password } = req.body;
 
   if (!username || !email || !password) {
-    res.status(400).json({ message: 'username, email and password are required' });
-    return;
+    throw new AppError(400, 'username, email and password are required');
   }
 
-  const existing = await prisma.authUser.findUnique({ where: { email } });
+    if (!isValidUsername(username)) {
+    throw new AppError(400, 'Username must be 3-30 characters (letters, digits, "_", ".").');
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  if (!isValidEmail(normalizedEmail)) {
+    throw new AppError(400, 'Invalid email format.');
+  }
+
+  const passwordIssues = getPasswordIssues(password);
+  if (passwordIssues.length > 0) {
+    throw new AppError(400, 'Password does not meet security requirements.');
+  }
+
+  const existing = await prisma.authUser.findUnique({ where: { email: normalizedEmail } });
   if (existing) {
-    res.status(409).json({ message: 'Email already in use' });
-    return;
+    throw new AppError(409, 'Email already in use');
   }
 
   const userId = randomUUID();
   const passwordHash = await bcrypt.hash(password, 10);
 
-  await prisma.authUser.create({ data: { userId, email, passwordHash } });
+  await prisma.authUser.create({ data: { userId, email: normalizedEmail, passwordHash } });
 
-  try {
-    const userRes = await fetch(`${USER_SERVICE_URL}/api/users/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: userId, username, email, role: 'user' }),
-    });
+  const userRes = await fetch(`${USER_SERVICE_URL}/api/users/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: userId, username, email: normalizedEmail, role: 'user' }),
+  });
 
     if (!userRes.ok) {
       const body = await userRes.text();
       console.error(`[auth] user-service rejected user creation: ${userRes.status} ${body}`);
       await rollbackRegisteredUser(userId);
-      res.status(502).json({ message: 'Failed to create user profile' });
-      return;
+      throw new AppError(502, 'Failed to create user profile');
     }
 
     const profileRes = await fetch(`${PROFILE_SERVICE_URL}/api/profile/`, {
@@ -117,16 +130,10 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       const body = await profileRes.text();
       console.error(`[auth] profile-service rejected profile creation: ${profileRes.status} ${body}`);
       await rollbackRegisteredUser(userId);
-      res.status(502).json({ message: 'Failed to initialize user profile' });
-      return;
+      throw new AppError(502, 'Failed to initialize user profile');
     }
-  } catch (err) {
-    console.error('[auth] downstream service unreachable during register:', err);
-    await rollbackRegisteredUser(userId);
-    throw err;
-  }
-
-  const { accessToken, refreshToken } = generateTokens(userId, email, 'user');
+ 
+  const { accessToken, refreshToken } = generateTokens(userId, normalizedEmail, 'user');
 
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7);
@@ -140,20 +147,17 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    res.status(400).json({ message: 'email and password are required' });
-    return;
+    throw new AppError(400, 'email and password are required');
   }
 
   const user = await prisma.authUser.findUnique({ where: { email } });
   if (!user) {
-    res.status(401).json({ message: 'Invalid credentials' });
-    return;
+    throw new AppError(401, 'Invalid credentials');
   }
 
   const isValid = await bcrypt.compare(password, user.passwordHash);
   if (!isValid) {
-    res.status(401).json({ message: 'Invalid credentials' });
-    return;
+    throw new AppError(401, 'Invalid credentials');
   }
 
   await prisma.authUser.update({
@@ -179,8 +183,7 @@ export const refresh = async (req: Request, res: Response): Promise<void> => {
   const refreshToken = req.cookies?.breezy_refresh ?? req.body?.refreshToken;
 
   if (!refreshToken) {
-    res.status(400).json({ message: 'Refresh token not found' });
-    return;
+    throw new AppError(400, 'Refresh token not found');
   }
 
   const stored = await prisma.refreshToken.findFirst({
@@ -189,8 +192,7 @@ export const refresh = async (req: Request, res: Response): Promise<void> => {
 
   if (!stored) {
     clearAuthCookies(res);
-    res.status(401).json({ message: 'Invalid or expired refresh token' });
-    return;
+    throw new AppError(401, 'Invalid or expired refresh token');
   }
 
   try {
@@ -212,7 +214,7 @@ export const refresh = async (req: Request, res: Response): Promise<void> => {
     res.status(200).json({ ok: true });
   } catch {
     clearAuthCookies(res);
-    res.status(401).json({ message: 'Invalid refresh token' });
+    throw new AppError(401, 'Invalid refresh token');
   }
 };
 
@@ -231,8 +233,7 @@ export const verifyToken = async (req: Request, res: Response): Promise<void> =>
   const authHeader = req.headers.authorization;
 
   if (!authHeader?.startsWith('Bearer ')) {
-    res.status(401).json({ message: 'No token provided' });
-    return;
+    throw new AppError(401, 'No token provided');
   }
 
   const token = authHeader.slice('Bearer '.length);
@@ -241,6 +242,6 @@ export const verifyToken = async (req: Request, res: Response): Promise<void> =>
     const decoded = jwt.verify(token, JWT_SECRET);
     res.status(200).json({ valid: true, payload: decoded });
   } catch {
-    res.status(401).json({ valid: false, message: 'Invalid or expired token' });
+    throw new AppError(401, 'Invalid or expired token');
   }
 };

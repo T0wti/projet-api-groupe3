@@ -35,5 +35,11 @@
     "show_more": "Voir plus",
     "show_less": "Voir moins"
   },
-  "pending": "Chargement..."
+  "pending": "Chargement...",
+  "profile": {
+    "no_bio": "Aucune biographie pour le moment.",
+    "edit_bio": "Modifier la bio",
+    "save": "Enregistrer",
+    "cancel": "Annuler"
+  }
 }

@@ -35,5 +35,11 @@
     "show_more": "Show more",
     "show_less": "Show less"
   },
-  "pending": "Loading..."
+  "pending": "Loading...",
+  "profile": {
+    "no_bio": "No bio yet.",
+    "edit_bio": "Edit bio",
+    "save": "Save",
+    "cancel": "Cancel"
+  }
 }
