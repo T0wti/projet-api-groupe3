@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Avatar from "@/components/ui/Avatar";
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/context/AuthContext';
 import { Post } from '@/types/post';
 
 interface PostCardProps {
@@ -14,10 +15,11 @@ interface PostCardProps {
 
 export default function PostCard({ post, onLike, onReply }: PostCardProps) {
   const { t } = useTranslation('common');
-  // Local state just to toggle the reply input box open and closed
+  const { user } = useAuth();
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState('');
   const profileHref = `/profile/${encodeURIComponent(post.author.username)}`;
+  const avatarSrc = post.author.id === user?.id ? (user.avatarUrl ?? post.author.avatarUrl) : post.author.avatarUrl;
 
   const submitReply = () => {
     if (replyText.trim().length === 0) return;
@@ -32,7 +34,7 @@ export default function PostCard({ post, onLike, onReply }: PostCardProps) {
         {/* Avatar */}
         <div className="shrink-0">
           <Link href={profileHref} aria-label={`Voir le profil de ${post.author.username}`}>
-            <Avatar src={post.author.avatarUrl} alt={post.author.username} size="md" />
+            <Avatar src={avatarSrc} alt={post.author.username} size="md" />
           </Link>
         </div>
 

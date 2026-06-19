@@ -15,6 +15,7 @@ import {
   createComment,
 } from '@/lib/api/posts';
 import { fetchPublicUserById } from '@/lib/api/users';
+import { fetchProfileById } from '@/lib/api/profile';
 
 export default function HomeFeed() {
   const { user, isLoading: authLoading } = useAuth();
@@ -42,19 +43,28 @@ export default function HomeFeed() {
         ]);
         const likedSet = new Set(likedIds);
 
-        // Fetch usernames for authors that are not the current user
+        // Fetch usernames and avatars for authors that are not the current user
         const otherAuthorIds = [...new Set(
           backendPosts.map((p) => p.authorId).filter((id) => id !== user!.id)
         )];
-        const profiles = await Promise.allSettled(otherAuthorIds.map(fetchPublicUserById));
+        const [userResults, profileResults] = await Promise.all([
+          Promise.allSettled(otherAuthorIds.map(fetchPublicUserById)),
+          Promise.allSettled(otherAuthorIds.map(fetchProfileById)),
+        ]);
         const authorMap = new Map<string, string>();
-        profiles.forEach((result, i) => {
+        const avatarMap = new Map<string, string | null | undefined>();
+        userResults.forEach((result, i) => {
           if (result.status === 'fulfilled') {
             authorMap.set(otherAuthorIds[i], result.value.username);
           }
         });
+        profileResults.forEach((result, i) => {
+          if (result.status === 'fulfilled') {
+            avatarMap.set(otherAuthorIds[i], result.value.avatar_url ?? null);
+          }
+        });
 
-        setPosts(backendPosts.map((bp) => mapBackendPost(bp, likedSet, user!, authorMap)));
+        setPosts(backendPosts.map((bp) => mapBackendPost(bp, likedSet, user!, authorMap, avatarMap)));
       } catch {
         setError('Failed to load posts.');
       } finally {
