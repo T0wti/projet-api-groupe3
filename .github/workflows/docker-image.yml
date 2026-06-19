@@ -81,6 +81,7 @@ jobs:
 
           POST_PORT=${{ vars.POST_PORT }}
           POST_MONGO_URI=${{ secrets.POST_MONGO_URI }}
+          POST_DB_USER=${{ vars.POST_DB_USER }}
           POST_DB_PASSWORD=${{ secrets.POST_DB_PASSWORD }}
 
           PROFILE_PORT=${{ vars.PROFILE_PORT }}
