@@ -3,9 +3,10 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { MessageCircle, Heart, MoreHorizontal } from 'lucide-react';
+import { MessageCircle, Heart } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Avatar from "@/components/ui/Avatar";
+import ContextMenu from "@/components/ui/ContextMenu";
 import { useAuth } from '@/context/AuthContext';
 import { Post } from '@/types/post';
 
@@ -25,7 +26,6 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState('');
   const [expanded, setExpanded] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content);
   const profileHref = `/profile/${encodeURIComponent(post.author.username)}`;
@@ -63,13 +63,6 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
     router.push(`/posts/${post.id}`);
   };
 
-  const handleDelete = async () => {
-    setIsMenuOpen(false);
-    if (!onDelete) return;
-    if (!window.confirm(t('post_card.delete_confirm'))) return;
-    await onDelete(post.id);
-  };
-
   return (
     <article
       className={`relative bg-white border border-gray-200 p-4 hover:bg-gray-50 transition-colors rounded-lg${disableNavigation ? '' : ' cursor-pointer'}`}
@@ -90,35 +83,13 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
             </Link>
 
             {showAuthorMenu && (
-              <div className="relative">
-                <button
-                  onClick={() => setIsMenuOpen((prev) => !prev)}
-                  className="text-gray-400 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 transition-colors"
-                  aria-label="Post options"
-                >
-                  <MoreHorizontal size={16} />
-                </button>
-                {isMenuOpen && (
-                  <div className="absolute right-0 top-7 z-20 min-w-27.5 rounded-lg border border-gray-200 bg-white shadow-lg">
-                    {onEdit && (
-                      <button
-                        onClick={() => { setIsEditing(true); setEditContent(post.content); setIsMenuOpen(false); }}
-                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-t-lg"
-                      >
-                        {t('post_card.edit')}
-                      </button>
-                    )}
-                    {onDelete && (
-                      <button
-                        onClick={handleDelete}
-                        className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-50 rounded-b-lg"
-                      >
-                        {t('post_card.delete')}
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
+              <ContextMenu
+                ariaLabel="Post options"
+                actions={[
+                  ...(onEdit ? [{ label: t('post_card.edit'), onClick: () => { setIsEditing(true); setEditContent(post.content); } }] : []),
+                  ...(onDelete ? [{ label: t('post_card.delete'), onClick: () => { if (window.confirm(t('post_card.delete_confirm'))) onDelete(post.id); }, danger: true }] : []),
+                ]}
+              />
             )}
           </div>
 
