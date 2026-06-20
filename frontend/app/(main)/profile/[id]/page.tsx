@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import Avatar from '@/components/ui/Avatar';
+import ContextMenu from '@/components/ui/ContextMenu';
 import Button from '@/components/ui/Button';
 import PostCard from '@/components/feed/PostCard';
 import FollowListModal from '@/components/profile/FollowListModal';
@@ -604,20 +605,13 @@ export default function ProfilePage() {
                             <span className="text-gray-500">@{profileUser?.username}</span>
                           </div>
                           {isOwnProfile && !isEditing && (
-                            <div className="flex gap-3">
-                              <button
-                                onClick={() => { setEditingCommentId(comment._id); setEditingCommentContent(comment.content); }}
-                                className="text-xs text-teal-600 hover:underline"
-                              >
-                                {t('profile:comment.edit')}
-                              </button>
-                              <button
-                                onClick={() => handleDeleteComment(comment._id)}
-                                className="text-xs text-red-500 hover:underline"
-                              >
-                                {t('profile:comment.delete')}
-                              </button>
-                            </div>
+                            <ContextMenu
+                              ariaLabel="Comment options"
+                              actions={[
+                                { label: t('profile:comment.edit'), onClick: () => { setEditingCommentId(comment._id); setEditingCommentContent(comment.content); } },
+                                { label: t('profile:comment.delete'), onClick: () => handleDeleteComment(comment._id), danger: true },
+                              ]}
+                            />
                           )}
                         </div>
                         {isEditing ? (
