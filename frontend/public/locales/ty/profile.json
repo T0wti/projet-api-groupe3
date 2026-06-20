@@ -20,6 +20,12 @@
     "posts_replies": "Tātā'ura'a & Pāhono",
     "likes": "Maitai"
   },
+  "follow_list": {
+    "followers_title": "Ia aru ia'na",
+    "following_title": "Ia aru atu",
+    "empty_followers": "Aore ia aru ia'na.",
+    "empty_following": "Aore ia aru atu."
+  },
   "avatar": {
     "uploading": "Fa'ahou...",
     "change": "Huri",

@@ -20,6 +20,12 @@
     "posts_replies": "المنشورات والردود",
     "likes": "الإعجابات"
   },
+  "follow_list": {
+    "followers_title": "المتابعون",
+    "following_title": "المتابَعون",
+    "empty_followers": "لا متابعون بعد.",
+    "empty_following": "لا يتابع أحداً بعد."
+  },
   "avatar": {
     "uploading": "جارٍ الرفع...",
     "change": "تغيير",

@@ -20,6 +20,12 @@
     "posts_replies": "Posts & Respuestas",
     "likes": "Me gusta"
   },
+  "follow_list": {
+    "followers_title": "Seguidores",
+    "following_title": "Seguidos",
+    "empty_followers": "Aún no hay seguidores.",
+    "empty_following": "Aún no sigue a nadie."
+  },
   "avatar": {
     "uploading": "Subiendo...",
     "change": "Cambiar",
