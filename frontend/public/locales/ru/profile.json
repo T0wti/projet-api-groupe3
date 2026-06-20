@@ -13,6 +13,11 @@
     "unfollow": "Отписаться"
   },
   "empty_posts_message": "Этот пользователь ещё ничего не опубликовал.",
+  "empty_replies_message": "Ответов пока нет.",
+  "tabs": {
+    "posts": "Публикации",
+    "posts_replies": "Публикации и ответы"
+  },
   "avatar": {
     "uploading": "Загрузка...",
     "change": "Изменить",

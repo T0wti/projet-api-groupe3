@@ -38,7 +38,8 @@
     "delete": "מחק",
     "save": "שמור",
     "cancel_edit": "בטל",
-    "delete_confirm": "האם אתה בטוח שברצונך למחוק פוסט זה?"
+    "delete_confirm": "האם אתה בטוח שברצונך למחוק פוסט זה?",
+    "no_comments": "אין תגובות עדיין."
   },
   "explore_page": {
     "title": "חיפוש",

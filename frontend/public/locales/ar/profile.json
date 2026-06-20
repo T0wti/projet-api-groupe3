@@ -13,6 +13,11 @@
     "unfollow": "إلغاء المتابعة"
   },
   "empty_posts_message": "لم ينشر هذا المستخدم أي منشور بعد.",
+  "empty_replies_message": "ما كانش ردود بعد.",
+  "tabs": {
+    "posts": "المنشورات",
+    "posts_replies": "المنشورات والردود"
+  },
   "avatar": {
     "uploading": "جارٍ الرفع...",
     "change": "تغيير",

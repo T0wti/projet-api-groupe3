@@ -38,7 +38,8 @@
     "delete": "Supprimer",
     "save": "Enregistrer",
     "cancel_edit": "Annuler",
-    "delete_confirm": "Êtes-vous sûr de vouloir supprimer ce post ?"
+    "delete_confirm": "Êtes-vous sûr de vouloir supprimer ce post ?",
+    "no_comments": "Aucun commentaire pour l'instant."
   },
   "explore_page": {
     "title": "Explorer",

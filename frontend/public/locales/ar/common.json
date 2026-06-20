@@ -38,7 +38,8 @@
     "delete": "احذف",
     "save": "حفظ",
     "cancel_edit": "إلغاء",
-    "delete_confirm": "واش راك متأكد بلي تحب تحذف هاد المنشور؟"
+    "delete_confirm": "واش راك متأكد بلي تحب تحذف هاد المنشور؟",
+    "no_comments": "ما كانش تعليقات بعد."
   },
   "explore_page": {
     "title": "اكتشف",
