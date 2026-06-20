@@ -13,6 +13,11 @@
     "unfollow": "Ārahi ore"
   },
   "empty_posts_message": "Aore te tao'a ua fa'aite'ite'ahia e tei'a feia.",
+  "empty_replies_message": "Aore pāhono.",
+  "tabs": {
+    "posts": "Tātā'ura'a",
+    "posts_replies": "Tātā'ura'a & Pāhono"
+  },
   "avatar": {
     "uploading": "Fa'ahou...",
     "change": "Huri",

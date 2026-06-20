@@ -38,7 +38,8 @@
     "delete": "Eliminar",
     "save": "Guardar",
     "cancel_edit": "Cancelar",
-    "delete_confirm": "¿Estás seguro de que quieres eliminar esta publicación?"
+    "delete_confirm": "¿Estás seguro de que quieres eliminar esta publicación?",
+    "no_comments": "Aún no hay comentarios."
   },
   "explore_page": {
     "title": "Explorar",

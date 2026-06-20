@@ -13,6 +13,11 @@
     "unfollow": "Ne plus suivre"
   },
   "empty_posts_message": "Cet utilisateur n'a pas encore publié de post.",
+  "empty_replies_message": "Aucune réponse pour l'instant.",
+  "tabs": {
+    "posts": "Posts",
+    "posts_replies": "Posts & Réponses"
+  },
   "avatar": {
     "uploading": "Envoi...",
     "change": "Changer",

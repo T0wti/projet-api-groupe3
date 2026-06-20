@@ -1,23 +1,24 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import Avatar from '@/components/ui/Avatar';
 import Button from '@/components/ui/Button';
 import PostCard from '@/components/feed/PostCard';
 import { useAuth } from '@/context/AuthContext';
-import { createComment, fetchPosts, fetchUserLikedPostIds, likePost, unlikePost, updatePost, deletePost } from '@/lib/api/posts';
+import { createComment, fetchPosts, fetchUserLikedPostIds, likePost, unlikePost, updatePost, deletePost, fetchCommentsByUser, fetchPostById } from '@/lib/api/posts';
 import { fetchFollowingById, fetchProfileById, followUser, unfollowUser, updateProfile } from '@/lib/api/profile';
 import { uploadMedia, deleteMedia, ALLOWED_AVATAR_TYPES, MAX_UPLOAD_SIZE_BYTES } from '@/lib/api/media';
 import { fetchPublicUserByUsername } from '@/lib/api/users';
-import { Post, Reply, mapBackendComment, mapBackendPost } from '@/types/post';
+import { Post, Reply, BackendComment, BackendPost, mapBackendComment, mapBackendPost } from '@/types/post';
 import { User } from '@/types/user';
 
 export default function ProfilePage() {
   const params = useParams<{ id: string }>();
   const routeUsername = Array.isArray(params.id) ? params.id[0] : params.id;
   const { user, isLoading: authLoading, updateUser } = useAuth();
+  const router = useRouter();
   const { t } = useTranslation(['common', 'profile']);
   const isProfileUnavailable = !authLoading && (!user || !routeUsername);
   const [profileUser, setProfileUser] = useState<User | null>(null);
@@ -31,6 +32,11 @@ export default function ProfilePage() {
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [bioInput, setBioInput] = useState('');
   const [isSavingBio, setIsSavingBio] = useState(false);
+  const [activeTab, setActiveTab] = useState<'posts' | 'replies'>('posts');
+  const [userComments, setUserComments] = useState<BackendComment[]>([]);
+  const [postMap, setPostMap] = useState<Map<string, BackendPost>>(new Map());
+  const [isLoadingReplies, setIsLoadingReplies] = useState(false);
+  const [repliesLoaded, setRepliesLoaded] = useState(false);
 
   useEffect(() => {
     if (authLoading || !user || !routeUsername) {
@@ -43,6 +49,10 @@ export default function ProfilePage() {
       try {
         setIsLoading(true);
         setError(null);
+        setActiveTab('posts');
+        setRepliesLoaded(false);
+        setUserComments([]);
+        setPostMap(new Map());
 
         const publicUser = await fetchPublicUserByUsername(routeUsername);
         const profileId = publicUser.id;
@@ -160,6 +170,34 @@ export default function ProfilePage() {
   const handleDeletePost = async (postId: string) => {
     await deletePost(postId);
     setPosts((prev) => prev.filter((p) => p.id !== postId));
+  };
+
+  const loadReplies = async (profileId: string) => {
+    setIsLoadingReplies(true);
+    try {
+      const comments = await fetchCommentsByUser(profileId);
+      setUserComments(comments);
+
+      const uniquePostIds = [...new Set(comments.map(c => c.post_id))];
+      const postResults = await Promise.allSettled(uniquePostIds.map(fetchPostById));
+      const map = new Map<string, BackendPost>();
+      postResults.forEach((r, i) => {
+        if (r.status === 'fulfilled') map.set(uniquePostIds[i], r.value.post);
+      });
+      setPostMap(map);
+      setRepliesLoaded(true);
+    } catch {
+      // fail silently
+    } finally {
+      setIsLoadingReplies(false);
+    }
+  };
+
+  const handleTabChange = (tab: 'posts' | 'replies') => {
+    setActiveTab(tab);
+    if (tab === 'replies' && !repliesLoaded && profileUser) {
+      loadReplies(profileUser.id);
+    }
   };
 
   const handleToggleFollow = async () => {
@@ -383,13 +421,27 @@ export default function ProfilePage() {
             </div>
           </section>
 
-          <section>
-            {posts.length === 0 && (
-              <p className="px-4 py-10 text-center text-gray-500">{t('profile:empty_posts_message')}</p>
-            )}
+          <div className="flex border-b border-gray-200">
+            <button
+              onClick={() => handleTabChange('posts')}
+              className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === 'posts' ? 'border-b-2 border-teal-600 text-teal-600' : 'text-gray-500 hover:text-gray-700'}`}
+            >
+              {t('profile:tabs.posts')}
+            </button>
+            <button
+              onClick={() => handleTabChange('replies')}
+              className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === 'replies' ? 'border-b-2 border-teal-600 text-teal-600' : 'text-gray-500 hover:text-gray-700'}`}
+            >
+              {t('profile:tabs.posts_replies')}
+            </button>
+          </div>
 
-            {posts.map((post) => {
-              return (
+          {activeTab === 'posts' && (
+            <section>
+              {posts.length === 0 && (
+                <p className="px-4 py-10 text-center text-gray-500">{t('profile:empty_posts_message')}</p>
+              )}
+              {posts.map((post) => (
                 <PostCard
                   key={post.id}
                   post={post}
@@ -397,9 +449,49 @@ export default function ProfilePage() {
                   onReply={(content: string) => handleReply(post.id, content)}
                   {...(isOwnProfile && { onEdit: handleEditPost, onDelete: handleDeletePost })}
                 />
-              );
-            })}
-          </section>
+              ))}
+            </section>
+          )}
+
+          {activeTab === 'replies' && (
+            <section>
+              {isLoadingReplies && (
+                <p className="px-4 py-10 text-center text-gray-400">{t('pending')}</p>
+              )}
+              {!isLoadingReplies && userComments.length === 0 && (
+                <p className="px-4 py-10 text-center text-gray-500">{t('profile:empty_replies_message')}</p>
+              )}
+              {!isLoadingReplies && userComments.map((comment) => {
+                const originalPost = postMap.get(comment.post_id);
+                return (
+                  <div key={comment._id} className="border-b border-gray-100 px-4 py-3 hover:bg-gray-50">
+                    {originalPost && (
+                      <button
+                        onClick={() => router.push(`/posts/${comment.post_id}`)}
+                        className="mb-2 w-full text-left px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-sm text-gray-500 line-clamp-2 hover:bg-gray-100 transition-colors"
+                      >
+                        {originalPost.content.length > 100
+                          ? originalPost.content.slice(0, 100) + '…'
+                          : originalPost.content}
+                      </button>
+                    )}
+                    <div className="flex gap-3">
+                      <div className="shrink-0">
+                        <Avatar src={profileUser?.avatarUrl} alt={profileUser?.username ?? ''} size="sm" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1 text-sm">
+                          <span className="font-bold text-gray-900">{profileUser?.name}</span>
+                          <span className="text-gray-500">@{profileUser?.username}</span>
+                        </div>
+                        <p className="mt-1 text-gray-900 text-[15px] whitespace-pre-wrap">{comment.content}</p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </section>
+          )}
         </>
       )}
     </main>
