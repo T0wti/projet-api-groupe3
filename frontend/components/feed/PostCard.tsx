@@ -161,6 +161,17 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
             </>
           )}
 
+          {post.imageUrl && (
+            <div className="mt-3 max-h-96 w-full overflow-hidden rounded-2xl border border-gray-100 bg-gray-50">
+              <img 
+                src={post.imageUrl} 
+                alt="Contenu du post" 
+                className="w-full max-h-96 object-cover"
+                loading="lazy"
+              />
+            </div>
+          )}
+
           {/* Actions */}
           <div className="flex items-center gap-8 mt-3">
             <button

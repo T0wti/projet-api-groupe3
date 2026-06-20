@@ -35,6 +35,10 @@ export interface BackendPost {
   commentsCount: number;
   tags?: string[];
   createdAt: string;
+  media?: {
+    type: 'image' | 'video' | null;
+    url: string | null;
+  }
 }
 
 export interface BackendComment {
@@ -75,6 +79,7 @@ export function mapBackendPost(
     likesCount: bp.likesCount,
     commentsCount: bp.commentsCount,
     tags: bp.tags,
+    imageUrl: bp.media?.url || undefined,
     repostsCount: 0,
     isLiked: likedIds.has(bp._id),
   };
