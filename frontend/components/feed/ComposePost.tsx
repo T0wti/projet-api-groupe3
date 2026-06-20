@@ -6,9 +6,10 @@ import { useTranslation } from 'react-i18next';
 import Avatar from '@/components/ui/Avatar';
 import Button from '@/components/ui/Button';
 import { useAuth } from '@/context/AuthContext';
+import { uploadMedia, deleteMedia, ALLOWED_AVATAR_TYPES, MAX_UPLOAD_SIZE_BYTES } from '@/lib/api/media';
 
 interface ComposePostProps {
-  onPost: (content: string) => Promise<void>;
+  onPost: (content: string, image: File | null) => Promise<void>;
   isPosting?: boolean;
 }
 
@@ -62,7 +63,7 @@ export default function ComposePost({ onPost, isPosting = false }: ComposePostPr
     // On permet de poster si le texte n'est pas vide OU si une image est présente
     if ((content.trim().length === 0 && !selectedFile) || isPosting) return;
     
-    await onPost(content);
+    await onPost(content, selectedFile);
     setContent('');
     setSelectedFile(null);
   };

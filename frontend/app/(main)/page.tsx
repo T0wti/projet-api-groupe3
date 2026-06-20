@@ -16,6 +16,7 @@ import {
 } from '@/lib/api/posts';
 import { fetchPublicUserById } from '@/lib/api/users';
 import { fetchProfileById, fetchFollowingById } from '@/lib/api/profile';
+import { uploadMedia } from '@/lib/api/media';
 
 export default function HomeFeed() {
   const { user, isLoading: authLoading } = useAuth();
@@ -78,7 +79,7 @@ export default function HomeFeed() {
     loadFeed();
   }, [user, authLoading]);
 
-  const handleAddNewPost = async (content: string) => {
+  const handleAddNewPost = async (content: string, image: File | null) => {
     if (!user) return;
     setIsPosting(true);
     setPostError(null);
@@ -86,7 +87,12 @@ export default function HomeFeed() {
       const tags = [...new Set(
         [...content.matchAll(/\B#(\w+)/g)].map((m) => m[1].toLowerCase())
       )];
-      const bp = await createPost(content, tags.length > 0 ? tags : undefined);
+      let uploadedImageUrl: string | null = null;
+      if (image) {
+        const {url} = await uploadMedia(image);
+        uploadedImageUrl = url;
+      }
+      const bp = await createPost(content, tags.length > 0 ? tags : undefined, uploadedImageUrl);
       const newPost = mapBackendPost(bp, new Set(), user);
       setPosts((prev) => [newPost, ...prev]);
     } catch (err: any) {
