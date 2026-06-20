@@ -68,6 +68,22 @@ export const getAllMainPosts = async (_req: Request, res: Response) => {
 };
 
 /**
+ * Retrieve posts from a specific set of authors (followed-users feed)
+ */
+export const getFeedPosts = async (req: Request, res: Response) => {
+  const raw = req.query.authorIds as string | string[] | undefined;
+  const authorIds = Array.isArray(raw) ? raw : raw ? raw.split(',') : [];
+
+  if (authorIds.length === 0) {
+    return res.status(200).json([]);
+  }
+
+  const posts = await Post.find({ parentPost: null, authorId: { $in: authorIds } })
+    .sort({ createdAt: -1 });
+  return res.status(200).json(await attachPostTags(posts));
+};
+
+/**
  * Retrieve a specific post along with all its direct replies
  */
 export const getPostWithReplies = async (req: Request, res: Response) => {
