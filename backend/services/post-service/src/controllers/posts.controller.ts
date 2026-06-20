@@ -140,6 +140,14 @@ export const updatePost = async (req: Request, res: Response) => {
     throw new AppError(400, 'Post ID is invalid.');
   }
 
+    const existingPost = await Post.findById(id);
+    if (!existingPost) throw new AppError(404, 'Post not found.');
+
+    const requestingUserId = req.headers['x-user-id'] as string | undefined;
+    if (!requestingUserId || requestingUserId !== existingPost.authorId.toString()) {
+      throw new AppError(403, 'You are not allowed to edit this post.');
+    }
+
     const updatedPost = await Post.findByIdAndUpdate(
       id,
       {
@@ -178,6 +186,11 @@ const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
 
     const postToDelete = await Post.findById(id);
     if (!postToDelete) throw new AppError(404, 'Post not found.');
+
+    const requestingUserId = req.headers['x-user-id'] as string | undefined;
+    if (!requestingUserId || requestingUserId !== postToDelete.authorId.toString()) {
+      throw new AppError(403, 'You are not allowed to delete this post.');
+    }
 
     if (postToDelete.parentPost) {
       await Post.findByIdAndUpdate(postToDelete.parentPost, { $inc: { commentsCount: -1 } });
