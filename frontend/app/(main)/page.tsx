@@ -7,7 +7,7 @@ import PostCard from '@/components/feed/PostCard';
 import { useAuth } from '@/context/AuthContext';
 import { Post, Reply, mapBackendPost, mapBackendComment } from '@/types/post';
 import {
-  fetchPosts,
+  fetchFeedPosts,
   fetchUserLikedPostIds,
   createPost,
   likePost,
@@ -15,7 +15,7 @@ import {
   createComment,
 } from '@/lib/api/posts';
 import { fetchPublicUserById } from '@/lib/api/users';
-import { fetchProfileById } from '@/lib/api/profile';
+import { fetchProfileById, fetchFollowingById } from '@/lib/api/profile';
 
 export default function HomeFeed() {
   const { user, isLoading: authLoading } = useAuth();
@@ -37,10 +37,17 @@ export default function HomeFeed() {
 
     async function loadFeed() {
       try {
-        const [backendPosts, likedIds] = await Promise.all([
-          fetchPosts(),
+        const [followingIds, likedIds] = await Promise.all([
+          fetchFollowingById(user!.id),
           fetchUserLikedPostIds(user!.id),
         ]);
+
+        if (followingIds.length === 0) {
+          setPosts([]);
+          return;
+        }
+
+        const backendPosts = await fetchFeedPosts(followingIds);
         const likedSet = new Set(likedIds);
 
         // Fetch usernames and avatars for authors that are not the current user
@@ -158,6 +165,10 @@ export default function HomeFeed() {
 
       {error && (
         <p className="text-center text-red-500 py-8">{error}</p>
+      )}
+
+      {!isLoading && !error && posts.length === 0 && (
+        <p className="text-center text-gray-400 py-16">{t('home_page.empty_message')}</p>
       )}
 
       <section className="px-10 py-5 space-y-5">

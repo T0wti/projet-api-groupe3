@@ -6,6 +6,13 @@ export async function fetchPosts(): Promise<BackendPost[]> {
   return res.data;
 }
 
+export async function fetchFeedPosts(authorIds: string[]): Promise<BackendPost[]> {
+  const res = await api.get<BackendPost[]>('/posts/feed', {
+    params: { authorIds: authorIds.join(',') },
+  });
+  return res.data;
+}
+
 export async function fetchUserLikedPostIds(userId: string): Promise<string[]> {
   const res = await api.get<{ liked_posts: string[] }>(`/post-likes/user/${userId}`);
   return res.data.liked_posts.map(String);
