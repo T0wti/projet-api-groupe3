@@ -113,7 +113,7 @@ export default function ComposePost({ onPost, isPosting = false }: ComposePostPr
                 type="file"
                 ref={fileInputRef}
                 onChange={handleFileChange}
-                accept="image/png, image/jpeg, image/webp"
+                accept="image/png, image/jpeg, image/webp, image/gif"
                 className="hidden"
               />
             </div>
