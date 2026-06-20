@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   createPost,
   getAllMainPosts,
+  getFeedPosts,
   getPostWithReplies,
   getRepliesForPost,
   getPostsByTag,
@@ -14,8 +15,9 @@ const router = Router();
 
 router.post('/', createPost);
 router.get('/', getAllMainPosts);
+router.get('/feed', getFeedPosts);
 router.get('/search', searchPosts);
-router.get('/tags/:tag', getPostsByTag); 
+router.get('/tags/:tag', getPostsByTag);
 router.get('/:id', getPostWithReplies);
 router.get('/:id/replies', getRepliesForPost);
 router.put('/:id', updatePost);

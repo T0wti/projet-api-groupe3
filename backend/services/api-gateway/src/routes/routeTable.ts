@@ -38,6 +38,7 @@ export const routeTable: RouteRule[] = [
   { method: 'post', path: '/api/posts', target: 'post', auth: 'required' },
   { method: 'get', path: '/api/posts/tags/:tag', target: 'post', auth: 'required' },
   { method: 'get', path: '/api/posts', target: 'post', auth: 'required' },
+  { method: 'get', path: '/api/posts/feed', target: 'post', auth: 'required' },
   { method: 'get', path: '/api/posts/:id', target: 'post', auth: 'required' },
   { method: 'get', path: '/api/posts/:id/replies', target: 'post', auth: 'required' },
   { method: 'get', path: '/api/posts/search', target: 'post', auth: 'required' },
