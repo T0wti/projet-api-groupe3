@@ -141,7 +141,7 @@ export default function HomeFeed() {
   };
 
   return (
-    <main className="w-full max-w-150 border-x border-gray-200 min-h-screen">
+    <main className="w-full border-x border-gray-200 min-h-screen">
       <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-200 p-4">
         <h1 className="text-xl font-bold">{t('home_page.title')}</h1>
       </header>
@@ -160,7 +160,7 @@ export default function HomeFeed() {
         <p className="text-center text-red-500 py-8">{error}</p>
       )}
 
-      <section>
+      <section className="px-10 py-5 space-y-5">
         {posts.map((post) => {
           const PostCardAny = PostCard as any;
           return (

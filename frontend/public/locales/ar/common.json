@@ -29,10 +29,13 @@
     "placeholder": "واش كاين جديد؟",
     "submit_button": "انشر"
   },
-  "post_card": {
+    "post_card": {
     "reply_placeholder": "رجع على هاد المنشور...",
-    "reply_button": "رجع"
+    "reply_button": "رجع",
+    "show_more": "شوف أكثر",
+    "show_less": "شوف أقل"
   },
+  "pending": "جارٍ التحميل...",
   "profile": {
     "no_bio": "ما كانش وصف بعد.",
     "edit_bio": "عدّل الوصف",

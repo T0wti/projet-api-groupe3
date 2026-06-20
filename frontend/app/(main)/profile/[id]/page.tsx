@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import Avatar from '@/components/ui/Avatar';
@@ -15,12 +16,13 @@ import { Post, Reply, mapBackendComment, mapBackendPost } from '@/types/post';
 import { User } from '@/types/user';
 
 export default function ProfilePage() {
+  const { t } = useTranslation('profile');
+  const { c } = useTranslation('common');
   const params = useParams<{ id: string }>();
   const routeUsername = Array.isArray(params.id) ? params.id[0] : params.id;
   const { user, isLoading: authLoading, updateUser } = useAuth();
   const { t } = useTranslation('common');
   const isProfileUnavailable = !authLoading && (!user || !routeUsername);
-
   const [profileUser, setProfileUser] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -258,20 +260,20 @@ export default function ProfilePage() {
   };
 
   return (
-    <main className="w-full max-w-150 border-x border-gray-200 min-h-screen bg-white">
+    <main className="w-full border-x border-gray-200 min-h-screen bg-gray-50">
       <header className="sticky top-0 z-10 border-b border-gray-200 bg-white/90 px-4 py-4 backdrop-blur-md">
-        <h1 className="text-xl font-bold text-gray-900">Profil</h1>
+        <h1 className="text-xl font-bold text-gray-900">{t('header_title')}</h1>
       </header>
 
-      {isLoading && <p className="px-4 py-8 text-center text-gray-400">Chargement du profil...</p>}
+      {isLoading && <p className="px-4 py-8 text-center text-gray-400">{t('loading_message')}</p>}
 
-      {isProfileUnavailable && <p className="px-4 py-8 text-center text-red-500">Profil indisponible.</p>}
+      {isProfileUnavailable && <p className="px-4 py-8 text-center text-red-500">{t('unavailable_message')}</p>}
 
-      {error && <p className="px-4 py-8 text-center text-red-500">{error}</p>}
+      {error && <p className="px-4 py-8 text-center text-red-500">{t('error_message')}</p>}
 
       {!isLoading && !isProfileUnavailable && !error && profileUser && (
         <>
-          <section className="border-b border-gray-200 px-4 py-6">
+          <section className="border-b border-gray-200 px-4 py-6 bg-white">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div className="flex items-start gap-4">
                 {isOwnProfile ? (
@@ -309,19 +311,19 @@ export default function ProfilePage() {
                   onClick={handleToggleFollow}
                   className="sm:self-start"
                 >
-                  {isFollowPending ? 'Chargement...' : isFollowing ? 'Ne plus suivre' : 'Suivre'}
+                  {isFollowPending ? c('pending') : isFollowing ? t('follow_button.unfollow') : t('follow_button.follow')}
                 </Button>
               )}
 
               <div className="flex gap-6 text-sm text-gray-600">
                 <p>
-                  <span className="font-bold text-gray-900">{posts.length}</span> posts
+                  <span className="font-bold text-gray-900">{posts.length}</span> {t('stats.posts')}
                 </p>
                 <p>
-                  <span className="font-bold text-gray-900">{profileUser.followersCount ?? 0}</span> abonnés
+                  <span className="font-bold text-gray-900">{profileUser.followersCount ?? 0}</span> {t('stats.followers')}
                 </p>
                 <p>
-                  <span className="font-bold text-gray-900">{profileUser.followingCount ?? 0}</span> abonnements
+                  <span className="font-bold text-gray-900">{profileUser.followingCount ?? 0}</span> {t('stats.following')}
                 </p>
               </div>
             </div>
@@ -373,9 +375,9 @@ export default function ProfilePage() {
             </div>
           </section>
 
-          <section>
+          <section className="flex flex-col divide-y divide-gray-200 px-10 center mx-auto py-5 space-y-5">
             {posts.length === 0 && (
-              <p className="px-4 py-10 text-center text-gray-500">Cet utilisateur n&apos;a pas encore publié de post.</p>
+              <p className="px-4 py-10 text-center text-gray-500">{t('empty_posts_message')}</p>
             )}
 
             {posts.map((post) => {

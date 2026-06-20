@@ -1,0 +1,16 @@
+{
+  "header_title": "Profil",
+  "loading_message": "Chargement du profil...",
+  "unavailable_message": "Profil indisponible.",
+  "error_message": "Impossible de charger ce profil.",
+  "stats": {
+    "posts": "posts",
+    "followers": "abonnés",
+    "following": "abonnements"
+  },
+  "follow_button": {
+    "follow": "Suivre",
+    "unfollow": "Ne plus suivre"
+  },
+  "empty_posts_message": "Cet utilisateur n'a pas encore publié de post."
+}

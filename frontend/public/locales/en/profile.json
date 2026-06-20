@@ -1,0 +1,16 @@
+{
+  "header_title": "Profile",
+  "loading_message": "Loading profile...",
+  "unavailable_message": "Profile unavailable.",
+  "error_message": "Unable to load this profile.",
+  "stats": {
+    "posts": "posts",
+    "followers": "followers",
+    "following": "following"
+  },
+  "follow_button": {
+    "follow": "Follow",
+    "unfollow": "Unfollow"
+  },
+  "empty_posts_message": "This user hasn't posted anything yet."
+}

@@ -1,5 +1,48 @@
 @import "tailwindcss";
 
+@theme {
+  --color-brand: #0E7490;
+  --color-brand-hover: #155E75;
+  --color-accent: #F97316;
+  --color-primary-cyan: #0E7490;
+  --color-primary-orange: #F97316;
+  --color-primary-purple: #9333EA;
+  --color-primary-lime: #84CC16;
+  --color-custom-white: #FFFFFF;
+  --color-gray-light: #E5E7EB;
+  --color-gray-dark: #374151;
+  --color-primary-blue: #3B82F6;
+}
+
 body {
-  @apply bg-slate-950 text-slate-200;
+  @apply bg-gray-50 text-gray-900 antialiased;
+}
+
+@layer components {
+  /* Sidebar / bottom-nav navigation item */
+  .nav-link {
+    @apply flex items-center gap-4 p-3 rounded-full transition-colors text-gray-700
+           hover:bg-gray-100 w-max lg:w-full;
+  }
+
+  /* Post action buttons (reply, repost, like) */
+  .post-action {
+    @apply inline-flex items-center gap-1.5 text-gray-500 transition-colors;
+  }
+
+  /* Generic card surface */
+  .card {
+    @apply bg-white rounded-2xl border border-gray-200 p-4;
+  }
+
+  /* Search bar wrapper */
+  .search-bar {
+    @apply bg-gray-100 rounded-full flex items-center gap-2 px-4 py-2;
+  }
+
+  /* Reply / compose input */
+  .inline-input {
+    @apply flex-1 bg-transparent border-b border-gray-300 outline-none
+           focus:border-brand py-1 text-sm;
+  }
 }

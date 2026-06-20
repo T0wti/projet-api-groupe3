@@ -31,8 +31,11 @@
   },
   "post_card": {
     "reply_placeholder": "Répondre à ce post...",
-    "reply_button": "Répondre"
+    "reply_button": "Répondre",
+    "show_more": "Voir plus",
+    "show_less": "Voir moins"
   },
+  "pending": "Chargement...",
   "profile": {
     "no_bio": "Aucune biographie pour le moment.",
     "edit_bio": "Modifier la bio",
