@@ -114,28 +114,6 @@ export const deleteUserInfos = async (req: Request<{ id: string }>, res: Respons
   }
 };
 
-// export const setBanStatus = async (req: Request<{ id: string }>, res: Response) => {
-//   const { id } = req.params;
-//   const { is_banned } = req.body;
-
-//   if (typeof is_banned !== 'boolean') {
-//     return res.status(400).json({ message: 'The is_banned field must be a boolean.' });
-//   }
-
-//   try {
-//     const user = await prisma.user.update({
-//       where: { id },
-//       data: { isBanned: is_banned },
-//     });
-//     return res.status(200).json(user);
-//   } catch (error) {
-//     if ((error as { code?: string }).code === 'P2025') {
-//       throw new AppError(404, 'User not found.');
-//     }
-//     throw new AppError(500, (error as Error).message);
-//   }
-// };
-
 export const updateUserRole = async (req: Request<{ id: string }>, res: Response) => {
   const { id } = req.params;
   const { role } = req.body;
@@ -172,7 +150,7 @@ export const searchUsers = async (req: Request, res: Response) => {
     const users = await prisma.user.findMany({
       where: {
         username: { contains: q, mode: 'insensitive' },
-        isBanned: false,
+        status: 'active', 
       },
       select: { id: true, username: true },
       take: 20,
@@ -181,3 +159,57 @@ export const searchUsers = async (req: Request, res: Response) => {
     return res.status(200).json(users);
 
 };
+
+export const suspendUser = async (req: Request<{ id: string }>, res: Response) => {
+  const { id } = req.params;
+  const { until, reason } = req.body;
+
+  if (!until) throw new AppError(400, 'until (date de fin de suspension) is required.');
+  const suspendedUntil = new Date(until);
+  if (isNaN(suspendedUntil.getTime()) || suspendedUntil <= new Date()) {
+    throw new AppError(400, 'until must be a valid future date.');
+  }
+
+  try {
+    const user = await prisma.user.update({
+      where: { id },
+      data: { status: 'suspended', suspendedUntil, statusReason: reason ?? null },
+    });
+    return res.status(200).json(user);
+  } catch (error) {
+    if ((error as { code?: string }).code === 'P2025') throw new AppError(404, 'User not found.');
+    throw error;
+  }
+};
+
+export const banUser = async (req: Request<{ id: string }>, res: Response) => {
+  const { id } = req.params;
+  const { reason } = req.body;
+
+  try {
+    const user = await prisma.user.update({
+      where: { id },
+      data: { status: 'banned', suspendedUntil: null, statusReason: reason ?? null },
+    });
+    return res.status(200).json(user);
+  } catch (error) {
+    if ((error as { code?: string }).code === 'P2025') throw new AppError(404, 'User not found.');
+    throw error;
+  }
+};
+
+export const reinstateUser = async (req: Request<{ id: string }>, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const user = await prisma.user.update({
+      where: { id },
+      data: { status: 'active', suspendedUntil: null, statusReason: null },
+    });
+    return res.status(200).json(user);
+  } catch (error) {
+    if ((error as { code?: string }).code === 'P2025') throw new AppError(404, 'User not found.');
+    throw error;
+  }
+};
+
