@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import Avatar from '@/components/ui/Avatar';
 import Button from '@/components/ui/Button';
 import PostCard from '@/components/feed/PostCard';
+import FollowListModal from '@/components/profile/FollowListModal';
 import { useAuth } from '@/context/AuthContext';
 import { createComment, fetchPosts, fetchUserLikedPostIds, likePost, unlikePost, updatePost, deletePost, fetchCommentsByUser, fetchPostById } from '@/lib/api/posts';
 import { fetchFollowingById, fetchProfileById, followUser, unfollowUser, updateProfile } from '@/lib/api/profile';
@@ -33,6 +34,7 @@ export default function ProfilePage() {
   const [bioInput, setBioInput] = useState('');
   const [isSavingBio, setIsSavingBio] = useState(false);
   const [activeTab, setActiveTab] = useState<'posts' | 'replies'>('posts');
+  const [followModal, setFollowModal] = useState<'followers' | 'following' | null>(null);
   const [userComments, setUserComments] = useState<BackendComment[]>([]);
   const [postMap, setPostMap] = useState<Map<string, BackendPost>>(new Map());
   const [isLoadingReplies, setIsLoadingReplies] = useState(false);
@@ -365,12 +367,18 @@ export default function ProfilePage() {
                 <p>
                   <span className="font-bold text-gray-900">{posts.length}</span> {t('profile:stats.posts')}
                 </p>
-                <p>
+                <button
+                  onClick={() => setFollowModal('followers')}
+                  className="hover:underline text-left"
+                >
                   <span className="font-bold text-gray-900">{profileUser.followersCount ?? 0}</span> {t('profile:stats.followers')}
-                </p>
-                <p>
+                </button>
+                <button
+                  onClick={() => setFollowModal('following')}
+                  className="hover:underline text-left"
+                >
                   <span className="font-bold text-gray-900">{profileUser.followingCount ?? 0}</span> {t('profile:stats.following')}
-                </p>
+                </button>
               </div>
             </div>
 
@@ -493,6 +501,13 @@ export default function ProfilePage() {
             </section>
           )}
         </>
+      )}
+      {followModal && profileUser && (
+        <FollowListModal
+          userId={profileUser.id}
+          type={followModal}
+          onClose={() => setFollowModal(null)}
+        />
       )}
     </main>
   );

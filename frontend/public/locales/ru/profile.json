@@ -18,6 +18,12 @@
     "posts": "Публикации",
     "posts_replies": "Публикации и ответы"
   },
+  "follow_list": {
+    "followers_title": "Подписчики",
+    "following_title": "Подписки",
+    "empty_followers": "Подписчиков пока нет.",
+    "empty_following": "Нет подписок."
+  },
   "avatar": {
     "uploading": "Загрузка...",
     "change": "Изменить",

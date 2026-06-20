@@ -18,6 +18,12 @@
     "posts": "Posts",
     "posts_replies": "Posts & Replies"
   },
+  "follow_list": {
+    "followers_title": "Followers",
+    "following_title": "Following",
+    "empty_followers": "No followers yet.",
+    "empty_following": "Not following anyone yet."
+  },
   "avatar": {
     "uploading": "Uploading...",
     "change": "Change",
