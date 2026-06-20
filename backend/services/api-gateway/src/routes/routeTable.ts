@@ -31,9 +31,13 @@ export const routeTable: RouteRule[] = [
   { method: 'get', path: '/api/users/search', target: 'user', auth: 'required' },
   { method: 'put', path: '/api/users/:id', target: 'user', auth: 'required', selfParam: 'id', bypassRoles: ['admin'] },
   { method: 'delete', path: '/api/users/:id', target: 'user', auth: 'required', selfParam: 'id', bypassRoles: ['admin'] },
-  //{ method: 'patch', path: '/api/users/:id/ban', target: 'user', auth: 'required', roles: ['admin'] },
   { method: 'patch', path: '/api/users/:id/role', target: 'user', auth: 'required', roles: ['admin'] },
 
+  // Moderation
+  { method: 'patch', path: '/api/users/:id/suspend', target: 'user', auth: 'required', roles: ['moderator', 'admin'] },
+  { method: 'patch', path: '/api/users/:id/ban', target: 'user', auth: 'required', roles: ['moderator', 'admin'] },
+  { method: 'patch', path: '/api/users/:id/reinstate', target: 'user', auth: 'required', roles: ['moderator', 'admin'] },
+  
   // Posts
   { method: 'post', path: '/api/posts', target: 'post', auth: 'required' },
   { method: 'get', path: '/api/posts/tags/:tag', target: 'post', auth: 'required' },
