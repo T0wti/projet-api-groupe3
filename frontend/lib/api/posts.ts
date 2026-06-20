@@ -97,6 +97,15 @@ export async function fetchUserLikedCommentIds(userId: string): Promise<string[]
   return res.data.liked_comments.map(String);
 }
 
+export async function updateComment(commentId: string, content: string): Promise<BackendComment> {
+  const res = await api.put<BackendComment>(`/comments/${commentId}`, { content });
+  return res.data;
+}
+
+export async function deleteComment(commentId: string): Promise<void> {
+  await api.delete(`/comments/${commentId}`);
+}
+
 export async function likeComment(commentId: string): Promise<void> {
   await api.post('/comment-likes', { comment_id: commentId });
 }
