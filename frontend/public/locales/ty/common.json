@@ -55,5 +55,10 @@
     "edit_bio": "Huri i te pāpa'ira'a parau",
     "save": "Fa'atāpura'a",
     "cancel": "Ha'uti"
+  },
+  "edit": {
+    "ajust_image": "Huri i te hoho'a",
+    "cancel": "Ha'uti",
+    "save": "Fa'atāpura'a"
   }
 }

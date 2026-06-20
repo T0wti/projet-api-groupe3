@@ -55,5 +55,10 @@
     "edit_bio": "Editar bio",
     "save": "Guardar",
     "cancel": "Cancelar"
+  },
+  "edit": {
+    "ajust_image": "Ajustar imagen",
+    "cancel": "Cancelar",
+    "save": "Validar"
   }
 }
