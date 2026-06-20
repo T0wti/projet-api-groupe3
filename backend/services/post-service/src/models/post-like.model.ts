@@ -13,6 +13,6 @@ const postLikeSchema = new Schema<IPostLike>(
 );
 
 postLikeSchema.index({ user_id: 1, post_id: 1 }, { unique: true });
-postLikeSchema.index({ post_id: 1 }); // "qui a liké ce post"
+postLikeSchema.index({ post_id: 1 }); 
 
 export const PostLike = model<IPostLike>('PostLike', postLikeSchema);

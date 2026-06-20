@@ -63,6 +63,11 @@ export const routeTable: RouteRule[] = [
   { method: 'get', path: '/api/post-likes/user/:userId', target: 'post', auth: 'required' },
   { method: 'get', path: '/api/post-likes/post/:postId', target: 'post', auth: 'required' },
 
+  // Reports
+  { method: 'post', path: '/api/reports', target: 'post', auth: 'required' },
+  { method: 'get', path: '/api/reports', target: 'post', auth: 'required', roles: ['moderator', 'admin'] },
+  { method: 'patch', path: '/api/reports/:id', target: 'post', auth: 'required', roles: ['moderator', 'admin'] },
+
   // Comment likes
   { method: 'post', path: '/api/comment-likes', target: 'post', auth: 'required' },
   { method: 'delete', path: '/api/comment-likes', target: 'post', auth: 'required' },

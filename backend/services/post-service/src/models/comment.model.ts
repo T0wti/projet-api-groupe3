@@ -18,6 +18,7 @@ export interface IComment extends Document {
   content: string;
   likesCount: number;
   commentsCount: number;
+  reportsCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -38,6 +39,7 @@ const commentSchema = new Schema<IComment>(
     },
     likesCount: { type: Number, default: 0 },
     commentsCount: { type: Number, default: 0 },
+    reportsCount: { type: Number, default: 0 }, 
   },
   {
     timestamps: true

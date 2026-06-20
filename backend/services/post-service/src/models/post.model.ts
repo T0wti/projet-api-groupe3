@@ -23,6 +23,7 @@ export interface IPost extends Document {
   media: Media;
   likesCount: number;
   commentsCount: number;
+  reportsCount: number;
   parentPost: mongoose.Types.ObjectId | null;
   createdAt: Date;
   updatedAt: Date;
@@ -45,6 +46,7 @@ const PostSchema = new Schema<IPost>(
     },
     likesCount: { type: Number, default: 0 },
     commentsCount: { type: Number, default: 0 },
+    reportsCount: { type: Number, default: 0 }, 
   },
   {
     timestamps: true
