@@ -18,6 +18,12 @@
     "posts": "פוסטים",
     "posts_replies": "פוסטים ותגובות"
   },
+  "follow_list": {
+    "followers_title": "עוקבים",
+    "following_title": "עוקב אחרי",
+    "empty_followers": "אין עוקבים עדיין.",
+    "empty_following": "לא עוקב אחרי אף אחד עדיין."
+  },
   "avatar": {
     "uploading": "מעלה...",
     "change": "שנה",

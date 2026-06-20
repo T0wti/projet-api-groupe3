@@ -18,6 +18,12 @@
     "posts": "Posts",
     "posts_replies": "Posts & Réponses"
   },
+  "follow_list": {
+    "followers_title": "Abonnés",
+    "following_title": "Abonnements",
+    "empty_followers": "Aucun abonné pour l'instant.",
+    "empty_following": "Aucun abonnement pour l'instant."
+  },
   "avatar": {
     "uploading": "Envoi...",
     "change": "Changer",
