@@ -33,7 +33,12 @@
     "reply_placeholder": "Pāhono i teie parau...",
     "reply_button": "Pāhono",
     "show_more": "Hō'ata hou",
-    "show_less": "Hō'ata iti"
+    "show_less": "Hō'ata iti",
+    "edit": "Huri",
+    "delete": "Horo'a",
+    "save": "Fa'atāpura'a",
+    "cancel_edit": "Ha'uti",
+    "delete_confirm": "E nehenehe anei oe e horo'a i teie tātā'ura'a?"
   },
   "explore_page": {
     "title": "Tāha'amana'o",

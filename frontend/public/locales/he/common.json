@@ -33,7 +33,12 @@
     "reply_placeholder": "הגב לפוסט זה...",
     "reply_button": "הגב",
     "show_more": "הצג עוד",
-    "show_less": "הצג פחות"
+    "show_less": "הצג פחות",
+    "edit": "ערוך",
+    "delete": "מחק",
+    "save": "שמור",
+    "cancel_edit": "בטל",
+    "delete_confirm": "האם אתה בטוח שברצונך למחוק פוסט זה?"
   },
   "explore_page": {
     "title": "חיפוש",

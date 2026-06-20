@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { MessageCircle, Repeat2, Heart } from 'lucide-react';
+import { MessageCircle, Heart, MoreHorizontal } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Avatar from "@/components/ui/Avatar";
 import { useAuth } from '@/context/AuthContext';
@@ -12,16 +12,23 @@ interface PostCardProps {
   post: Post;
   onLike: () => void;
   onReply: (content: string) => void;
+  onEdit?: (postId: string, newContent: string) => Promise<void>;
+  onDelete?: (postId: string) => Promise<void>;
 }
 
-export default function PostCard({ post, onLike, onReply }: PostCardProps) {
+export default function PostCard({ post, onLike, onReply, onEdit, onDelete }: PostCardProps) {
   const { t } = useTranslation('common');
   const { user } = useAuth();
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState('');
   const [expanded, setExpanded] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState(post.content);
   const profileHref = `/profile/${encodeURIComponent(post.author.username)}`;
   const avatarSrc = post.author.id === user?.id ? (user.avatarUrl ?? post.author.avatarUrl) : post.author.avatarUrl;
+  const isAuthor = post.author.id === user?.id;
+  const showAuthorMenu = isAuthor && (onEdit !== undefined || onDelete !== undefined);
 
   const TRUNCATE_LIMIT = 140;
   const isTruncatable = post.content.length > TRUNCATE_LIMIT;
@@ -36,8 +43,26 @@ export default function PostCard({ post, onLike, onReply }: PostCardProps) {
     setIsReplying(false);
   };
 
+  const handleSaveEdit = async () => {
+    if (!onEdit || !editContent.trim()) return;
+    await onEdit(post.id, editContent.trim());
+    setIsEditing(false);
+  };
+
+  const handleCancelEdit = () => {
+    setEditContent(post.content);
+    setIsEditing(false);
+  };
+
+  const handleDelete = async () => {
+    setIsMenuOpen(false);
+    if (!onDelete) return;
+    if (!window.confirm(t('post_card.delete_confirm'))) return;
+    await onDelete(post.id);
+  };
+
   return (
-    <article className="bg-white border border-gray-200 p-4 hover:bg-gray-50 transition-colors rounded-lg">
+    <article className="relative bg-white border border-gray-200 p-4 hover:bg-gray-50 transition-colors rounded-lg">
       <div className="flex gap-3">
         <div className="shrink-0">
           <Link href={profileHref} aria-label={`Voir le profil de ${post.author.username}`}>
@@ -46,19 +71,82 @@ export default function PostCard({ post, onLike, onReply }: PostCardProps) {
         </div>
 
         <div className="flex-1 min-w-0">
-          <Link href={profileHref} className="flex items-center gap-1 text-sm w-max">
-            <span className="font-bold text-gray-900">{post.author.name}</span>
-            <span className="text-gray-500">@{post.author.username}</span>
-          </Link>
+          <div className="flex items-center justify-between">
+            <Link href={profileHref} className="flex items-center gap-1 text-sm">
+              <span className="font-bold text-gray-900">{post.author.name}</span>
+              <span className="text-gray-500">@{post.author.username}</span>
+            </Link>
 
-          <p className="mt-1 text-gray-900 text-[15px] whitespace-pre-wrap wrap-break-word">{displayContent}</p>
-          {isTruncatable && (
-            <button
-              onClick={() => setExpanded(!expanded)}
-              className="text-brand text-sm font-semibold mt-1 hover:underline"
-            >
-              {expanded ? t('post_card.show_less') : t('post_card.show_more')}
-            </button>
+            {showAuthorMenu && (
+              <div className="relative">
+                <button
+                  onClick={() => setIsMenuOpen((prev) => !prev)}
+                  className="text-gray-400 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 transition-colors"
+                  aria-label="Post options"
+                >
+                  <MoreHorizontal size={16} />
+                </button>
+                {isMenuOpen && (
+                  <div className="absolute right-0 top-7 z-20 min-w-27.5 rounded-lg border border-gray-200 bg-white shadow-lg">
+                    {onEdit && (
+                      <button
+                        onClick={() => { setIsEditing(true); setEditContent(post.content); setIsMenuOpen(false); }}
+                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-t-lg"
+                      >
+                        {t('post_card.edit')}
+                      </button>
+                    )}
+                    {onDelete && (
+                      <button
+                        onClick={handleDelete}
+                        className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-50 rounded-b-lg"
+                      >
+                        {t('post_card.delete')}
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {isEditing ? (
+            <div className="mt-2 flex flex-col gap-2">
+              <textarea
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                rows={3}
+                autoFocus
+                className="w-full resize-none rounded-lg border border-gray-300 p-2 text-sm outline-none focus:border-teal-500"
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={handleSaveEdit}
+                  disabled={!editContent.trim()}
+                  className="rounded-full bg-teal-600 px-4 py-1 text-sm font-semibold text-white disabled:opacity-50"
+                >
+                  {t('post_card.save')}
+                </button>
+                <button
+                  onClick={handleCancelEdit}
+                  className="rounded-full border border-gray-300 px-4 py-1 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                >
+                  {t('post_card.cancel_edit')}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <p className="mt-1 text-gray-900 text-[15px] whitespace-pre-wrap wrap-break-word">{displayContent}</p>
+              {isTruncatable && (
+                <button
+                  onClick={() => setExpanded(!expanded)}
+                  className="text-brand text-sm font-semibold mt-1 hover:underline"
+                >
+                  {expanded ? t('post_card.show_less') : t('post_card.show_more')}
+                </button>
+              )}
+            </>
           )}
 
           {/* Actions */}
