@@ -155,8 +155,6 @@ services:
       context: ./backend/services/media-service
       dockerfile: Dockerfile
     container_name: breezy-media-service
-    ports:
-      - "3005:3005"
     environment:
       - PORT=3005
       - MINIO_ENDPOINT=minio
