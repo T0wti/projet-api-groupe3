@@ -8,7 +8,7 @@ import Button from '@/components/ui/Button';
 import PostCard from '@/components/feed/PostCard';
 import FollowListModal from '@/components/profile/FollowListModal';
 import { useAuth } from '@/context/AuthContext';
-import { createComment, fetchPosts, fetchPostsByIds, fetchUserLikedPostIds, likePost, unlikePost, updatePost, deletePost, fetchCommentsByUser, fetchPostById } from '@/lib/api/posts';
+import { createComment, fetchPosts, fetchPostsByIds, fetchUserLikedPostIds, likePost, unlikePost, updatePost, deletePost, fetchCommentsByUser, fetchPostById, updateComment, deleteComment } from '@/lib/api/posts';
 import { fetchFollowingById, fetchProfileById, followUser, unfollowUser, updateProfile } from '@/lib/api/profile';
 import { uploadMedia, deleteMedia, ALLOWED_AVATAR_TYPES, MAX_UPLOAD_SIZE_BYTES } from '@/lib/api/media';
 import { fetchPublicUserById, fetchPublicUserByUsername } from '@/lib/api/users';
@@ -42,6 +42,8 @@ export default function ProfilePage() {
   const [likedPosts, setLikedPosts] = useState<Post[]>([]);
   const [isLoadingLikes, setIsLoadingLikes] = useState(false);
   const [likesLoaded, setLikesLoaded] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editingCommentContent, setEditingCommentContent] = useState('');
 
   useEffect(() => {
     if (authLoading || !user || !routeUsername) {
@@ -60,6 +62,7 @@ export default function ProfilePage() {
         setPostMap(new Map());
         setLikesLoaded(false);
         setLikedPosts([]);
+        setEditingCommentId(null);
 
         const publicUser = await fetchPublicUserByUsername(routeUsername);
         const profileId = publicUser.id;
@@ -177,6 +180,17 @@ export default function ProfilePage() {
   const handleDeletePost = async (postId: string) => {
     await deletePost(postId);
     setPosts((prev) => prev.filter((p) => p.id !== postId));
+  };
+
+  const handleEditComment = async (commentId: string, newContent: string) => {
+    await updateComment(commentId, newContent);
+    setUserComments((prev) => prev.map((c) => c._id === commentId ? { ...c, content: newContent } : c));
+    setEditingCommentId(null);
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    await deleteComment(commentId);
+    setUserComments((prev) => prev.filter((c) => c._id !== commentId));
   };
 
   const loadReplies = async (profileId: string) => {
@@ -566,9 +580,10 @@ export default function ProfilePage() {
               )}
               {!isLoadingReplies && userComments.map((comment) => {
                 const originalPost = postMap.get(comment.post_id);
+                const isEditing = editingCommentId === comment._id;
                 return (
                   <div key={comment._id} className="border-b border-gray-100 px-4 py-3 hover:bg-gray-50">
-                    {originalPost && (
+                    {originalPost && !isEditing && (
                       <button
                         onClick={() => router.push(`/posts/${comment.post_id}`)}
                         className="mb-2 w-full text-left px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-sm text-gray-500 line-clamp-2 hover:bg-gray-100 transition-colors"
@@ -583,11 +598,56 @@ export default function ProfilePage() {
                         <Avatar src={profileUser?.avatarUrl} alt={profileUser?.username ?? ''} size="sm" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1 text-sm">
-                          <span className="font-bold text-gray-900">{profileUser?.name}</span>
-                          <span className="text-gray-500">@{profileUser?.username}</span>
+                        <div className="flex items-center justify-between gap-1 text-sm">
+                          <div className="flex items-center gap-1">
+                            <span className="font-bold text-gray-900">{profileUser?.name}</span>
+                            <span className="text-gray-500">@{profileUser?.username}</span>
+                          </div>
+                          {isOwnProfile && !isEditing && (
+                            <div className="flex gap-3">
+                              <button
+                                onClick={() => { setEditingCommentId(comment._id); setEditingCommentContent(comment.content); }}
+                                className="text-xs text-teal-600 hover:underline"
+                              >
+                                {t('profile:comment.edit')}
+                              </button>
+                              <button
+                                onClick={() => handleDeleteComment(comment._id)}
+                                className="text-xs text-red-500 hover:underline"
+                              >
+                                {t('profile:comment.delete')}
+                              </button>
+                            </div>
+                          )}
                         </div>
-                        <p className="mt-1 text-gray-900 text-[15px] whitespace-pre-wrap">{comment.content}</p>
+                        {isEditing ? (
+                          <div className="mt-1 flex flex-col gap-2">
+                            <textarea
+                              value={editingCommentContent}
+                              onChange={(e) => setEditingCommentContent(e.target.value)}
+                              rows={3}
+                              autoFocus
+                              className="w-full resize-none rounded-lg border border-gray-300 p-2 text-sm outline-none focus:border-teal-500"
+                            />
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleEditComment(comment._id, editingCommentContent)}
+                                disabled={!editingCommentContent.trim()}
+                                className="rounded-full bg-teal-600 px-4 py-1 text-sm font-semibold text-white disabled:opacity-50"
+                              >
+                                {t('profile:comment.save')}
+                              </button>
+                              <button
+                                onClick={() => setEditingCommentId(null)}
+                                className="rounded-full border border-gray-300 px-4 py-1 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                              >
+                                {t('profile:comment.cancel')}
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="mt-1 text-gray-900 text-[15px] whitespace-pre-wrap">{comment.content}</p>
+                        )}
                       </div>
                     </div>
                   </div>

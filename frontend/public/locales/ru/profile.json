@@ -26,6 +26,12 @@
     "empty_followers": "Подписчиков пока нет.",
     "empty_following": "Нет подписок."
   },
+  "comment": {
+    "edit": "Изменить",
+    "delete": "Удалить",
+    "save": "Сохранить",
+    "cancel": "Отмена"
+  },
   "avatar": {
     "uploading": "Загрузка...",
     "change": "Изменить",

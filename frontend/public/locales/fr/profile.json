@@ -26,6 +26,12 @@
     "empty_followers": "Aucun abonné pour l'instant.",
     "empty_following": "Aucun abonnement pour l'instant."
   },
+  "comment": {
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "save": "Enregistrer",
+    "cancel": "Annuler"
+  },
   "avatar": {
     "uploading": "Envoi...",
     "change": "Changer",

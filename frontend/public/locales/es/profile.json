@@ -26,6 +26,12 @@
     "empty_followers": "Aún no hay seguidores.",
     "empty_following": "Aún no sigue a nadie."
   },
+  "comment": {
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "save": "Guardar",
+    "cancel": "Cancelar"
+  },
   "avatar": {
     "uploading": "Subiendo...",
     "change": "Cambiar",

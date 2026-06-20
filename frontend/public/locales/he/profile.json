@@ -26,6 +26,12 @@
     "empty_followers": "אין עוקבים עדיין.",
     "empty_following": "לא עוקב אחרי אף אחד עדיין."
   },
+  "comment": {
+    "edit": "ערוך",
+    "delete": "מחק",
+    "save": "שמור",
+    "cancel": "בטל"
+  },
   "avatar": {
     "uploading": "מעלה...",
     "change": "שנה",

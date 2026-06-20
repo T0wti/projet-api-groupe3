@@ -26,6 +26,12 @@
     "empty_followers": "No followers yet.",
     "empty_following": "Not following anyone yet."
   },
+  "comment": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
   "avatar": {
     "uploading": "Uploading...",
     "change": "Change",
