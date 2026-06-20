@@ -33,7 +33,12 @@
     "reply_placeholder": "Post your reply...",
     "reply_button": "Reply",
     "show_more": "Show more",
-    "show_less": "Show less"
+    "show_less": "Show less",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel_edit": "Cancel",
+    "delete_confirm": "Are you sure you want to delete this post?"
   },
   "explore_page": {
     "title": "Explore",

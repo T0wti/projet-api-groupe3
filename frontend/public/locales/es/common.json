@@ -33,7 +33,12 @@
     "reply_placeholder": "Responder a esta publicación...",
     "reply_button": "Responder",
     "show_more": "Ver más",
-    "show_less": "Ver menos"
+    "show_less": "Ver menos",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "save": "Guardar",
+    "cancel_edit": "Cancelar",
+    "delete_confirm": "¿Estás seguro de que quieres eliminar esta publicación?"
   },
   "explore_page": {
     "title": "Explorar",

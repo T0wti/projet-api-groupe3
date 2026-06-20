@@ -33,7 +33,12 @@
     "reply_placeholder": "رجع على هاد المنشور...",
     "reply_button": "رجع",
     "show_more": "شوف أكثر",
-    "show_less": "شوف أقل"
+    "show_less": "شوف أقل",
+    "edit": "عدّل",
+    "delete": "احذف",
+    "save": "حفظ",
+    "cancel_edit": "إلغاء",
+    "delete_confirm": "واش راك متأكد بلي تحب تحذف هاد المنشور؟"
   },
   "explore_page": {
     "title": "اكتشف",

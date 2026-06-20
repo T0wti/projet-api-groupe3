@@ -31,6 +31,15 @@ export async function unlikePost(postId: string): Promise<void> {
   await api.delete('/post-likes', { data: { post_id: postId } });
 }
 
+export async function updatePost(postId: string, content: string, tags?: string[]): Promise<BackendPost> {
+  const res = await api.put<BackendPost>(`/posts/${postId}`, { content, tags });
+  return res.data;
+}
+
+export async function deletePost(postId: string): Promise<void> {
+  await api.delete(`/posts/${postId}`);
+}
+
 export async function searchPosts(q: string): Promise<BackendPost[]> {
   const res = await api.get<BackendPost[]>('/posts/search', { params: { q } });
   return res.data;

@@ -7,7 +7,7 @@ import Avatar from '@/components/ui/Avatar';
 import Button from '@/components/ui/Button';
 import PostCard from '@/components/feed/PostCard';
 import { useAuth } from '@/context/AuthContext';
-import { createComment, fetchPosts, fetchUserLikedPostIds, likePost, unlikePost } from '@/lib/api/posts';
+import { createComment, fetchPosts, fetchUserLikedPostIds, likePost, unlikePost, updatePost, deletePost } from '@/lib/api/posts';
 import { fetchFollowingById, fetchProfileById, followUser, unfollowUser, updateProfile } from '@/lib/api/profile';
 import { uploadMedia, deleteMedia, ALLOWED_AVATAR_TYPES, MAX_UPLOAD_SIZE_BYTES } from '@/lib/api/media';
 import { fetchPublicUserByUsername } from '@/lib/api/users';
@@ -149,6 +149,17 @@ export default function ProfilePage() {
     } catch {
       // Ignore reply failures for now.
     }
+  };
+
+  const handleEditPost = async (postId: string, newContent: string) => {
+    const tags = [...new Set([...newContent.matchAll(/\B#(\w+)/g)].map((m) => m[1].toLowerCase()))];
+    const bp = await updatePost(postId, newContent, tags.length > 0 ? tags : []);
+    setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, content: bp.content, tags: bp.tags } : p));
+  };
+
+  const handleDeletePost = async (postId: string) => {
+    await deletePost(postId);
+    setPosts((prev) => prev.filter((p) => p.id !== postId));
   };
 
   const handleToggleFollow = async () => {
@@ -384,6 +395,7 @@ export default function ProfilePage() {
                   post={post}
                   onLike={() => handleToggleLike(post.id)}
                   onReply={(content: string) => handleReply(post.id, content)}
+                  {...(isOwnProfile && { onEdit: handleEditPost, onDelete: handleDeletePost })}
                 />
               );
             })}
