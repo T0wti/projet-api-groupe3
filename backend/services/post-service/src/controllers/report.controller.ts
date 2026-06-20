@@ -63,3 +63,24 @@ export const updateReportStatus = async (req: Request, res: Response) => {
 
   return res.status(200).json(report);
 };
+
+/**
+ * Get all reports targeting a specific post
+ */
+export const getReportsByPost = async (req: Request, res: Response) => {
+  const postId = Array.isArray(req.params.postId) ? req.params.postId[0] : req.params.postId;
+  if (!isValidObjectId(postId)) throw new AppError(400, 'Post ID is invalid.');
+
+  const reports = await Report.find({ target_type: 'post', target_id: postId }).sort({ createdAt: -1 });
+  return res.status(200).json(reports);
+};
+/**
+ * Get all reports targeting a specific comment
+ */
+export const getReportsByComment = async (req: Request, res: Response) => {
+  const commentId = Array.isArray(req.params.commentId) ? req.params.commentId[0] : req.params.commentId;
+  if (!isValidObjectId(commentId)) throw new AppError(400, 'Comment ID is invalid.');
+
+  const reports = await Report.find({ target_type: 'comment', target_id: commentId }).sort({ createdAt: -1 });
+  return res.status(200).json(reports);
+};
