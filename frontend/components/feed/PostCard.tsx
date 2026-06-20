@@ -59,7 +59,7 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
 
   const handleCardClick = (e: React.MouseEvent) => {
     if (disableNavigation) return;
-    if ((e.target as HTMLElement).closest('button, a, input, textarea')) return;
+    if ((e.target as HTMLElement).closest('button, a, input, textarea, video')) return; // Ajout de video ici pour éviter les conflits au clic sur les contrôles du lecteur
     router.push(`/posts/${post.id}`);
   };
 
@@ -69,6 +69,11 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
     if (!window.confirm(t('post_card.delete_confirm'))) return;
     await onDelete(post.id);
   };
+
+  // Détermination dynamique du type de fichier (Image ou Vidéo)
+  const isVideoUrl = post.imageUrl
+    ? /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(post.imageUrl)
+    : false;
 
   return (
     <article
@@ -161,14 +166,24 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
             </>
           )}
 
+          {/* Zone d'affichage adaptative Image OU Vidéo */}
           {post.imageUrl && (
-            <div className="mt-3 max-h-96 w-full overflow-hidden rounded-2xl border border-gray-100 bg-gray-50">
-              <img 
-                src={post.imageUrl} 
-                alt="Contenu du post" 
-                className="w-full max-h-96 object-cover"
-                loading="lazy"
-              />
+            <div className="mt-3 w-full overflow-hidden border border-gray-100 rounded-2xl flex justify-center items-center">
+              {isVideoUrl ? (
+                <video
+                  src={post.imageUrl}
+                  controls
+                  preload="metadata"
+                  className="w-full object-contain max-h-[50vh]"
+                />
+              ) : (
+                <img 
+                  src={post.imageUrl} 
+                  alt="Contenu du post" 
+                  className="w-full object-contain max-h-[50vh]"
+                  loading="lazy"
+                />
+              )}
             </div>
           )}
 
