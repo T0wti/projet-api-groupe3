@@ -26,6 +26,12 @@
     "empty_followers": "Aore ia aru ia'na.",
     "empty_following": "Aore ia aru atu."
   },
+  "comment": {
+    "edit": "Huri",
+    "delete": "Pohe",
+    "save": "Fa'a'ite",
+    "cancel": "Fa'a'ore"
+  },
   "avatar": {
     "uploading": "Fa'ahou...",
     "change": "Huri",

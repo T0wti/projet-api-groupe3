@@ -26,6 +26,12 @@
     "empty_followers": "لا متابعون بعد.",
     "empty_following": "لا يتابع أحداً بعد."
   },
+  "comment": {
+    "edit": "تعديل",
+    "delete": "حذف",
+    "save": "حفظ",
+    "cancel": "إلغاء"
+  },
   "avatar": {
     "uploading": "جارٍ الرفع...",
     "change": "تغيير",
