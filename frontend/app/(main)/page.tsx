@@ -42,12 +42,8 @@ export default function HomeFeed() {
           fetchUserLikedPostIds(user!.id),
         ]);
 
-        if (followingIds.length === 0) {
-          setPosts([]);
-          return;
-        }
-
-        const backendPosts = await fetchFeedPosts(followingIds);
+        const allIds = [...new Set([user!.id, ...followingIds])];
+        const backendPosts = await fetchFeedPosts(allIds);
         const likedSet = new Set(likedIds);
 
         // Fetch usernames and avatars for authors that are not the current user
