@@ -87,7 +87,10 @@ export default function HomeFeed() {
     setIsPosting(true);
     setPostError(null);
     try {
-      const bp = await createPost(content);
+      const tags = [...new Set(
+        [...content.matchAll(/\B#(\w+)/g)].map((m) => m[1].toLowerCase())
+      )];
+      const bp = await createPost(content, tags.length > 0 ? tags : undefined);
       const newPost = mapBackendPost(bp, new Set(), user);
       setPosts((prev) => [newPost, ...prev]);
     } catch (err: any) {

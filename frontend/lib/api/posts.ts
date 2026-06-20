@@ -18,8 +18,8 @@ export async function fetchUserLikedPostIds(userId: string): Promise<string[]> {
   return res.data.liked_posts.map(String);
 }
 
-export async function createPost(content: string): Promise<BackendPost> {
-  const res = await api.post<BackendPost>('/posts', { content });
+export async function createPost(content: string, tags?: string[]): Promise<BackendPost> {
+  const res = await api.post<BackendPost>('/posts', { content, tags });
   return res.data;
 }
 
