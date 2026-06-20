@@ -15,3 +15,8 @@ export async function fetchPublicUserByUsername(username: string): Promise<Backe
   const res = await api.get<BackendPublicUser>(`/users/username/${encodeURIComponent(username)}/public`);
   return res.data;
 }
+
+export async function searchUsers(q: string): Promise<{ id: string; username: string }[]> {
+  const res = await api.get<{ id: string; username: string }[]>('/users/search', { params: { q } });
+  return res.data;
+}

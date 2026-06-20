@@ -1,10 +1,15 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function RightSidebar() {
   const { t } = useTranslation('common');
+  const router = useRouter();
+  const [q, setQ] = useState('');
+
   return (
     <aside className="hidden lg:block shrink-0 w-80 xl:w-96 pl-8 py-4 sticky top-0 h-screen overflow-y-auto px-8">
       {/* Search */}
@@ -12,6 +17,13 @@ export default function RightSidebar() {
         <Search size={16} className="text-gray-400 shrink-0" />
         <input
           type="text"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && q.trim()) {
+              router.push(`/explore?q=${encodeURIComponent(q.trim())}`);
+            }
+          }}
           placeholder={t('right_sidebar.search_placeholder')}
           className="bg-transparent border-none outline-none w-full text-sm"
         />
