@@ -5,15 +5,18 @@ import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import PostCard from '@/components/feed/PostCard';
-import Avatar from '@/components/ui/Avatar';
+import CommentCard from '@/components/feed/CommentCard';
 import { useAuth } from '@/context/AuthContext';
 import { Post, Reply, mapBackendPost, mapBackendComment } from '@/types/post';
 import {
   fetchPostById,
   fetchComments,
   fetchUserLikedPostIds,
+  fetchUserLikedCommentIds,
   likePost,
   unlikePost,
+  likeComment,
+  unlikeComment,
   createComment,
 } from '@/lib/api/posts';
 import { fetchPublicUserById } from '@/lib/api/users';
@@ -39,10 +42,11 @@ export default function PostDetailPage() {
 
     async function load() {
       try {
-        const [{ post: bp }, likedIds, backendComments] = await Promise.all([
+        const [{ post: bp }, likedIds, backendComments, likedCommentIds] = await Promise.all([
           fetchPostById(postId),
           fetchUserLikedPostIds(user!.id),
           fetchComments(postId),
+          fetchUserLikedCommentIds(user!.id),
         ]);
 
         // Enrich post author if not the current user
@@ -79,7 +83,12 @@ export default function PostDetailPage() {
           if (r.status === 'fulfilled') cAvatarMap.set(commentAuthorIds[i], r.value.avatar_url ?? null);
         });
 
-        setComments(backendComments.map(bc => mapBackendComment(bc, user!, cAuthorMap, cAvatarMap)));
+        const likedCommentSet = new Set(likedCommentIds);
+        setComments(backendComments.map(bc => {
+          const mapped = mapBackendComment(bc, user!, cAuthorMap, cAvatarMap);
+          mapped.isLiked = likedCommentSet.has(bc._id);
+          return mapped;
+        }));
       } catch {
         setError('Failed to load post.');
       } finally {
@@ -109,6 +118,39 @@ export default function PostDetailPage() {
       const newComment = mapBackendComment(bc, user);
       setComments(prev => [newComment, ...prev]);
       setPost(prev => prev ? { ...prev, commentsCount: prev.commentsCount + 1 } : prev);
+    } catch {
+      // silently fail
+    }
+  };
+
+  const handleLikeComment = async (commentId: string) => {
+    setComments(prev => prev.map(c => c.id === commentId ? { ...c, isLiked: true, likesCount: c.likesCount + 1 } : c));
+    try {
+      await likeComment(commentId);
+    } catch {
+      setComments(prev => prev.map(c => c.id === commentId ? { ...c, isLiked: false, likesCount: c.likesCount - 1 } : c));
+    }
+  };
+
+  const handleUnlikeComment = async (commentId: string) => {
+    setComments(prev => prev.map(c => c.id === commentId ? { ...c, isLiked: false, likesCount: c.likesCount - 1 } : c));
+    try {
+      await unlikeComment(commentId);
+    } catch {
+      setComments(prev => prev.map(c => c.id === commentId ? { ...c, isLiked: true, likesCount: c.likesCount + 1 } : c));
+    }
+  };
+
+  const handleReplyToComment = async (parentCommentId: string, content: string) => {
+    if (!user || !post) return;
+    try {
+      const bc = await createComment(post.id, content, parentCommentId);
+      const newReply = mapBackendComment(bc, user);
+      setComments(prev => prev.flatMap(c =>
+        c.id === parentCommentId
+          ? [{ ...c, commentsCount: c.commentsCount + 1 }, newReply]
+          : [c]
+      ));
     } catch {
       // silently fail
     }
@@ -146,18 +188,13 @@ export default function PostDetailPage() {
               <p className="text-center text-gray-400 py-10">{t('post_card.no_comments')}</p>
             )}
             {comments.map(comment => (
-              <div key={comment.id} className="flex gap-3 px-4 py-3 border-b border-gray-100 hover:bg-gray-50">
-                <div className="shrink-0">
-                  <Avatar src={comment.author.avatarUrl} alt={comment.author.username} size="sm" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1 text-sm">
-                    <span className="font-bold text-gray-900">{comment.author.name}</span>
-                    <span className="text-gray-500">@{comment.author.username}</span>
-                  </div>
-                  <p className="mt-1 text-gray-900 text-[15px] whitespace-pre-wrap">{comment.content}</p>
-                </div>
-              </div>
+              <CommentCard
+                key={comment.id}
+                comment={comment}
+                onLike={() => handleLikeComment(comment.id)}
+                onUnlike={() => handleUnlikeComment(comment.id)}
+                onReply={(content) => handleReplyToComment(comment.id, content)}
+              />
             ))}
           </section>
         </>
