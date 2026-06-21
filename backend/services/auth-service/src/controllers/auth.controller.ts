@@ -150,11 +150,12 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     throw new AppError(400, 'email and password are required');
   }
 
-  const user = await prisma.authUser.findUnique({ where: { email } });
+  const normalizedEmail = email.trim().toLowerCase();
+  const user = await prisma.authUser.findUnique({ where: { email: normalizedEmail } });
   if (!user) {
     throw new AppError(401, 'Invalid credentials');
   }
-
+  
   const isValid = await bcrypt.compare(password, user.passwordHash);
   if (!isValid) {
     throw new AppError(401, 'Invalid credentials');
