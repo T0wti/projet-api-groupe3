@@ -69,10 +69,11 @@ export async function fetchComments(postId: string): Promise<BackendComment[]> {
   return res.data;
 }
 
-export async function createComment(postId: string, content: string, parentCommentId?: string): Promise<BackendComment> {
+export async function createComment(postId: string, content: string, imageUrl?: string | null, parentCommentId?: string): Promise<BackendComment> {
   const res = await api.post<BackendComment>('/comments', {
     post_id: postId,
     content,
+    ...(imageUrl ? { media: { type: 'image', url: imageUrl } } : {}),
     ...(parentCommentId ? { parent_comment_id: parentCommentId } : {}),
   });
   return res.data;

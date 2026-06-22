@@ -19,6 +19,7 @@ import {
 } from '@/lib/api/posts';
 import { searchUsers, fetchPublicUserById } from '@/lib/api/users';
 import { fetchProfileById } from '@/lib/api/profile';
+import { uploadMedia } from '@/lib/api/media';
 
 type PersonResult = { id: string; username: string; avatarUrl?: string | null };
 type SearchMode = 'idle' | 'tags' | 'normal';
@@ -136,10 +137,15 @@ function ExplorePage() {
     }
   };
 
-  const handleReply = async (postId: string, replyContent: string) => {
+  const handleReply = async (postId: string, replyContent: string, image: File | null) => {
     if (!user) return;
     try {
-      const bc = await createComment(postId, replyContent);
+      let uploadedImageUrl: string | null = null;
+      if (image) {
+        const { url } = await uploadMedia(image);
+        uploadedImageUrl = url;
+      }
+      const bc = await createComment(postId, replyContent, uploadedImageUrl);
       const newReply: Reply = mapBackendComment(bc, user);
       setPosts((prev) =>
         prev.map((p) =>
@@ -213,7 +219,7 @@ function ExplorePage() {
                   key={post.id}
                   post={post}
                   onLike={() => handleToggleLike(post.id)}
-                  onReply={(content: string) => handleReply(post.id, content)}
+                  onReply={(content: string, image: File | null) => handleReply(post.id, content, image)}
                 />
               ))}
             </section>
@@ -231,7 +237,7 @@ function ExplorePage() {
                   key={post.id}
                   post={post}
                   onLike={() => handleToggleLike(post.id)}
-                  onReply={(content: string) => handleReply(post.id, content)}
+                  onReply={(content: string, image: File | null) => handleReply(post.id, content, image)}
                 />
               ))}
             </section>

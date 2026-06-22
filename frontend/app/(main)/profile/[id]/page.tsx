@@ -138,11 +138,16 @@ export default function ProfilePage() {
     }
   };
 
-  const handleReply = async (postId: string, replyContent: string) => {
+  const handleReply = async (postId: string, replyContent: string, image: File | null) => {
     if (!user) return;
 
     try {
-      const backendComment = await createComment(postId, replyContent);
+      let uploadedImageUrl: string | null = null;
+      if (image) {
+        const { url } = await uploadMedia(image);
+        uploadedImageUrl = url;
+      }
+      const backendComment = await createComment(postId, replyContent, uploadedImageUrl);
       const newReply: Reply = mapBackendComment(backendComment, user);
 
       setPosts((currentPosts) =>
@@ -446,7 +451,7 @@ export default function ProfilePage() {
                   key={post.id}
                   post={post}
                   onLike={() => handleToggleLike(post.id)}
-                  onReply={(content: string) => handleReply(post.id, content)}
+                  onReply={(content: string, image: File | null) => handleReply(post.id, content, image)}
                   {...(isOwnProfile && { onEdit: handleEditPost, onDelete: handleDeletePost })}
                 />
               ))}

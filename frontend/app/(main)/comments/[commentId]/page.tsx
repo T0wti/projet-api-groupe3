@@ -17,6 +17,7 @@ import {
 } from '@/lib/api/posts';
 import { fetchPublicUserById } from '@/lib/api/users';
 import { fetchProfileById } from '@/lib/api/profile';
+import { uploadMedia } from '@/lib/api/media';
 
 export default function CommentDetailPage() {
   const { commentId } = useParams<{ commentId: string }>();
@@ -135,10 +136,15 @@ export default function CommentDetailPage() {
     }
   };
 
-  const handleReply = async (content: string) => {
+  const handleReply = async (content: string, image: File | null) => {
     if (!user || !comment) return;
     try {
-      const bc = await createComment(comment.postId, content, comment.id);
+      let uploadedImageUrl: string | null = null;
+      if (image) {
+        const { url } = await uploadMedia(image);
+        uploadedImageUrl = url;
+      }
+      const bc = await createComment(comment.postId, content,uploadedImageUrl, comment.id);
       const newReply = mapBackendComment(bc, user);
       setReplies(prev => [newReply, ...prev]);
       setComment(prev => prev ? { ...prev, commentsCount: prev.commentsCount + 1 } : prev);
@@ -185,7 +191,7 @@ export default function CommentDetailPage() {
                 comment={reply}
                 onLike={() => handleLikeReply(reply.id)}
                 onUnlike={() => handleUnlikeReply(reply.id)}
-                onReply={(content) => handleReply(content)}
+                onReply={(content: string, image: File | null) => handleReply(content, image)}
               />
             ))}
           </section>
