@@ -10,6 +10,7 @@
       "notifications": "Notifications",
       "messages": "Messages",
       "profile": "Profile",
+      "preferences": "Preferences",
       "more": "More"
     },
     "post_button": "Post",
@@ -55,5 +56,26 @@
     "edit_bio": "Edit bio",
     "save": "Save",
     "cancel": "Cancel"
+  },
+  "preferences_page": {
+    "title": "Preferences",
+    "description": "Choose the interface language and color theme used across Breezy.",
+    "language": {
+      "title": "Language",
+      "description": "Your selection is applied immediately in the interface.",
+      "label": "Application language"
+    },
+    "theme": {
+      "title": "Theme",
+      "description": "Switch between a light and dark appearance.",
+      "options": {
+        "light": "Light",
+        "dark": "Dark"
+      },
+      "help": {
+        "light": "Bright interface for daytime use.",
+        "dark": "Softer interface for low-light environments."
+      }
+    }
   }
 }

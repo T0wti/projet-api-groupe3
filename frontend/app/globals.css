@@ -1,5 +1,25 @@
 @import "tailwindcss";
 
+:root {
+  --app-bg: #f8fafc;
+  --app-surface: #ffffff;
+  --app-muted-surface: #f3f4f6;
+  --app-border: #e5e7eb;
+  --app-text: #111827;
+  --app-text-muted: #6b7280;
+  --app-hover: #eef2f7;
+}
+
+html[data-theme='dark'] {
+  --app-bg: #0f172a;
+  --app-surface: #111827;
+  --app-muted-surface: #1f2937;
+  --app-border: #334155;
+  --app-text: #f8fafc;
+  --app-text-muted: #94a3b8;
+  --app-hover: #1e293b;
+}
+
 @theme {
   --color-brand: #0E7490;
   --color-brand-hover: #155E75;
@@ -15,14 +35,37 @@
 }
 
 body {
-  @apply bg-gray-50 text-gray-900 antialiased;
+  @apply antialiased;
+  background-color: var(--app-bg);
+  color: var(--app-text);
+  transition: background-color 180ms ease, color 180ms ease;
 }
 
 @layer components {
+  .app-surface {
+    background-color: var(--app-surface);
+  }
+
+  .app-border {
+    border-color: var(--app-border);
+  }
+
+  .app-text-muted {
+    color: var(--app-text-muted);
+  }
+
+  .app-hover-surface:hover {
+    background-color: var(--app-hover);
+  }
+
   /* Sidebar / bottom-nav navigation item */
   .nav-link {
-    @apply flex items-center gap-4 p-3 rounded-full transition-colors text-gray-700
-           hover:bg-gray-100 w-max lg:w-full;
+    @apply flex items-center gap-4 p-3 rounded-full transition-colors w-max lg:w-full;
+    color: var(--app-text-muted);
+  }
+
+  .nav-link:hover {
+    background-color: var(--app-hover);
   }
 
   /* Post action buttons (reply, repost, like) */
@@ -32,17 +75,22 @@ body {
 
   /* Generic card surface */
   .card {
-    @apply bg-white rounded-2xl border border-gray-200 p-4;
+    @apply rounded-2xl border p-4;
+    background-color: var(--app-surface);
+    border-color: var(--app-border);
   }
 
   /* Search bar wrapper */
   .search-bar {
-    @apply bg-gray-100 rounded-full flex items-center gap-2 px-4 py-2;
+    @apply rounded-full flex items-center gap-2 px-4 py-2;
+    background-color: var(--app-muted-surface);
+    color: var(--app-text);
   }
 
   /* Reply / compose input */
   .inline-input {
-    @apply flex-1 bg-transparent border-b border-gray-300 outline-none
-           focus:border-brand py-1 text-sm;
+    @apply flex-1 bg-transparent border-b outline-none focus:border-brand py-1 text-sm;
+    border-bottom-color: var(--app-border);
+    color: var(--app-text);
   }
 }

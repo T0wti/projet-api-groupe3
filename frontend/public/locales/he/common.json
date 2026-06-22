@@ -10,6 +10,7 @@
       "notifications": "התראות",
       "messages": "הודעות",
       "profile": "פרופיל",
+      "preferences": "העדפות",
       "more": "עוד"
     },
     "post_button": "פרסם",
@@ -55,5 +56,26 @@
     "edit_bio": "ערוך ביוגרפיה",
     "save": "שמור",
     "cancel": "בטל"
+  },
+  "preferences_page": {
+    "title": "העדפות",
+    "description": "בחר את שפת הממשק ואת ערכת הנושא של Breezy.",
+    "language": {
+      "title": "שפה",
+      "description": "הבחירה מוחלת מיד בממשק.",
+      "label": "שפת האפליקציה"
+    },
+    "theme": {
+      "title": "ערכת נושא",
+      "description": "עבור בין מראה בהיר וכהה.",
+      "options": {
+        "light": "בהיר",
+        "dark": "כהה"
+      },
+      "help": {
+        "light": "ממשק בהיר לשימוש יומיומי.",
+        "dark": "ממשק רגוע יותר לסביבה חשוכה."
+      }
+    }
   }
 }

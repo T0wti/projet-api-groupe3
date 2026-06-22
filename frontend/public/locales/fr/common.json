@@ -10,6 +10,7 @@
       "notifications": "Notifications",
       "messages": "Messages",
       "profile": "Profil",
+      "preferences": "Preferences",
       "more": "Plus"
     },
     "post_button": "Publier",
@@ -55,5 +56,26 @@
     "edit_bio": "Modifier la bio",
     "save": "Enregistrer",
     "cancel": "Annuler"
+  },
+  "preferences_page": {
+    "title": "Preferences",
+    "description": "Choisissez la langue de l'interface et le theme d'affichage de Breezy.",
+    "language": {
+      "title": "Langue",
+      "description": "La langue choisie est appliquee immediatement dans l'interface.",
+      "label": "Langue de l'application"
+    },
+    "theme": {
+      "title": "Theme",
+      "description": "Basculez entre une apparence claire et sombre.",
+      "options": {
+        "light": "Clair",
+        "dark": "Sombre"
+      },
+      "help": {
+        "light": "Interface lumineuse pour la journee.",
+        "dark": "Interface attenuee pour les environnements sombres."
+      }
+    }
   }
 }

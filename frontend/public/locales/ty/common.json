@@ -10,6 +10,7 @@
       "notifications": "Fā’ara’a",
       "messages": "Karere",
       "profile": "Pāpa’ira’a parau",
+      "preferences": "Preferences",
       "more": "Hā’uti ā"
     },
     "post_button": "Piha’iho",
@@ -55,5 +56,26 @@
     "edit_bio": "Huri i te pāpa'ira'a parau",
     "save": "Fa'atāpura'a",
     "cancel": "Ha'uti"
+  },
+  "preferences_page": {
+    "title": "Preferences",
+    "description": "Ma'iti i te reo o te interface e te theme o Breezy.",
+    "language": {
+      "title": "Reo",
+      "description": "Ua taui oioi te ma'itiraa i roto i te interface.",
+      "label": "Reo o te application"
+    },
+    "theme": {
+      "title": "Theme",
+      "description": "Taui i rotopu i te huru maramarama e te huru poiri.",
+      "options": {
+        "light": "Maramarama",
+        "dark": "Poiri"
+      },
+      "help": {
+        "light": "Interface maramarama no te mahana.",
+        "dark": "Interface mamaru no te po e te vahi poiri."
+      }
+    }
   }
 }
