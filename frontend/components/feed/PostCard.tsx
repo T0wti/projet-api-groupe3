@@ -9,7 +9,6 @@ import Avatar from "@/components/ui/Avatar";
 import Button from '@/components/ui/Button';
 import ContextMenu from "@/components/ui/ContextMenu";
 import { useAuth } from '@/context/AuthContext';
-import { Post } from '@/types/post';
 import ReactCrop, { type Crop, centerCrop, makeAspectCrop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 
@@ -34,6 +33,7 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
   const router = useRouter();
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState('');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content);
@@ -238,14 +238,6 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
     ? /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(post.imageUrl)
     : false;
 
-  const isVideo = selectedFile?.type.startsWith('video/');
-  const isGif = selectedFile?.type === 'image/gif';
-
-  // Détermination dynamique du type de fichier (Image ou Vidéo)
-  const isVideoUrl = post.imageUrl
-    ? /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(post.imageUrl)
-    : false;
-
   return (
     <article
       className={`relative app-surface-elevated border app-border p-4 app-hover-surface transition-colors rounded-lg${disableNavigation ? '' : ' cursor-pointer'}`}
@@ -417,19 +409,6 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
                   placeholder={t('post_card.reply_placeholder')}
                   className="inline-input flex-1"
                 />
-                <div
-                  className="text-brand cursor-pointer hover:opacity-80 p-1 rounded-full hover:bg-brand/10 transition-colors"
-                  onClick={handleIconClick}
-                >
-                  <ImageIcon size={20} />
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    accept="image/png, image/jpeg, image/webp, image/gif, video/mp4, video/webm"
-                    className="hidden"
-                  />
-                </div>
                 <div
                   className="text-brand cursor-pointer hover:opacity-80 p-1 rounded-full hover:bg-brand/10 transition-colors"
                   onClick={handleIconClick}
