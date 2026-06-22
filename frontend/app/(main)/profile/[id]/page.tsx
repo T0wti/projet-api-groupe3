@@ -122,10 +122,10 @@ export default function ProfilePage() {
       currentPosts.map((entry) =>
         entry.id === postId
           ? {
-              ...entry,
-              isLiked: !wasLiked,
-              likesCount: wasLiked ? entry.likesCount - 1 : entry.likesCount + 1,
-            }
+            ...entry,
+            isLiked: !wasLiked,
+            likesCount: wasLiked ? entry.likesCount - 1 : entry.likesCount + 1,
+          }
           : entry
       )
     );
@@ -141,10 +141,10 @@ export default function ProfilePage() {
         currentPosts.map((entry) =>
           entry.id === postId
             ? {
-                ...entry,
-                isLiked: wasLiked,
-                likesCount: wasLiked ? entry.likesCount + 1 : entry.likesCount - 1,
-              }
+              ...entry,
+              isLiked: wasLiked,
+              likesCount: wasLiked ? entry.likesCount + 1 : entry.likesCount - 1,
+            }
             : entry
         )
       );
@@ -167,10 +167,10 @@ export default function ProfilePage() {
         currentPosts.map((entry) =>
           entry.id === postId
             ? {
-                ...entry,
-                replies: [...(entry.replies ?? []), newReply],
-                commentsCount: entry.commentsCount + 1,
-              }
+              ...entry,
+              replies: [...(entry.replies ?? []), newReply],
+              commentsCount: entry.commentsCount + 1,
+            }
             : entry
         )
       );
@@ -381,7 +381,7 @@ export default function ProfilePage() {
       const oldUrl = profileUser.avatarUrl;
       if (oldUrl && oldUrl.includes('/breezy-media/')) {
         const oldObjectName = oldUrl.split('/').pop();
-        if (oldObjectName) await deleteMedia(oldObjectName).catch(() => {});
+        if (oldObjectName) await deleteMedia(oldObjectName).catch(() => { });
       }
 
       await updateProfile(user.id, { avatar_url: url });
@@ -426,7 +426,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <main className="w-full max-w-150 border-x app-border min-h-screen app-page">
+    <main className="w-full border-x app-border min-h-screen app-page">
       <header className="sticky top-0 z-10 border-b app-border app-header px-4 py-4 backdrop-blur-md">
         <h1 className="text-xl font-bold app-text">{t('profile:header_title')}</h1>
       </header>
@@ -581,39 +581,43 @@ export default function ProfilePage() {
           </div>
 
           {activeTab === 'posts' && (
-            <section>
-              {posts.length === 0 && (
-                <p className="px-4 py-10 text-center app-text-muted">{t('profile:empty_posts_message')}</p>
-              )}
-              {posts.map((post) => (
-                <PostCard
-                  key={post.id}
-                  post={post}
-                  onLike={() => handleToggleLike(post.id)}
-                  onReply={(content: string, image: File | null) => handleReply(post.id, content, image)}
-                  {...(isOwnProfile && { onEdit: handleEditPost, onDelete: handleDeletePost })}
-                />
-              ))}
-            </section>
+            <div className="px-8 py-4">
+              <section className="flex flex-col gap-4">
+                {posts.length === 0 && (
+                  <p className="px-4 py-10 text-center app-text-muted">{t('profile:empty_posts_message')}</p>
+                )}
+                {posts.map((post) => (
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    onLike={() => handleToggleLike(post.id)}
+                    onReply={(content: string, image: File | null) => handleReply(post.id, content, image)}
+                    {...(isOwnProfile && { onEdit: handleEditPost, onDelete: handleDeletePost })}
+                  />
+                ))}
+              </section>
+            </div>
           )}
 
           {activeTab === 'likes' && (
-            <section>
-              {isLoadingLikes && (
-                <p className="px-4 py-10 text-center app-text-soft">{t('pending')}</p>
-              )}
-              {!isLoadingLikes && likedPosts.length === 0 && (
-                <p className="px-4 py-10 text-center app-text-muted">{t('profile:empty_likes_message')}</p>
-              )}
-              {!isLoadingLikes && likedPosts.map((post) => (
-                <PostCard
-                  key={post.id}
-                  post={post}
-                  onLike={() => handleToggleLikedPost(post.id)}
-                  onReply={(content: string) => handleReply(post.id, content)}
-                />
-              ))}
-            </section>
+            <div className="px-8 py-4">
+              <section className="flex flex-col gap-4">
+                {isLoadingLikes && (
+                  <p className="px-4 py-10 text-center app-text-soft">{t('pending')}</p>
+                )}
+                {!isLoadingLikes && likedPosts.length === 0 && (
+                  <p className="px-4 py-10 text-center app-text-muted">{t('profile:empty_likes_message')}</p>
+                )}
+                {!isLoadingLikes && likedPosts.map((post) => (
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    onLike={() => handleToggleLikedPost(post.id)}
+                    onReply={(content: string) => handleReply(post.id, content)}
+                  />
+                ))}
+              </section>
+            </div>
           )}
 
           {activeTab === 'replies' && (
