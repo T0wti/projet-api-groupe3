@@ -39,25 +39,53 @@
     "characters_left_one": "נותר תו אחד",
     "characters_left_other": "נותרו {{count}} תווים"
   },
-    "post_card": {
+  "post_card": {
     "reply_placeholder": "הגב לפוסט זה...",
     "reply_button": "הגב",
     "show_more": "הצג עוד",
     "show_less": "הצג פחות",
+    "report": "דוח",
+    "report_title": "דווח על הודעה זו",
+    "report_description": "בחר את הסיבה העיקרית לדוח זה.",
+    "report_reason_label": "הסיבה",
+    "report_submit": "שלח דוח",
+    "report_success": "הפוסט הזה דווח בהצלחה.",
+    "report_error": "לא ניתן לדווח על הודעה זו.",
     "edit": "ערוך",
     "delete": "מחק",
     "save": "שמור",
     "cancel_edit": "בטל",
     "delete_confirm": "האם אתה בטוח שברצונך למחוק פוסט זה?",
-    "no_comments": "אין תגובות עדיין."
+    "no_comments": "אין תגובות עדיין.",
+    "report_reasons": {
+      "spam": "דואר זבל",
+      "harassment": "הטרדה",
+      "hate_speech": "הסתה לשנאה",
+      "violence": "אלימות",
+      "nudity": "עירום",
+      "misinformation": "מידע כוזב",
+      "other": "אחר"
+    }
   },
   "explore_page": {
     "title": "חיפוש",
     "search_placeholder": "חפש פוסטים, אנשים, #תגיות…",
-    "tabs": { "posts": "פוסטים", "people": "אנשים" },
+    "tabs": {
+      "posts": "פוסטים",
+      "people": "אנשים"
+    },
     "no_results_posts": "לא נמצאו פוסטים.",
     "no_results_people": "לא נמצאו חשבונות.",
-    "no_results_tags": "לא נמצאו פוסטים עבור תגית זו."
+    "no_results_tags": "לא נמצאו פוסטים עבור תגית זו.",
+    "search_error": "החיפוש נכשל. אנא נסה שוב."
+  },
+  "post_detail": {
+    "title": "פוסט",
+    "load_error": "לא ניתן לטעון פוסט זה."
+  },
+  "comment_detail": {
+    "title": "תגובה",
+    "load_error": "לא ניתן לטעון תגובה זו."
   },
   "accessibility": {
     "options": "אפשרויות",

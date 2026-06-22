@@ -482,12 +482,6 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
             </p>
           )}
 
-          {reportFeedback && (
-            <p className={`mt-3 text-sm ${reportFeedback.type === 'success' ? 'text-emerald-600' : 'text-red-500'}`}>
-              {reportFeedback.message}
-            </p>
-          )}
-
           {post.replies && post.replies.length > 0 && (
             <div className="mt-4 pl-4 border-l-2 app-border space-y-3">
               {post.replies.map((reply) => (

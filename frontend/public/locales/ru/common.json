@@ -44,20 +44,48 @@
     "reply_button": "Ответить",
     "show_more": "Показать больше",
     "show_less": "Показать меньше",
+    "report": "Отчет",
+    "report_title": "Пожаловаться на это сообщение",
+    "report_description": "Выберите основную причину составления данного отчета.",
+    "report_reason_label": "Причина",
+    "report_submit": "Отправить отчет",
+    "report_success": "Сообщение было успешно отправлено.",
+    "report_error": "Не удалось пожаловаться на это сообщение.",
     "edit": "Редактировать",
     "delete": "Удалить",
     "save": "Сохранить",
     "cancel_edit": "Отмена",
     "delete_confirm": "Вы уверены, что хотите удалить этот пост?",
-    "no_comments": "Комментариев пока нет."
+    "no_comments": "Комментариев пока нет.",
+    "report_reasons": {
+      "spam": "Спам",
+      "harassment": "Домогательства",
+      "hate_speech": "Разжигание ненависти",
+      "violence": "Насилие",
+      "nudity": "Нагота",
+      "misinformation": "Дезинформация",
+      "other": "Прочее"
+    }
   },
   "explore_page": {
     "title": "Поиск",
     "search_placeholder": "Искать посты, людей, #теги…",
-    "tabs": { "posts": "Публикации", "people": "Люди" },
+    "tabs": {
+      "posts": "Публикации",
+      "people": "Люди"
+    },
     "no_results_posts": "Публикации не найдены.",
     "no_results_people": "Аккаунты не найдены.",
-    "no_results_tags": "Публикации по этому тегу не найдены."
+    "no_results_tags": "Публикации по этому тегу не найдены.",
+    "search_error": "Поиск не удался. Пожалуйста, попробуйте ещё раз."
+  },
+  "post_detail": {
+    "title": "Публикация",
+    "load_error": "Не удалось загрузить эту публикацию."
+  },
+  "comment_detail": {
+    "title": "Комментарий",
+    "load_error": "Не удалось загрузить этот комментарий."
   },
   "accessibility": {
     "options": "Опции",
