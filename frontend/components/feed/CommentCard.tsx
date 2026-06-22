@@ -1,19 +1,20 @@
 "use client";
 
 import Link from 'next/link';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { MessageCircle, Heart, ImageIcon, Crop as CropIcon, X } from 'lucide-react';
+import { MessageCircle, Heart, ImageIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Avatar from '@/components/ui/Avatar';
 import { Reply } from '@/types/post';
-import ReactCrop, { type Crop, centerCrop, makeAspectCrop, PixelCrop } from 'react-image-crop';
+import { useMediaPicker } from '@/src/hooks/useMediaPicker';
+import MediaPreview from '@/components/ui/MediaPreview';
 
 interface CommentCardProps {
   comment: Reply;
   onLike?: () => void;
   onUnlike?: () => void;
-  onReply?: (content: string, media: File | null) => void; // Ajout du média ici
+  onReply?: (content: string, media: File | null) => void;
   disableNavigation?: boolean;
   isPosting?: boolean;
 }
@@ -26,109 +27,28 @@ export default function CommentCard({ comment, onLike, onUnlike, onReply, disabl
 
   const profileHref = `/profile/${encodeURIComponent(comment.author.username)}`;
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const {
+    selectedFile,
+    previewUrl,
+    isCropping,
+    srcUrl,
+    crop,
+    isVideo,
+    isGif,
+    fileInputRef,
+    imgRef,
+    handleIconClick,
+    handleFileChange,
+    handleTriggerCrop,
+    onImageLoad,
+    handleCropComplete,
+    handleRemoveImage,
+    cancelCrop,
+    setCrop,
+    setCompletedCrop,
+    reset,
+  } = useMediaPicker();
 
-  // Pour recadrage de l'image
-  const [srcUrl, setSrcUrl] = useState<string | null>(null);
-  const [crop, setCrop] = useState<Crop>();
-  const [completedCrop, setCompletedCrop] = useState<PixelCrop | null>(null);
-  const [isCropping, setIsCropping] = useState(false);
-
-  const imgRef = useRef<HTMLImageElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Générer ou nettoyer l'URL de preview quand le fichier change
-  useEffect(() => {
-    if (!selectedFile) {
-      setPreviewUrl(null);
-      return;
-    }
-
-    const objectUrl = URL.createObjectURL(selectedFile);
-    setPreviewUrl(objectUrl);
-
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [selectedFile]);
-
-  const handleIconClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      setSelectedFile(file);
-    }
-  };
-
-  const handleTriggerCrop = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!selectedFile) return;
-    const reader = new FileReader();
-    reader.addEventListener('load', () => {
-      setSrcUrl(reader.result as string);
-      setIsCropping(true);
-    });
-    reader.readAsDataURL(selectedFile);
-  };
-
-  const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const { width, height } = e.currentTarget;
-    const initialCrop = centerCrop(
-      makeAspectCrop({ unit: '%', width: 90 }, 16 / 9, width, height),
-      width,
-      height
-    );
-    setCrop(initialCrop);
-  };
-
-  const handleCropComplete = async () => {
-    if (!imgRef.current || !completedCrop) return;
-
-    const image = imgRef.current;
-    const canvas = document.createElement('canvas');
-    const scaleX = image.naturalWidth / image.width;
-    const scaleY = image.naturalHeight / image.height;
-
-    canvas.width = completedCrop.width;
-    canvas.height = completedCrop.height;
-    const ctx = canvas.getContext('2d');
-
-    if (ctx) {
-      ctx.drawImage(
-        image,
-        completedCrop.x * scaleX,
-        completedCrop.y * scaleY,
-        completedCrop.width * scaleX,
-        completedCrop.height * scaleY,
-        0,
-        0,
-        completedCrop.width,
-        completedCrop.height
-      );
-
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const croppedFile = new File([blob], 'cropped-image.jpeg', { type: 'image/jpeg' });
-          setSelectedFile(croppedFile);
-          setIsCropping(false);
-          setSrcUrl(null);
-        }
-      }, 'image/jpeg', 0.9);
-    }
-  };
-
-  const handleRemoveImage = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setSelectedFile(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
-
-  // --- FONCTIONS CORRIGÉES ET AJOUTÉES À L'INTÉRIEUR DU COMPOSANT ---
   const handleCardClick = () => {
     if (disableNavigation) return;
     router.push(`/comments/${comment.id}`);
@@ -147,12 +67,9 @@ export default function CommentCard({ comment, onLike, onUnlike, onReply, disabl
     if (!replyText.trim() || !onReply) return;
     onReply(replyText, selectedFile);
     setReplyText('');
-    setSelectedFile(null);
+    reset();
     setIsReplying(false);
   };
-
-  const isVideo = selectedFile?.type.startsWith('video/');
-  const isGif = selectedFile?.type === 'image/gif';
 
   const isVideoUrl = comment.imageUrl
     ? /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(comment.imageUrl)
@@ -253,46 +170,24 @@ export default function CommentCard({ comment, onLike, onUnlike, onReply, disabl
                   {t('post_card.reply_button')}
                 </button>
               </div>
-              
+
               {previewUrl && selectedFile && (
-                <div className="relative my-3 w-full overflow-hidden rounded-2xl border border-gray-100 bg-gray-50 group">
-                  {isVideo ? (
-                    <video
-                      src={previewUrl}
-                      controls
-                      muted
-                      className="w-full h-full object-contain max-h-[50vh]"
-                    />
-                  ) : (
-                    <img
-                      src={previewUrl}
-                      alt="Preview"
-                      className="w-full h-full object-contain max-h-[50vh]"
-                    />
-                  )}
-
-                  <div className="absolute top-2 right-2 flex gap-2 z-10">
-                    {!isVideo && !isGif && (
-                      <button
-                        type="button"
-                        onClick={handleTriggerCrop}
-                        className="p-1.5 rounded-full bg-black/70 hover:bg-black/80 text-white transition-colors backdrop-blur-sm"
-                        title="Recadrer l'image"
-                      >
-                        <CropIcon size={18} />
-                      </button>
-                    )}
-
-                    <button
-                      type="button"
-                      onClick={handleRemoveImage}
-                      className="p-1.5 rounded-full bg-black/70 hover:bg-black/80 text-white transition-colors backdrop-blur-sm"
-                      title="Supprimer le média"
-                    >
-                      <X size={18} />
-                    </button>
-                  </div>
-                </div>
+                <MediaPreview
+                  previewUrl={previewUrl}
+                  isVideo={isVideo}
+                  isGif={isGif}
+                  onTriggerCrop={handleTriggerCrop}
+                  onRemove={handleRemoveImage}
+                  isCropping={isCropping}
+                  srcUrl={srcUrl}
+                  crop={crop}
+                  imgRef={imgRef}
+                  onImageLoad={onImageLoad}
+                  onCropChange={setCrop}
+                  onCropComplete={setCompletedCrop}
+                  onCropSave={handleCropComplete}
+                  onCropCancel={cancelCrop}
+                />
               )}
             </div>
           )}
@@ -300,4 +195,4 @@ export default function CommentCard({ comment, onLike, onUnlike, onReply, disabl
       </div>
     </article>
   );
-} // 👈 L'accolade ferme bien le composant tout à la fin maintenant !
+}
