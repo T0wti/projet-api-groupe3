@@ -41,6 +41,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme]);
 
   const setTheme = (nextTheme: Theme) => {
+    applyTheme(nextTheme);
+    window.localStorage.setItem(STORAGE_KEY, nextTheme);
     setThemeState(nextTheme);
   };
 
