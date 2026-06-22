@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
-import { Home, Search, Bell, Mail, User, MoreHorizontal, LogOut, Wind, Plus, Shield, Settings } from 'lucide-react';
+import { Home, Search, Bell, Mail, User, MoreHorizontal, LogOut, Wind, Shield, Settings } from 'lucide-react';
 import Avatar from '@/components/ui/Avatar';
-import Button from '@/components/ui/Button';
+import PublishPostModal from '../feed/PublishPostModal';
 import { useAuth } from '@/context/AuthContext';
 
 const NAV_ITEMS = [
@@ -45,10 +45,7 @@ export default function Sidebar() {
       </nav>
 
       {/* Post button */}
-      <Button className="mt-6" variant="primary" size="lg">
-        <Plus size={20} className="block lg:hidden" />
-        <span className="hidden lg:block">{t('sidebar.post_button')}</span>
-      </Button>
+      <PublishPostModal triggerVariant="sidebar" />
 
       {/* User + logout */}
       <div className="mt-auto flex flex-col gap-1">
