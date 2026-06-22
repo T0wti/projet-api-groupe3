@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Home, Search, Plus, Bell, LogOut, Settings } from 'lucide-react';
+import { Home, Search, Bell, LogOut, Settings } from 'lucide-react';
+import PublishPostModal from '../feed/PublishPostModal';
 import { useAuth } from '@/context/AuthContext';
 
 export default function MobileBottomNav() {
@@ -17,9 +18,7 @@ export default function MobileBottomNav() {
           <Search size={24} />
         </Link>
 
-        <Link href="/compose" className="bg-brand text-white rounded-full p-2 hover:bg-brand-hover transition-colors">
-          <Plus size={24} />
-        </Link>
+        <PublishPostModal triggerVariant="mobile" />
 
         <Link href="/notifications" className="app-text-muted hover:text-brand transition-colors p-2">
           <Bell size={24} />

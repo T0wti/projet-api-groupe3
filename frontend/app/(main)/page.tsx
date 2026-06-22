@@ -77,6 +77,21 @@ export default function HomeFeed() {
     loadFeed();
   }, [user, authLoading]);
 
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+
+    const handleCreatedPost = (event: WindowEventMap['breezy:post-created']) => {
+      const newPost = mapBackendPost(event.detail, new Set(), user);
+      setPosts((currentPosts) => [newPost, ...currentPosts.filter((post) => post.id !== newPost.id)]);
+      setPostError(null);
+    };
+
+    window.addEventListener('breezy:post-created', handleCreatedPost);
+    return () => window.removeEventListener('breezy:post-created', handleCreatedPost);
+  }, [user]);
+
   const handleAddNewPost = async (content: string) => {
     if (!user) return;
     setIsPosting(true);

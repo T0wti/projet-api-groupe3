@@ -28,7 +28,15 @@
   },
   "compose_post": {
     "placeholder": "Quoi de neuf ?",
-    "submit_button": "Publier"
+    "submit_button": "Publier",
+    "modal_title": "Creer un post",
+    "modal_description": "Partage une idee, une actualite ou un message avec ta communaute.",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "publishing": "Publication...",
+    "publish_error": "Impossible de publier le post.",
+    "characters_left_one": "{{count}} caractere restant",
+    "characters_left_other": "{{count}} caracteres restants"
   },
   "post_card": {
     "reply_placeholder": "Répondre à ce post...",
