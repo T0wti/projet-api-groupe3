@@ -426,7 +426,7 @@ export default function ProfilePage() {
       {!isLoading && !isProfileUnavailable && !error && profileUser && (
         <>
           <section className="border-b app-border px-4 py-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex items-start gap-4">
                 {isOwnProfile ? (
                   <label htmlFor="avatar-upload" className="relative cursor-pointer group shrink-0">
@@ -454,48 +454,48 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {user && user.id !== profileUser.id && (
-                <Button
-                  type="button"
-                  variant={isFollowing ? 'secondary' : 'primary'}
-                  size="md"
-                  disabled={isFollowPending}
-                  onClick={handleToggleFollow}
-                  className="sm:self-start"
-                >
-                  {isFollowPending ? t('pending') : isFollowing ? t('profile:follow_button.unfollow') : t('profile:follow_button.follow')}
-                </Button>
-              )}
-
               <div className="flex flex-col gap-3 sm:ml-auto sm:items-end">
+                {user && user.id !== profileUser.id && (
+                  <Button
+                    type="button"
+                    variant={isFollowing ? 'secondary' : 'primary'}
+                    size="md"
+                    disabled={isFollowPending}
+                    onClick={handleToggleFollow}
+                    className="self-start sm:self-end"
+                  >
+                    {isFollowPending ? t('pending') : isFollowing ? t('profile:follow_button.unfollow') : t('profile:follow_button.follow')}
+                  </Button>
+                )}
+
                 {isOwnProfile && (
                   <button
                     type="button"
                     onClick={() => setIsEditAccountModalOpen(true)}
-                    className="shrink-0 self-end text-xs text-teal-600 hover:underline"
+                    className="shrink-0 self-start text-xs text-teal-600 hover:underline sm:self-end"
                   >
                     {t('profile:account_modal.open', { defaultValue: 'Edit account' })}
                   </button>
                 )}
-
-                <div className="flex gap-6 text-sm app-text-muted sm:justify-end">
-                  <p>
-                    <span className="font-bold app-text">{posts.length}</span> {t('profile:stats.posts')}
-                  </p>
-                  <button
-                    onClick={() => setFollowModal('followers')}
-                    className="hover:underline text-left"
-                  >
-                    <span className="font-bold app-text">{profileUser.followersCount ?? 0}</span> {t('profile:stats.followers')}
-                  </button>
-                  <button
-                    onClick={() => setFollowModal('following')}
-                    className="hover:underline text-left"
-                  >
-                    <span className="font-bold app-text">{profileUser.followingCount ?? 0}</span> {t('profile:stats.following')}
-                  </button>
-                </div>
               </div>
+            </div>
+
+            <div className="mt-4 flex justify-end gap-6 text-sm app-text-muted">
+              <p>
+                <span className="font-bold app-text">{posts.length}</span> {t('profile:stats.posts')}
+              </p>
+              <button
+                onClick={() => setFollowModal('followers')}
+                className="hover:underline text-left"
+              >
+                <span className="font-bold app-text">{profileUser.followersCount ?? 0}</span> {t('profile:stats.followers')}
+              </button>
+              <button
+                onClick={() => setFollowModal('following')}
+                className="hover:underline text-left"
+              >
+                <span className="font-bold app-text">{profileUser.followingCount ?? 0}</span> {t('profile:stats.following')}
+              </button>
             </div>
 
             {avatarError && <p className="mt-2 text-sm text-red-500">{avatarError}</p>}
