@@ -2,9 +2,6 @@ import { Schema, model, Document, Types } from 'mongoose';
 
 export type MediaType = 'image' | 'video' | null;
 
-/**
- * Media object structure attached to a post.
- */
 export interface Media {
   type: MediaType;
   url: string | null;
@@ -18,6 +15,7 @@ export interface IComment extends Document {
   content: string;
   likesCount: number;
   commentsCount: number;
+  reportsCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,9 +23,9 @@ export interface IComment extends Document {
 const commentSchema = new Schema<IComment>(
   {
     post_id: { type: Schema.Types.ObjectId, ref: 'Post', required: true },
-    user_id: { type:  String, required: true },
+    user_id: { type: String, required: true },
     parent_comment_id: { type: Schema.Types.ObjectId, ref: 'Comment', default: null },
-    content: { type: String, required: true, maxlength: 280 },
+    content: { type: String, default: '', maxlength: 280 },
     media: {
       type: {
         type: String,
@@ -38,15 +36,26 @@ const commentSchema = new Schema<IComment>(
     },
     likesCount: { type: Number, default: 0 },
     commentsCount: { type: Number, default: 0 },
+    reportsCount: { type: Number, default: 0 },
   },
   {
     timestamps: true
   }
 );
 
-commentSchema.index({ content: 'text' });
+commentSchema.pre('validate', function (next) {
+  const hasContent = typeof this.content === 'string' && this.content.trim().length > 0;
+  const hasMedia = !!this.media?.url;
 
-commentSchema.index({ post_id: 1, createdAt: -1 }); // Comment of a post
-commentSchema.index({ parent_comment_id: 1 }); // response to a comment
+  if (!hasContent && !hasMedia) {
+    return next(new Error('A comment must have either content or media.'));
+  }
+
+  next();
+});
+
+commentSchema.index({ content: 'text' });
+commentSchema.index({ post_id: 1, createdAt: -1 });
+commentSchema.index({ parent_comment_id: 1 });
 
 export const Comment = model<IComment>('Comment', commentSchema);

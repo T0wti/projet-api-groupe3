@@ -1,40 +1,28 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-/**
- * Allowed media types for a post
- * A post can contain either an image, a video, or no media
- */
 export type MediaType = 'image' | 'video' | null;
 
-/**
- * Media object structure attached to a post.
- */
 export interface Media {
   type: MediaType;
   url: string | null;
 }
 
-/**
- * TypeScript interface representing a Post document in MongoDB.
- */
 export interface IPost extends Document {
   authorId: string;
   content: string;
   media: Media;
   likesCount: number;
   commentsCount: number;
+  reportsCount: number;
   parentPost: mongoose.Types.ObjectId | null;
   createdAt: Date;
   updatedAt: Date;
 }
 
-/**
- * Mongoose schema definition for posts.
- */
 const PostSchema = new Schema<IPost>(
   {
     authorId: { type: String, required: true },
-    content: { type: String, required: true, maxlength: 280 },
+    content: { type: String, default: '', maxlength: 280 },
     media: {
       type: {
         type: String,
@@ -45,11 +33,23 @@ const PostSchema = new Schema<IPost>(
     },
     likesCount: { type: Number, default: 0 },
     commentsCount: { type: Number, default: 0 },
+    reportsCount: { type: Number, default: 0 },
   },
   {
     timestamps: true
   }
 );
+
+PostSchema.pre('validate', function (next) {
+  const hasContent = typeof this.content === 'string' && this.content.trim().length > 0;
+  const hasMedia = !!this.media?.url;
+
+  if (!hasContent && !hasMedia) {
+    return next(new Error('A post must have either content or media.'));
+  }
+
+  next();
+});
 
 PostSchema.index({ content: 'text' });
 

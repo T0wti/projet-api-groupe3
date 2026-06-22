@@ -12,7 +12,7 @@ export const createComment = async (req: Request, res: Response) => {
   const { post_id, content, media, parent_comment_id, tags } = req.body;
 
 
-  if (!post_id || !user_id || !content) {
+  if (!post_id || !user_id) {
     throw new AppError(400, 'post_id, content, and authenticated user are required.');
   }
   if (!isValidObjectId(post_id)) throw new AppError(400, 'post_id is invalid.');
