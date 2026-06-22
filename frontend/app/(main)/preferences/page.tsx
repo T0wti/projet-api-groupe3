@@ -105,9 +105,6 @@ export default function PreferencesPage() {
                     <Icon size={20} />
                   </div>
                   <p className="font-semibold">{t(`preferences_page.theme.options.${value}`)}</p>
-                  <p className="mt-1 text-sm app-text-muted">
-                    {t(`preferences_page.theme.help.${value}`)}
-                  </p>
                 </button>
               );
             })}

@@ -3,21 +3,31 @@
 :root {
   --app-bg: #f8fafc;
   --app-surface: #ffffff;
+  --app-surface-elevated: #ffffff;
   --app-muted-surface: #f3f4f6;
   --app-border: #e5e7eb;
+  --app-border-subtle: #edf2f7;
   --app-text: #111827;
   --app-text-muted: #6b7280;
+  --app-text-soft: #94a3b8;
   --app-hover: #eef2f7;
+  --app-header: rgba(255, 255, 255, 0.84);
+  --app-overlay: rgba(15, 23, 42, 0.48);
 }
 
 html[data-theme='dark'] {
   --app-bg: #0f172a;
   --app-surface: #111827;
+  --app-surface-elevated: #172033;
   --app-muted-surface: #1f2937;
   --app-border: #334155;
+  --app-border-subtle: #1f2937;
   --app-text: #f8fafc;
   --app-text-muted: #94a3b8;
+  --app-text-soft: #64748b;
   --app-hover: #1e293b;
+  --app-header: rgba(17, 24, 39, 0.84);
+  --app-overlay: rgba(2, 6, 23, 0.72);
 }
 
 @theme {
@@ -46,15 +56,66 @@ body {
     background-color: var(--app-surface);
   }
 
+  .app-page {
+    background-color: var(--app-surface);
+  }
+
+  .app-surface-elevated {
+    background-color: var(--app-surface-elevated);
+  }
+
+  .app-surface-muted {
+    background-color: var(--app-muted-surface);
+  }
+
   .app-border {
     border-color: var(--app-border);
+  }
+
+  .app-border-subtle {
+    border-color: var(--app-border-subtle);
+  }
+
+  .app-text {
+    color: var(--app-text);
   }
 
   .app-text-muted {
     color: var(--app-text-muted);
   }
 
+  .app-text-soft {
+    color: var(--app-text-soft);
+  }
+
+  .app-header {
+    background-color: var(--app-header);
+  }
+
+  .app-overlay {
+    background-color: var(--app-overlay);
+  }
+
   .app-hover-surface:hover {
+    background-color: var(--app-hover);
+  }
+
+  .app-input {
+    background-color: var(--app-surface);
+    border-color: var(--app-border);
+    color: var(--app-text);
+  }
+
+  .app-input::placeholder {
+    color: var(--app-text-muted);
+  }
+
+  .app-button-secondary {
+    background-color: var(--app-muted-surface);
+    color: var(--app-text);
+  }
+
+  .app-button-secondary:hover {
     background-color: var(--app-hover);
   }
 
@@ -70,7 +131,8 @@ body {
 
   /* Post action buttons (reply, repost, like) */
   .post-action {
-    @apply inline-flex items-center gap-1.5 text-gray-500 transition-colors;
+    @apply inline-flex items-center gap-1.5 transition-colors;
+    color: var(--app-text-muted);
   }
 
   /* Generic card surface */

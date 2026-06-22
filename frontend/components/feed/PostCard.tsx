@@ -65,7 +65,7 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
 
   return (
     <article
-      className={`relative bg-white border border-gray-200 p-4 hover:bg-gray-50 transition-colors rounded-lg${disableNavigation ? '' : ' cursor-pointer'}`}
+      className={`relative app-surface-elevated border app-border p-4 app-hover-surface transition-colors rounded-lg${disableNavigation ? '' : ' cursor-pointer'}`}
       onClick={handleCardClick}
     >
       <div className="flex gap-3">
@@ -78,8 +78,8 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between">
             <Link href={profileHref} className="flex items-center gap-1 text-sm">
-              <span className="font-bold text-gray-900">{post.author.name}</span>
-              <span className="text-gray-500">@{post.author.username}</span>
+              <span className="font-bold app-text">{post.author.name}</span>
+              <span className="app-text-muted">@{post.author.username}</span>
             </Link>
 
             {showAuthorMenu && (
@@ -100,7 +100,7 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
                 onChange={(e) => setEditContent(e.target.value)}
                 rows={3}
                 autoFocus
-                className="w-full resize-none rounded-lg border border-gray-300 p-2 text-sm outline-none focus:border-teal-500"
+                className="w-full resize-none rounded-lg border app-input p-2 text-sm outline-none focus:border-teal-500"
               />
               <div className="flex gap-2">
                 <button
@@ -112,7 +112,7 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
                 </button>
                 <button
                   onClick={handleCancelEdit}
-                  className="rounded-full border border-gray-300 px-4 py-1 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                  className="rounded-full border app-border px-4 py-1 text-sm font-semibold app-text app-hover-surface"
                 >
                   {t('post_card.cancel_edit')}
                 </button>
@@ -120,7 +120,7 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
             </div>
           ) : (
             <>
-              <p className="mt-1 text-gray-900 text-[15px] whitespace-pre-wrap wrap-break-word">{displayContent}</p>
+              <p className="mt-1 app-text text-[15px] whitespace-pre-wrap wrap-break-word">{displayContent}</p>
               {isTruncatable && (
                 <button
                   onClick={() => setExpanded(!expanded)}
@@ -171,11 +171,11 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
           )}
 
           {post.replies && post.replies.length > 0 && (
-            <div className="mt-4 pl-4 border-l-2 border-gray-200 space-y-3">
+            <div className="mt-4 pl-4 border-l-2 app-border space-y-3">
               {post.replies.map((reply) => (
                 <div key={reply.id} className="text-sm">
                   <span className="font-bold mr-2">{reply.author.name}</span>
-                  <span className="text-gray-700">{reply.content}</span>
+                  <span className="app-text-muted">{reply.content}</span>
                 </div>
               ))}
             </div>

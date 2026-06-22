@@ -67,18 +67,18 @@ export default function FollowListModal({ userId, type, onClose }: FollowListMod
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+      className="fixed inset-0 z-50 flex items-center justify-center app-overlay"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-sm mx-4 bg-white rounded-2xl shadow-xl flex flex-col max-h-[70vh]"
+        className="relative w-full max-w-sm mx-4 app-surface-elevated rounded-2xl shadow-xl flex flex-col max-h-[70vh] border app-border"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 shrink-0">
-          <h2 className="text-lg font-bold text-gray-900">{title}</h2>
+        <div className="flex items-center justify-between px-4 py-3 border-b app-border shrink-0">
+          <h2 className="text-lg font-bold app-text">{title}</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-700 transition-colors p-1 rounded-full hover:bg-gray-100"
+            className="app-text-muted hover:app-text transition-colors p-1 rounded-full app-hover-surface"
             aria-label="Close"
           >
             <X size={18} />
@@ -87,11 +87,11 @@ export default function FollowListModal({ userId, type, onClose }: FollowListMod
 
         <div className="overflow-y-auto flex-1">
           {isLoading && (
-            <p className="text-center text-gray-400 py-8 text-sm">{t('loading_message')}</p>
+            <p className="text-center app-text-soft py-8 text-sm">{t('loading_message')}</p>
           )}
 
           {!isLoading && users.length === 0 && (
-            <p className="text-center text-gray-400 py-8 text-sm">{emptyMessage}</p>
+            <p className="text-center app-text-soft py-8 text-sm">{emptyMessage}</p>
           )}
 
           {!isLoading && users.map((u) => (
@@ -99,12 +99,12 @@ export default function FollowListModal({ userId, type, onClose }: FollowListMod
               key={u.id}
               href={`/profile/${encodeURIComponent(u.username)}`}
               onClick={onClose}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-3 px-4 py-3 app-hover-surface transition-colors"
             >
               <Avatar src={u.avatarUrl} alt={u.username} size="sm" />
               <div className="min-w-0">
-                <p className="font-bold text-gray-900 text-sm truncate">{u.username}</p>
-                <p className="text-gray-500 text-sm truncate">@{u.username}</p>
+                <p className="font-bold app-text text-sm truncate">{u.username}</p>
+                <p className="app-text-muted text-sm truncate">@{u.username}</p>
               </div>
             </Link>
           ))}

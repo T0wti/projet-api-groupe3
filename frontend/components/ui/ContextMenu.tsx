@@ -33,18 +33,18 @@ export default function ContextMenu({ actions, ariaLabel = 'Options' }: ContextM
     <div ref={containerRef} className="relative">
       <button
         onClick={() => setIsOpen((prev) => !prev)}
-        className="text-gray-400 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 transition-colors"
+        className="app-text-muted hover:app-text p-1 rounded-full app-hover-surface transition-colors"
         aria-label={ariaLabel}
       >
         <MoreHorizontal size={16} />
       </button>
       {isOpen && (
-        <div className="absolute right-0 top-7 z-20 min-w-27.5 rounded-lg border border-gray-200 bg-white shadow-lg">
+        <div className="absolute right-0 top-7 z-20 min-w-27.5 rounded-lg border app-border app-surface-elevated shadow-lg">
           {actions.map((action, index) => (
             <button
               key={index}
               onClick={() => { action.onClick(); setIsOpen(false); }}
-              className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 ${index === 0 ? 'rounded-t-lg' : ''} ${index === actions.length - 1 ? 'rounded-b-lg' : ''} ${action.danger ? 'text-red-600' : 'text-gray-700'}`}
+              className={`w-full px-4 py-2 text-left text-sm app-hover-surface ${index === 0 ? 'rounded-t-lg' : ''} ${index === actions.length - 1 ? 'rounded-b-lg' : ''} ${action.danger ? 'text-red-600' : 'app-text'}`}
             >
               {action.label}
             </button>
