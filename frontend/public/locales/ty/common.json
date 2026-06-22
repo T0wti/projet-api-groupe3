@@ -1,7 +1,8 @@
 ﻿{
   "home_page": {
     "title": "E rēfara",
-    "empty_message": "Kahore he tātā’ura’a e hō’ata. Tāmata i te pe’e i te tahi mau 'āfata rorouira nō te 'ite i te mau parau i ’onei."
+    "empty_message": "Kahore he tātā’ura’a e hō’ata. Tāmata i te pe’e i te tahi mau 'āfata rorouira nō te 'ite i te mau parau i ’onei.",
+    "load_error": "Aita i manuia te fāriira’a o te mau parau."
   },
   "sidebar": {
     "nav": {
@@ -44,20 +45,48 @@
     "reply_button": "Pāhono",
     "show_more": "Hō'ata hou",
     "show_less": "Hō'ata iti",
+    "report": "Fa'ahapa",
+    "report_title": "Fa'ahapa i teie parau",
+    "report_description": "Ma'iti i te tumu matamua no teie fa'ahapara'a.",
+    "report_reason_label": "Tumu",
+    "report_submit": "Hāpono i te fa'ahapa",
+    "report_success": "Ua manuia te fa'ahapara'a o teie parau.",
+    "report_error": "Aita i manuia te fa'ahapa i teie parau.",
     "edit": "Huri",
     "delete": "Horo'a",
     "save": "Fa'atāpura'a",
     "cancel_edit": "Ha'uti",
     "delete_confirm": "E nehenehe anei oe e horo'a i teie tātā'ura'a?",
-    "no_comments": "Aore pāhono."
+    "no_comments": "Aore pāhono.",
+    "report_reasons": {
+      "spam": "Spam",
+      "harassment": "Ha'amāuiui",
+      "hate_speech": "Parau faufau",
+      "violence": "Hāmani 'ino",
+      "nudity": "Taha'a",
+      "misinformation": "Parau ha'avare",
+      "other": "Te tahi atu"
+    }
   },
   "explore_page": {
     "title": "Tāha'amana'o",
     "search_placeholder": "Paha'imi i te tātā'ura'a, ta'āto'ara'a, #labels…",
-    "tabs": { "posts": "Tātā'ura'a", "people": "Ta'āto'ara'a" },
+    "tabs": {
+      "posts": "Tātā'ura'a",
+      "people": "Ta'āto'ara'a"
+    },
     "no_results_posts": "Aore tātā'ura'a.",
     "no_results_people": "Aore pūpū.",
-    "no_results_tags": "Aore tātā'ura'a no tei'a label."
+    "no_results_tags": "Aore tātā'ura'a no tei'a label.",
+    "search_error": "Ua hapa te paha'imi. Tāmata fa'ahou."
+  },
+  "post_detail": {
+    "title": "Parau",
+    "load_error": "Aita i manuia te fāriira’a o teie parau."
+  },
+  "comment_detail": {
+    "title": "Pāhono",
+    "load_error": "Aita i manuia te fāriira’a o teie pāhono."
   },
   "accessibility": {
     "options": "Mau ma'itiraa",
@@ -86,7 +115,16 @@
     "language": {
       "title": "Reo",
       "description": "Ua taui oioi te ma'itiraa i roto i te interface.",
-      "label": "Reo o te application"
+      "label": "Reo o te application",
+      "options": {
+        "french": "French",
+        "english": "English",
+        "spanish": "Spanish",
+        "arabic": "Arabic",
+        "hebrew": "Hebrew",
+        "russian": "Russian",
+        "tahitian": "Tahitian"
+      }
     },
     "theme": {
       "title": "Theme",
