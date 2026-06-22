@@ -31,14 +31,19 @@ export const routeTable: RouteRule[] = [
   { method: 'get', path: '/api/users/search', target: 'user', auth: 'required' },
   { method: 'put', path: '/api/users/:id', target: 'user', auth: 'required', selfParam: 'id', bypassRoles: ['admin'] },
   { method: 'delete', path: '/api/users/:id', target: 'user', auth: 'required', selfParam: 'id', bypassRoles: ['admin'] },
-  //{ method: 'patch', path: '/api/users/:id/ban', target: 'user', auth: 'required', roles: ['admin'] },
   { method: 'patch', path: '/api/users/:id/role', target: 'user', auth: 'required', roles: ['admin'] },
 
+  // Moderation
+  { method: 'patch', path: '/api/users/:id/suspend', target: 'user', auth: 'required', roles: ['moderator', 'admin'] },
+  { method: 'patch', path: '/api/users/:id/ban', target: 'user', auth: 'required', roles: ['moderator', 'admin'] },
+  { method: 'patch', path: '/api/users/:id/reinstate', target: 'user', auth: 'required', roles: ['moderator', 'admin'] },
+  
   // Posts
   { method: 'post', path: '/api/posts', target: 'post', auth: 'required' },
   { method: 'get', path: '/api/posts/tags/:tag', target: 'post', auth: 'required' },
   { method: 'get', path: '/api/posts', target: 'post', auth: 'required' },
   { method: 'get', path: '/api/posts/feed', target: 'post', auth: 'required' },
+  { method: 'get', path: '/api/posts/batch', target: 'post', auth: 'required' },
   { method: 'get', path: '/api/posts/:id', target: 'post', auth: 'required' },
   { method: 'get', path: '/api/posts/:id/replies', target: 'post', auth: 'required' },
   { method: 'get', path: '/api/posts/search', target: 'post', auth: 'required' },
@@ -61,6 +66,14 @@ export const routeTable: RouteRule[] = [
   { method: 'delete', path: '/api/post-likes', target: 'post', auth: 'required' },
   { method: 'get', path: '/api/post-likes/user/:userId', target: 'post', auth: 'required' },
   { method: 'get', path: '/api/post-likes/post/:postId', target: 'post', auth: 'required' },
+
+  // Reports
+  { method: 'post', path: '/api/reports', target: 'post', auth: 'required' },
+  { method: 'get', path: '/api/reports', target: 'post', auth: 'required', roles: ['moderator', 'admin'] },
+  { method: 'patch', path: '/api/reports/:id', target: 'post', auth: 'required', roles: ['moderator', 'admin'] },
+  { method: 'get', path: '/api/reports/post/:postId', target: 'post', auth: 'required', roles: ['moderator', 'admin'] },
+  { method: 'get', path: '/api/reports/comment/:commentId', target: 'post', auth: 'required', roles: ['moderator', 'admin'] },
+
 
   // Comment likes
   { method: 'post', path: '/api/comment-likes', target: 'post', auth: 'required' },

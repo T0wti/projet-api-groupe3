@@ -1,5 +1,5 @@
 import api from '../api';
-import type { BackendPost, BackendComment } from '@/types/post';
+import type { BackendPost, BackendComment, BackendReport, ReportReason, ReportStatus } from '@/types/post';
 
 export async function fetchPosts(): Promise<BackendPost[]> {
   const res = await api.get<BackendPost[]>('/posts');
@@ -54,6 +54,14 @@ export async function fetchPostsByTag(tag: string): Promise<BackendPost[]> {
   return res.data;
 }
 
+export async function fetchPostsByIds(ids: string[]): Promise<BackendPost[]> {
+  if (ids.length === 0) return [];
+  const res = await api.get<BackendPost[]>('/posts/batch', {
+    params: { ids: ids.join(',') },
+  });
+  return res.data;
+}
+
 export async function fetchPostById(postId: string): Promise<{ post: BackendPost; replies: BackendPost[] }> {
   const res = await api.get<{ post: BackendPost; replies: BackendPost[] }>(`/posts/${postId}`);
   return res.data;
@@ -94,10 +102,38 @@ export async function fetchUserLikedCommentIds(userId: string): Promise<string[]
   return res.data.liked_comments.map(String);
 }
 
+export async function updateComment(commentId: string, content: string): Promise<BackendComment> {
+  const res = await api.put<BackendComment>(`/comments/${commentId}`, { content });
+  return res.data;
+}
+
+export async function deleteComment(commentId: string): Promise<void> {
+  await api.delete(`/comments/${commentId}`);
+}
+
 export async function likeComment(commentId: string): Promise<void> {
   await api.post('/comment-likes', { comment_id: commentId });
 }
 
 export async function unlikeComment(commentId: string): Promise<void> {
   await api.delete('/comment-likes', { data: { comment_id: commentId } });
+}
+
+export async function createPostReport(postId: string, reason: ReportReason): Promise<BackendReport> {
+  const res = await api.post<BackendReport>('/reports', {
+    target_type: 'post',
+    target_id: postId,
+    reason,
+  });
+  return res.data;
+}
+
+export async function fetchReports(status: ReportStatus = 'pending'): Promise<BackendReport[]> {
+  const res = await api.get<BackendReport[]>('/reports', { params: { status } });
+  return res.data;
+}
+
+export async function updateReportStatus(reportId: string, status: Exclude<ReportStatus, 'pending'>): Promise<BackendReport> {
+  const res = await api.patch<BackendReport>(`/reports/${reportId}`, { status });
+  return res.data;
 }

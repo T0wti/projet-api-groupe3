@@ -14,9 +14,23 @@
   },
   "empty_posts_message": "Este usuario aún no ha publicado ninguna publicación.",
   "empty_replies_message": "Sin respuestas aún.",
+  "empty_likes_message": "Ningún post gustado aún.",
   "tabs": {
     "posts": "Posts",
-    "posts_replies": "Posts & Respuestas"
+    "posts_replies": "Posts & Respuestas",
+    "likes": "Me gusta"
+  },
+  "follow_list": {
+    "followers_title": "Seguidores",
+    "following_title": "Seguidos",
+    "empty_followers": "Aún no hay seguidores.",
+    "empty_following": "Aún no sigue a nadie."
+  },
+  "comment": {
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "save": "Guardar",
+    "cancel": "Cancelar"
   },
   "avatar": {
     "uploading": "Subiendo...",

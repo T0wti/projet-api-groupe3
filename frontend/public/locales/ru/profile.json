@@ -14,9 +14,23 @@
   },
   "empty_posts_message": "Этот пользователь ещё ничего не опубликовал.",
   "empty_replies_message": "Ответов пока нет.",
+  "empty_likes_message": "Нет понравившихся публикаций.",
   "tabs": {
     "posts": "Публикации",
-    "posts_replies": "Публикации и ответы"
+    "posts_replies": "Публикации и ответы",
+    "likes": "Понравилось"
+  },
+  "follow_list": {
+    "followers_title": "Подписчики",
+    "following_title": "Подписки",
+    "empty_followers": "Подписчиков пока нет.",
+    "empty_following": "Нет подписок."
+  },
+  "comment": {
+    "edit": "Изменить",
+    "delete": "Удалить",
+    "save": "Сохранить",
+    "cancel": "Отмена"
   },
   "avatar": {
     "uploading": "Загрузка...",

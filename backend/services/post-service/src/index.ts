@@ -6,6 +6,7 @@ import postRoutes from './routes/post.routes';
 import commentRoutes from './routes/comment.route';
 import postLikeRoutes from './routes/post-like.routes';
 import commentLikeRoutes from './routes/comment-like.routes';
+import reportRoutes from './routes/report.routes';   // ← ajouter
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use('/api/posts', postRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/post-likes', postLikeRoutes);
 app.use('/api/comment-likes', commentLikeRoutes);
+app.use('/api/reports', reportRoutes);
 
 app.use(errorHandler); 
 

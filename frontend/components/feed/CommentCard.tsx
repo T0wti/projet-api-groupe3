@@ -160,7 +160,7 @@ export default function CommentCard({ comment, onLike, onUnlike, onReply, disabl
 
   return (
     <article
-      className={`bg-white border-b border-gray-100 px-4 py-3 hover:bg-gray-50 transition-colors${disableNavigation ? '' : ' cursor-pointer'}`}
+      className={`app-surface border-b app-border-subtle px-4 py-3 app-hover-surface transition-colors${disableNavigation ? '' : ' cursor-pointer'}`}
       onClick={handleCardClick}
     >
       <div className="flex gap-3">
@@ -173,12 +173,12 @@ export default function CommentCard({ comment, onLike, onUnlike, onReply, disabl
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1 text-sm">
             <Link href={profileHref} className="flex items-center gap-1">
-              <span className="font-bold text-gray-900">{comment.author.name}</span>
-              <span className="text-gray-500">@{comment.author.username}</span>
+              <span className="font-bold app-text">{comment.author.name}</span>
+              <span className="app-text-muted">@{comment.author.username}</span>
             </Link>
           </div>
 
-          <p className="mt-1 text-gray-900 text-[15px] whitespace-pre-wrap wrap-break-word">{comment.content}</p>
+          <p className="mt-1 app-text text-[15px] whitespace-pre-wrap wrap-break-word">{comment.content}</p>
 
           {comment.imageUrl && (
             <div className="mt-3 w-full overflow-hidden border border-gray-100 rounded-2xl flex justify-center items-center">

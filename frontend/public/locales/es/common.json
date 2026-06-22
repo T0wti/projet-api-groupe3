@@ -10,6 +10,7 @@
       "notifications": "Notificaciones",
       "messages": "Mensajes",
       "profile": "Perfil",
+      "preferences": "Preferencias",
       "more": "Más"
     },
     "post_button": "Publicar",
@@ -60,5 +61,26 @@
     "ajust_image": "Ajustar imagen",
     "cancel": "Cancelar",
     "save": "Validar"
+  },
+  "preferences_page": {
+    "title": "Preferencias",
+    "description": "Elige el idioma de la interfaz y el tema de color de Breezy.",
+    "language": {
+      "title": "Idioma",
+      "description": "La seleccion se aplica inmediatamente en la interfaz.",
+      "label": "Idioma de la aplicacion"
+    },
+    "theme": {
+      "title": "Tema",
+      "description": "Cambia entre una apariencia clara y oscura.",
+      "options": {
+        "light": "Claro",
+        "dark": "Oscuro"
+      },
+      "help": {
+        "light": "Interfaz luminosa para el dia.",
+        "dark": "Interfaz mas suave para entornos oscuros."
+      }
+    }
   }
 }

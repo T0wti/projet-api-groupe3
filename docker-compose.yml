@@ -155,8 +155,6 @@ services:
       context: ./backend/services/media-service
       dockerfile: Dockerfile
     container_name: breezy-media-service
-    ports:
-      - "3005:3005"
     environment:
       - PORT=3005
       - MINIO_ENDPOINT=minio
@@ -200,9 +198,20 @@ services:
       - ./backend/services/api-gateway:/usr/src/app
       - /usr/src/app/node_modules
 
+  # ==========================================
+  # REDIS
+  # ==========================================
+  redis:
+    image: redis:7-alpine
+    container_name: breezy-redis
+    volumes:
+     - redis_data:/data
+
+
 volumes:
   user_db_data:
   post_db_data:
   profile_db_data:
   auth_db_data:
   minio_data:
+  redis_data:

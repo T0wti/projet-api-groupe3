@@ -188,7 +188,10 @@ const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     if (!postToDelete) throw new AppError(404, 'Post not found.');
 
     const requestingUserId = req.headers['x-user-id'] as string | undefined;
-    if (!requestingUserId || requestingUserId !== postToDelete.authorId.toString()) {
+    const requestingUserRole = req.headers['x-user-role'] as string | undefined;
+    const canModerate = requestingUserRole === 'moderator' || requestingUserRole === 'admin';
+
+    if (!requestingUserId || (requestingUserId !== postToDelete.authorId.toString() && !canModerate)) {
       throw new AppError(403, 'You are not allowed to delete this post.');
     }
 
@@ -200,6 +203,21 @@ const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     await Tag.deleteMany({ post_id: id });
     return res.status(200).json({ message: 'Post deleted successfully.' });
 
+};
+
+/**
+ * Retrieve a specific set of posts by their IDs
+ */
+export const getPostsByIds = async (req: Request, res: Response) => {
+  const raw = req.query.ids as string | string[] | undefined;
+  const ids = Array.isArray(raw) ? raw : raw ? raw.split(',') : [];
+
+  if (ids.length === 0) {
+    return res.status(200).json([]);
+  }
+
+  const posts = await Post.find({ _id: { $in: ids } }).sort({ createdAt: -1 });
+  return res.status(200).json(await attachPostTags(posts));
 };
 
 /**

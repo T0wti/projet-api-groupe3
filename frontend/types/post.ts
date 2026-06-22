@@ -57,6 +57,23 @@ export interface BackendComment {
   }
 }
 
+export type ReportReason = 'spam' | 'harassment' | 'hate_speech' | 'violence' | 'nudity' | 'misinformation' | 'other';
+
+export type ReportStatus = 'pending' | 'reviewed' | 'dismissed';
+
+export interface BackendReport {
+  _id: string;
+  reporter_id: string;
+  target_type: 'post' | 'comment';
+  target_id: string;
+  reason: ReportReason;
+  status: ReportStatus;
+  reviewed_by?: string | null;
+  reviewed_at?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export function mapBackendPost(
   bp: BackendPost,
   likedIds: Set<string>,

@@ -33,13 +33,11 @@ export default function PostDetailPage() {
   const [comments, setComments] = useState<Reply[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const isPageLoading = authLoading || (Boolean(user) && isLoading);
 
   useEffect(() => {
     if (authLoading) return;
-    if (!user || !postId) {
-      setIsLoading(false);
-      return;
-    }
+    if (!user || !postId) return;
 
     async function load() {
       try {
@@ -168,11 +166,11 @@ export default function PostDetailPage() {
   };
 
   return (
-    <main className="w-full border-x border-gray-200 min-h-screen">
-      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-200 px-4 py-4 flex items-center gap-4">
+    <main className="w-full border-x app-border app-page min-h-screen">
+      <header className="sticky top-0 z-10 app-header backdrop-blur-md border-b app-border px-4 py-4 flex items-center gap-4">
         <button
           onClick={() => router.back()}
-          className="text-gray-600 hover:text-gray-900 transition-colors"
+          className="app-text-muted hover:app-text transition-colors"
           aria-label="Go back"
         >
           <ArrowLeft size={20} />
@@ -180,12 +178,12 @@ export default function PostDetailPage() {
         <h1 className="text-xl font-bold">Post</h1>
       </header>
 
-      {isLoading && <p className="text-center text-gray-400 py-8">{t('pending')}</p>}
+      {isPageLoading && <p className="text-center app-text-soft py-8">{t('pending')}</p>}
       {error && <p className="text-center text-red-500 py-8">{error}</p>}
 
-      {!isLoading && !error && post && (
+      {!isPageLoading && !error && post && (
         <>
-          <div className="px-4 py-4 border-b border-gray-200">
+          <div className="px-4 py-4 border-b app-border">
             <PostCard
               post={post}
               onLike={handleToggleLike}
@@ -196,7 +194,7 @@ export default function PostDetailPage() {
 
           <section>
             {comments.length === 0 && (
-              <p className="text-center text-gray-400 py-10">{t('post_card.no_comments')}</p>
+              <p className="text-center app-text-soft py-10">{t('post_card.no_comments')}</p>
             )}
             {comments.map(comment => (
               <CommentCard

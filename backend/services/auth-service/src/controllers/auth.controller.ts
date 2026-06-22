@@ -150,14 +150,29 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     throw new AppError(400, 'email and password are required');
   }
 
-  const user = await prisma.authUser.findUnique({ where: { email } });
+  const normalizedEmail = email.trim().toLowerCase();
+  const user = await prisma.authUser.findUnique({ where: { email: normalizedEmail } });
   if (!user) {
     throw new AppError(401, 'Invalid credentials');
   }
-
+  
   const isValid = await bcrypt.compare(password, user.passwordHash);
   if (!isValid) {
     throw new AppError(401, 'Invalid credentials');
+  }
+
+  const userInfoRes = await fetch(`${USER_SERVICE_URL}/api/users/${user.userId}`);
+  const userInfo = (await userInfoRes.json()) as {
+    status?: string;
+    statusReason?: string;
+    suspendedUntil?: string;
+  };
+
+  if (userInfo.status === 'banned') {
+  throw new AppError(403, `This account has been banned.${userInfo.statusReason ? ' Reason: ' + userInfo.statusReason : ''}`);
+  }
+  if (userInfo.status === 'suspended' && userInfo.suspendedUntil && new Date(userInfo.suspendedUntil) > new Date()) {
+    throw new AppError(403, `This account is suspended until ${userInfo.suspendedUntil}.`);
   }
 
   await prisma.authUser.update({
@@ -197,6 +212,19 @@ export const refresh = async (req: Request, res: Response): Promise<void> => {
 
   try {
     const decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET) as { user_id: string };
+
+    const userInfoRes = await fetch(`${USER_SERVICE_URL}/api/users/${decoded.user_id}`);
+    const userInfo = (await userInfoRes.json()) as {
+      status?: string;
+      statusReason?: string;
+      suspendedUntil?: string;
+    };
+    
+  if (userInfo.status === 'banned' || (userInfo.status === 'suspended' && userInfo.suspendedUntil && new Date(userInfo.suspendedUntil) > new Date())) {
+    clearAuthCookies(res);
+    await prisma.refreshToken.deleteMany({ where: { userId: decoded.user_id } });
+    throw new AppError(403, 'This account is no longer active.');
+  }
 
     const user = await prisma.authUser.findUnique({
       where: { userId: decoded.user_id },

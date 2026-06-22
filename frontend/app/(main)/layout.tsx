@@ -7,7 +7,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     <div className="mx-auto flex min-h-screen w-full">
       <Sidebar />
 
-      <main className="flex-1 min-w-0 border-x border-gray-200 pb-20 md:pb-0">
+      <main className="flex-1 min-w-0 border-x app-border pb-20 md:pb-0">
         {children}
       </main>
 
