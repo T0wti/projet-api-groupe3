@@ -24,6 +24,9 @@ export default function CommentCard({ comment, onLike, onUnlike, onReply, disabl
 
   const profileHref = `/profile/${encodeURIComponent(comment.author.username)}`;
 
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+
   const handleCardClick = (e: React.MouseEvent) => {
     if (disableNavigation) return;
     if ((e.target as HTMLElement).closest('button, a, input, textarea')) return;
@@ -41,6 +44,14 @@ export default function CommentCard({ comment, onLike, onUnlike, onReply, disabl
     setReplyText('');
     setIsReplying(false);
   };
+
+  const isVideo = selectedFile?.type.startsWith('video/');
+  const isGif = selectedFile?.type === 'image/gif';
+
+  const isVideoUrl = comment.imageUrl
+    ? /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(comment.imageUrl)
+    : false;
+
 
   return (
     <article
@@ -63,6 +74,26 @@ export default function CommentCard({ comment, onLike, onUnlike, onReply, disabl
           </div>
 
           <p className="mt-1 text-gray-900 text-[15px] whitespace-pre-wrap wrap-break-word">{comment.content}</p>
+
+          {comment.imageUrl && (
+            <div className="mt-3 w-full overflow-hidden border border-gray-100 rounded-2xl flex justify-center items-center">
+              {isVideoUrl ? (
+                <video
+                  src={comment.imageUrl}
+                  controls
+                  preload="metadata"
+                  className="w-full object-contain max-h-[30vh]"
+                />
+              ) : (
+                <img
+                  src={comment.imageUrl}
+                  alt="Contenu du comment"
+                  className="w-full object-contain max-h-[30vh]"
+                  loading="lazy"
+                />
+              )}
+            </div>
+          )}
 
           <div className="flex items-center gap-6 mt-2">
             {onReply !== undefined && (
