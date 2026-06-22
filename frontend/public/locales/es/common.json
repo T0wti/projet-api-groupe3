@@ -57,6 +57,11 @@
     "save": "Guardar",
     "cancel": "Cancelar"
   },
+  "edit": {
+    "ajust_image": "Ajustar imagen",
+    "cancel": "Cancelar",
+    "save": "Validar"
+  },
   "preferences_page": {
     "title": "Preferencias",
     "description": "Elige el idioma de la interfaz y el tema de color de Breezy.",

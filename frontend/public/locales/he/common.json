@@ -57,6 +57,11 @@
     "save": "שמור",
     "cancel": "בטל"
   },
+  "edit": {
+    "ajust_image": "התאם תמונה",
+    "cancel": "בטל",
+    "save": "אשר"
+  },
   "preferences_page": {
     "title": "העדפות",
     "description": "בחר את שפת הממשק ואת ערכת הנושא של Breezy.",

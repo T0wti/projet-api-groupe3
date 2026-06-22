@@ -81,6 +81,11 @@
     "save": "Enregistrer",
     "cancel": "Annuler"
   },
+  "edit": {
+    "ajust_image": "Ajuster l'image",
+    "cancel": "Annuler",
+    "save": "Valider"
+  },
   "preferences_page": {
     "title": "Preferences",
     "description": "Choisissez la langue de l'interface et le theme d'affichage de Breezy.",

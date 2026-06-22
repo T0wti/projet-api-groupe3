@@ -19,6 +19,7 @@ import {
   unlikeComment,
   createComment,
 } from '@/lib/api/posts';
+import { uploadMedia } from '@/lib/api/media';
 import { fetchPublicUserById } from '@/lib/api/users';
 import { fetchProfileById } from '@/lib/api/profile';
 
@@ -109,10 +110,15 @@ export default function PostDetailPage() {
     }
   };
 
-  const handleReply = async (content: string) => {
+  const handleReply = async (content: string, image: File | null) => {
     if (!user || !post) return;
     try {
-      const bc = await createComment(post.id, content);
+      let uploadedImageUrl: string | null = null;
+      if (image) {
+        const { url } = await uploadMedia(image);
+        uploadedImageUrl = url;
+      }
+      const bc = await createComment(post.id, content, uploadedImageUrl);
       const newComment = mapBackendComment(bc, user);
       setComments(prev => [newComment, ...prev]);
       setPost(prev => prev ? { ...prev, commentsCount: prev.commentsCount + 1 } : prev);
@@ -139,12 +145,20 @@ export default function PostDetailPage() {
     }
   };
 
-  const handleReplyToComment = async (parentCommentId: string, content: string) => {
+  const handleReplyToComment = async (parentCommentId: string, content: string, image: File | null) => {
     if (!user || !post) return;
     try {
-      await createComment(post.id, content, parentCommentId);
-      setComments(prev => prev.map(c =>
-        c.id === parentCommentId ? { ...c, commentsCount: c.commentsCount + 1 } : c
+      let uploadedImageUrl: string | null = null;
+      if (image) {
+        const { url } = await uploadMedia(image);
+        uploadedImageUrl = url;
+      }
+      const bc = await createComment(post.id, content, uploadedImageUrl, parentCommentId);
+      const newReply = mapBackendComment(bc, user);
+      setComments(prev => prev.flatMap(c =>
+        c.id === parentCommentId
+          ? [{ ...c, commentsCount: c.commentsCount + 1 }, newReply]
+          : [c]
       ));
     } catch {
       // silently fail
@@ -188,7 +202,7 @@ export default function PostDetailPage() {
                 comment={comment}
                 onLike={() => handleLikeComment(comment.id)}
                 onUnlike={() => handleUnlikeComment(comment.id)}
-                onReply={(content) => handleReplyToComment(comment.id, content)}
+                onReply={(content: string, image: File | null) => handleReplyToComment(comment.id, content, image)}
               />
             ))}
           </section>

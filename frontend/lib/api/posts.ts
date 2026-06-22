@@ -18,8 +18,12 @@ export async function fetchUserLikedPostIds(userId: string): Promise<string[]> {
   return res.data.liked_posts.map(String);
 }
 
-export async function createPost(content: string, tags?: string[]): Promise<BackendPost> {
-  const res = await api.post<BackendPost>('/posts', { content, tags });
+export async function createPost(content: string, tags?: string[], imageUrl?: string | null): Promise<BackendPost> {
+  const mediaPayload = imageUrl
+  ? { type: 'image', url: imageUrl }
+  : { type: null, url: null };
+
+  const res = await api.post<BackendPost>('/posts', { content, tags, media: mediaPayload });
   return res.data;
 }
 
@@ -31,8 +35,8 @@ export async function unlikePost(postId: string): Promise<void> {
   await api.delete('/post-likes', { data: { post_id: postId } });
 }
 
-export async function updatePost(postId: string, content: string, tags?: string[]): Promise<BackendPost> {
-  const res = await api.put<BackendPost>(`/posts/${postId}`, { content, tags });
+export async function updatePost(postId: string, content: string, tags?: string[], mediaParam?: { type: "image" | "video"; url: string; } | undefined): Promise<BackendPost> {
+  const res = await api.put<BackendPost>(`/posts/${postId}`, { content, tags, media: mediaParam });
   return res.data;
 }
 
@@ -73,10 +77,11 @@ export async function fetchComments(postId: string): Promise<BackendComment[]> {
   return res.data;
 }
 
-export async function createComment(postId: string, content: string, parentCommentId?: string): Promise<BackendComment> {
+export async function createComment(postId: string, content: string, imageUrl?: string | null, parentCommentId?: string): Promise<BackendComment> {
   const res = await api.post<BackendComment>('/comments', {
     post_id: postId,
     content,
+    ...(imageUrl ? { media: { type: 'image', url: imageUrl } } : {}),
     ...(parentCommentId ? { parent_comment_id: parentCommentId } : {}),
   });
   return res.data;

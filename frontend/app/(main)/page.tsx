@@ -17,6 +17,7 @@ import {
 } from '@/lib/api/posts';
 import { fetchPublicUserById } from '@/lib/api/users';
 import { fetchProfileById, fetchFollowingById } from '@/lib/api/profile';
+import { uploadMedia } from '@/lib/api/media';
 
 export default function HomeFeed() {
   const { user, isLoading: authLoading } = useAuth();
@@ -92,7 +93,7 @@ export default function HomeFeed() {
     return () => window.removeEventListener('breezy:post-created', handleCreatedPost);
   }, [user]);
 
-  const handleAddNewPost = async (content: string) => {
+  const handleAddNewPost = async (content: string, image: File | null) => {
     if (!user) return;
     setIsPosting(true);
     setPostError(null);
@@ -100,7 +101,12 @@ export default function HomeFeed() {
       const tags = [...new Set(
         [...content.matchAll(/\B#(\w+)/g)].map((m) => m[1].toLowerCase())
       )];
-      const bp = await createPost(content, tags.length > 0 ? tags : undefined);
+      let uploadedImageUrl: string | null = null;
+      if (image) {
+        const {url} = await uploadMedia(image);
+        uploadedImageUrl = url;
+      }
+      const bp = await createPost(content, tags.length > 0 ? tags : undefined, uploadedImageUrl);
       const newPost = mapBackendPost(bp, new Set(), user);
       setPosts((prev) => [newPost, ...prev]);
     } catch (err: unknown) {
@@ -146,10 +152,15 @@ export default function HomeFeed() {
     }
   };
 
-  const handleReply = async (postId: string, replyContent: string) => {
+  const handleReply = async (postId: string, replyContent: string, image: File | null) => {
     if (!user) return;
     try {
-      const bc = await createComment(postId, replyContent);
+      let uploadedImageUrl: string | null = null;
+      if (image) {
+        const { url } = await uploadMedia(image);
+        uploadedImageUrl = url;
+      }
+      const bc = await createComment(postId, replyContent, uploadedImageUrl);
       const newReply: Reply = mapBackendComment(bc, user);
       setPosts((prev) =>
         prev.map((p) =>
@@ -188,14 +199,17 @@ export default function HomeFeed() {
       )}
 
       <section className="px-10 py-5 space-y-5">
-        {posts.map((post) => (
-          <PostCard
-            key={post.id}
-            post={post}
-            onLike={() => handleToggleLike(post.id)}
-            onReply={(content: string) => handleReply(post.id, content)}
-          />
-        ))}
+        {posts.map((post) => {
+          const PostCardAny = PostCard as any;
+          return (
+            <PostCardAny
+              key={post.id}
+              post={post}
+              onLike={() => handleToggleLike(post.id)}
+              onReply={(content: string, image: File | null) => handleReply(post.id, content, image)}
+            />
+          );
+        })}
       </section>
     </main>
   );

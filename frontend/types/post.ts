@@ -5,6 +5,7 @@ export interface Reply {
   id: string;
   author: User;
   content: string;
+  imageUrl?: string;
   postId: string;
   parentCommentId?: string | null;
   likesCount: number;
@@ -35,6 +36,10 @@ export interface BackendPost {
   commentsCount: number;
   tags?: string[];
   createdAt: string;
+  media?: {
+    type: 'image' | 'video' | null;
+    url: string | null;
+  }
 }
 
 export interface BackendComment {
@@ -46,6 +51,10 @@ export interface BackendComment {
   likesCount: number;
   commentsCount: number;
   parent_comment_id?: string | null;
+  media? : {
+    type: 'image' | 'video' | null;
+    url: string | null;
+  }
 }
 
 export type ReportReason = 'spam' | 'harassment' | 'hate_speech' | 'violence' | 'nudity' | 'misinformation' | 'other';
@@ -92,6 +101,7 @@ export function mapBackendPost(
     likesCount: bp.likesCount,
     commentsCount: bp.commentsCount,
     tags: bp.tags,
+    imageUrl: bp.media?.url || undefined,
     repostsCount: 0,
     isLiked: likedIds.has(bp._id),
   };
@@ -117,5 +127,6 @@ export function mapBackendComment(
     likesCount: bc.likesCount ?? 0,
     commentsCount: bc.commentsCount ?? 0,
     isLiked: false,
+    imageUrl: bc.media?.url || undefined,
   };
 }

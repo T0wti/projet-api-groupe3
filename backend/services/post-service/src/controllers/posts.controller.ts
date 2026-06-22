@@ -14,13 +14,13 @@ export const createPost = async (req: Request, res: Response) => {
   const authorId = req.headers['x-user-id'] as string;
   const { content, media, tags, parentPost } = req.body;
 
-  if (!authorId || !content) {
+  if (!authorId) {
     throw new AppError(400, 'Authenticated user and content are required.');
   }
 
     const newPost = new Post({
       authorId,
-      content,
+      content: content || "",
       media: media || { type: null, url: null },
       parentPost: parentPost || null
     });

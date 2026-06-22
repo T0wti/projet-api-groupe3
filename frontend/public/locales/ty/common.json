@@ -57,6 +57,11 @@
     "save": "Fa'atāpura'a",
     "cancel": "Ha'uti"
   },
+  "edit": {
+    "ajust_image": "Huri i te hoho'a",
+    "cancel": "Ha'uti",
+    "save": "Fa'atāpura'a"
+  },
   "preferences_page": {
     "title": "Preferences",
     "description": "Ma'iti i te reo o te interface e te theme o Breezy.",
