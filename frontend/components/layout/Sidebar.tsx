@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
-import { Home, Search, Bell, Mail, User, MoreHorizontal, LogOut, Wind, Plus } from 'lucide-react';
+import { Home, Search, Bell, Mail, User, MoreHorizontal, LogOut, Wind, Plus, Shield } from 'lucide-react';
 import Avatar from '@/components/ui/Avatar';
 import Button from '@/components/ui/Button';
 import { useAuth } from '@/context/AuthContext';
@@ -20,6 +20,10 @@ export default function Sidebar() {
   const { t } = useTranslation('common');
   const { user, logout } = useAuth();
   const profileHref = user ? `/profile/${encodeURIComponent(user.username)}` : '/';
+  const isStaff = user?.role === 'admin' || user?.role === 'moderator';
+  const navItems = isStaff
+    ? [...NAV_ITEMS, { key: 'staff', icon: Shield, href: '/staff' }]
+    : NAV_ITEMS;
 
   return (
     <aside className="hidden md:flex flex-col shrink-0 w-20 lg:w-64 xl:w-72 h-screen sticky top-0 px-2 lg:px-6 py-4 border-r border-gray-200 bg-white">
@@ -31,10 +35,10 @@ export default function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex flex-col gap-1">
-        {NAV_ITEMS.map(({ key, icon: Icon, href }) => (
+        {navItems.map(({ key, icon: Icon, href }) => (
           <Link key={key} href={key === 'profile' ? profileHref : href} className="nav-link">
             <Icon size={22} className="shrink-0" />
-            <span className="hidden lg:block font-semibold">{t(`sidebar.nav.${key}`)}</span>
+            <span className="hidden lg:block font-semibold">{key === 'staff' ? 'Moderation' : t(`sidebar.nav.${key}`)}</span>
           </Link>
         ))}
       </nav>

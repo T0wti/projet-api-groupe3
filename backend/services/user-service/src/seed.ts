@@ -3,16 +3,16 @@ import prisma from './config/db';
 const USERS = [
   {
     id: '11111111-1111-1111-1111-111111111111',
-    username: 'alice',
-    email: 'alice@breezy.local',
+    username: 'admin',
+    email: 'admin@breezy.local',
     role: 'admin' as const,
     languagePreference: 'fr',
     themePreference: 'light',
   },
   {
     id: '22222222-2222-2222-2222-222222222222',
-    username: 'bob',
-    email: 'bob@breezy.local',
+    username: 'moderator',
+    email: 'moderator@breezy.local',
     role: 'moderator' as const,
     languagePreference: 'en',
     themePreference: 'dark',
