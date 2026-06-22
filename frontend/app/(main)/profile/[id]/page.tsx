@@ -166,9 +166,18 @@ export default function ProfilePage() {
     }
   };
 
-  const handleEditPost = async (postId: string, newContent: string) => {
+  const handleEditPost = async (postId: string, newContent: string, newImage: File | null) => {
     const tags = [...new Set([...newContent.matchAll(/\B#(\w+)/g)].map((m) => m[1].toLowerCase()))];
-    const bp = await updatePost(postId, newContent, tags.length > 0 ? tags : []);
+    let mediaParam: { type: 'image' | 'video'; url: string } | undefined = undefined;
+    if (newImage) {
+      const { url } = await uploadMedia(newImage);
+      const isVideo = /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(url);
+      mediaParam = {
+        type: isVideo ? 'video' : 'image',
+        url: url
+      };
+    }
+    const bp = await updatePost(postId, newContent, tags.length > 0 ? tags : [], mediaParam);
     setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, content: bp.content, tags: bp.tags } : p));
   };
 
