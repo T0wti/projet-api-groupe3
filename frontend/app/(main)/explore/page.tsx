@@ -91,12 +91,12 @@ function ExplorePage() {
           );
         }
       } catch {
-        setError('Search failed. Please try again.');
+        setError(t('explore_page.search_error'));
       } finally {
         setIsLoading(false);
       }
     },
-    [user, enrichPosts]
+    [user, enrichPosts, t]
   );
 
   useEffect(() => {
