@@ -14,7 +14,7 @@ export default function RightSidebar() {
     <aside className="hidden lg:block shrink-0 w-80 xl:w-96 pl-8 py-4 sticky top-0 h-screen overflow-y-auto px-8">
       {/* Search */}
       <div className="search-bar mb-6">
-        <Search size={16} className="text-gray-400 shrink-0" />
+        <Search size={16} className="app-text-muted shrink-0" />
         <input
           type="text"
           value={q}
@@ -32,7 +32,7 @@ export default function RightSidebar() {
       {/* Who to follow */}
       <div className="card mb-6">
         <h2 className="font-bold text-lg mb-4">{t('right_sidebar.who_to_follow.title')}</h2>
-        <p className="text-sm text-gray-500">{t('right_sidebar.who_to_follow.empty_message')}</p>
+        <p className="text-sm app-text-muted">{t('right_sidebar.who_to_follow.empty_message')}</p>
       </div>
 
       {/* Trending */}
