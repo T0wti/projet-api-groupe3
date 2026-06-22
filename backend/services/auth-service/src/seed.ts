@@ -4,12 +4,12 @@ import prisma from './config/db';
 const AUTH_USERS = [
   {
     userId: '11111111-1111-1111-1111-111111111111',
-    email: 'alice@breezy.local',
+    email: 'admin@breezy.local',
     password: 'Password123!',
   },
   {
     userId: '22222222-2222-2222-2222-222222222222',
-    email: 'bob@breezy.local',
+    email: 'moderator@breezy.local',
     password: 'Password123!',
   },
   {

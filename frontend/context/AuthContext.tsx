@@ -2,12 +2,13 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
+import type { UserRole } from '@/types/user';
 
 export interface AuthUser {
   id: string;
   email: string;
   username: string;
-  role: string;
+  role: UserRole;
   avatarUrl?: string | null;
 }
 
@@ -38,10 +39,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    restoreSession();
-  }, []);
-
   function updateUser(partial: Partial<AuthUser>) {
     setUser((prev) => (prev ? { ...prev, ...partial } : prev));
   }
@@ -69,6 +66,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     }
   }
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void restoreSession();
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, []);
 
   async function login(email: string, password: string) {
     const res = await fetch('/api/auth/login', {

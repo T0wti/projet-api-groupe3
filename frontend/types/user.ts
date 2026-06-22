@@ -1,3 +1,7 @@
+export type UserRole = 'user' | 'moderator' | 'admin';
+
+export type AccountStatus = 'active' | 'suspended' | 'banned';
+
 export interface User {
   id: string;
   name: string;
@@ -13,8 +17,10 @@ export interface BackendUser {
   id: string;
   username: string;
   email: string;
-  role: string;
-  isBanned: boolean;
+  role: UserRole;
+  status: AccountStatus;
+  suspendedUntil?: string | null;
+  statusReason?: string | null;
   avatarUrl?: string | null;
   languagePreference: string;
   themePreference: string;
@@ -26,4 +32,12 @@ export interface BackendPublicUser {
   id: string;
   username: string;
   avatarUrl?: string | null;
+}
+
+export interface UserSearchResult {
+  id: string;
+  username: string;
+  email: string;
+  role: UserRole;
+  status: AccountStatus;
 }
