@@ -178,7 +178,7 @@ export default function ProfilePage() {
       };
     }
     const bp = await updatePost(postId, newContent, tags.length > 0 ? tags : [], mediaParam);
-    setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, content: bp.content, tags: bp.tags } : p));
+    setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, content: bp.content, tags: bp.tags, imageUrl: bp.media?.url || undefined } : p));
   };
 
   const handleDeletePost = async (postId: string) => {
