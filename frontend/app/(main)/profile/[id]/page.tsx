@@ -393,12 +393,12 @@ export default function ProfilePage() {
   };
 
   return (
-    <main className="w-full max-w-150 border-x border-gray-200 min-h-screen bg-white">
-      <header className="sticky top-0 z-10 border-b border-gray-200 bg-white/90 px-4 py-4 backdrop-blur-md">
-        <h1 className="text-xl font-bold text-gray-900">{t('profile:header_title')}</h1>
+    <main className="w-full max-w-150 border-x app-border min-h-screen app-page">
+      <header className="sticky top-0 z-10 border-b app-border app-header px-4 py-4 backdrop-blur-md">
+        <h1 className="text-xl font-bold app-text">{t('profile:header_title')}</h1>
       </header>
 
-      {isLoading && <p className="px-4 py-8 text-center text-gray-400">{t('profile:loading_message')}</p>}
+      {isLoading && <p className="px-4 py-8 text-center app-text-soft">{t('profile:loading_message')}</p>}
 
       {isProfileUnavailable && <p className="px-4 py-8 text-center text-red-500">{t('profile:unavailable_message')}</p>}
 
@@ -406,7 +406,7 @@ export default function ProfilePage() {
 
       {!isLoading && !isProfileUnavailable && !error && profileUser && (
         <>
-          <section className="border-b border-gray-200 px-4 py-6">
+          <section className="border-b app-border px-4 py-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div className="flex items-start gap-4">
                 {isOwnProfile ? (
@@ -430,8 +430,8 @@ export default function ProfilePage() {
                   <Avatar src={profileUser.avatarUrl} alt={profileUser.username} size="xl" />
                 )}
                 <div className="min-w-0 pt-2">
-                  <h2 className="truncate text-2xl font-black text-gray-900">{profileUser.name}</h2>
-                  <p className="text-sm text-gray-500">@{profileUser.username}</p>
+                  <h2 className="truncate text-2xl font-black app-text">{profileUser.name}</h2>
+                  <p className="text-sm app-text-muted">@{profileUser.username}</p>
                 </div>
               </div>
 
@@ -448,21 +448,21 @@ export default function ProfilePage() {
                 </Button>
               )}
 
-              <div className="flex gap-6 text-sm text-gray-600">
+              <div className="flex gap-6 text-sm app-text-muted">
                 <p>
-                  <span className="font-bold text-gray-900">{posts.length}</span> {t('profile:stats.posts')}
+                  <span className="font-bold app-text">{posts.length}</span> {t('profile:stats.posts')}
                 </p>
                 <button
                   onClick={() => setFollowModal('followers')}
                   className="hover:underline text-left"
                 >
-                  <span className="font-bold text-gray-900">{profileUser.followersCount ?? 0}</span> {t('profile:stats.followers')}
+                  <span className="font-bold app-text">{profileUser.followersCount ?? 0}</span> {t('profile:stats.followers')}
                 </button>
                 <button
                   onClick={() => setFollowModal('following')}
                   className="hover:underline text-left"
                 >
-                  <span className="font-bold text-gray-900">{profileUser.followingCount ?? 0}</span> {t('profile:stats.following')}
+                  <span className="font-bold app-text">{profileUser.followingCount ?? 0}</span> {t('profile:stats.following')}
                 </button>
               </div>
             </div>
@@ -478,7 +478,7 @@ export default function ProfilePage() {
                     maxLength={160}
                     rows={3}
                     autoFocus
-                    className="w-full max-w-2xl resize-none rounded-lg border border-gray-300 p-2 text-sm outline-none focus:border-teal-500"
+                    className="w-full max-w-2xl resize-none rounded-lg border app-input p-2 text-sm outline-none focus:border-teal-500"
                   />
                   <div className="flex gap-2">
                     <button
@@ -490,7 +490,7 @@ export default function ProfilePage() {
                     </button>
                     <button
                       onClick={() => { setIsEditingBio(false); setBioInput(profileUser.bio ?? ''); }}
-                      className="rounded-full border border-gray-300 px-4 py-1 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                      className="rounded-full border app-border px-4 py-1 text-sm font-semibold app-text app-hover-surface"
                     >
                       {t('profile.cancel')}
                     </button>
@@ -498,7 +498,7 @@ export default function ProfilePage() {
                 </div>
               ) : (
                 <div className="flex items-start gap-3">
-                  <p className={`max-w-2xl whitespace-pre-wrap text-sm ${profileUser.bio ? 'text-gray-700' : 'italic text-gray-400'}`}>
+                  <p className={`max-w-2xl whitespace-pre-wrap text-sm ${profileUser.bio ? 'app-text-muted' : 'italic app-text-soft'}`}>
                     {profileUser.bio || t('profile.no_bio')}
                   </p>
                   {isOwnProfile && (
@@ -514,22 +514,22 @@ export default function ProfilePage() {
             </div>
           </section>
 
-          <div className="flex border-b border-gray-200">
+          <div className="flex border-b app-border">
             <button
               onClick={() => handleTabChange('posts')}
-              className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === 'posts' ? 'border-b-2 border-teal-600 text-teal-600' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === 'posts' ? 'border-b-2 border-teal-600 text-teal-600' : 'app-text-muted hover:app-text'}`}
             >
               {t('profile:tabs.posts')}
             </button>
             <button
               onClick={() => handleTabChange('replies')}
-              className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === 'replies' ? 'border-b-2 border-teal-600 text-teal-600' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === 'replies' ? 'border-b-2 border-teal-600 text-teal-600' : 'app-text-muted hover:app-text'}`}
             >
               {t('profile:tabs.posts_replies')}
             </button>
             <button
               onClick={() => handleTabChange('likes')}
-              className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === 'likes' ? 'border-b-2 border-teal-600 text-teal-600' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === 'likes' ? 'border-b-2 border-teal-600 text-teal-600' : 'app-text-muted hover:app-text'}`}
             >
               {t('profile:tabs.likes')}
             </button>
@@ -538,7 +538,7 @@ export default function ProfilePage() {
           {activeTab === 'posts' && (
             <section>
               {posts.length === 0 && (
-                <p className="px-4 py-10 text-center text-gray-500">{t('profile:empty_posts_message')}</p>
+                <p className="px-4 py-10 text-center app-text-muted">{t('profile:empty_posts_message')}</p>
               )}
               {posts.map((post) => (
                 <PostCard
@@ -555,10 +555,10 @@ export default function ProfilePage() {
           {activeTab === 'likes' && (
             <section>
               {isLoadingLikes && (
-                <p className="px-4 py-10 text-center text-gray-400">{t('pending')}</p>
+                <p className="px-4 py-10 text-center app-text-soft">{t('pending')}</p>
               )}
               {!isLoadingLikes && likedPosts.length === 0 && (
-                <p className="px-4 py-10 text-center text-gray-500">{t('profile:empty_likes_message')}</p>
+                <p className="px-4 py-10 text-center app-text-muted">{t('profile:empty_likes_message')}</p>
               )}
               {!isLoadingLikes && likedPosts.map((post) => (
                 <PostCard
@@ -574,20 +574,20 @@ export default function ProfilePage() {
           {activeTab === 'replies' && (
             <section>
               {isLoadingReplies && (
-                <p className="px-4 py-10 text-center text-gray-400">{t('pending')}</p>
+                <p className="px-4 py-10 text-center app-text-soft">{t('pending')}</p>
               )}
               {!isLoadingReplies && userComments.length === 0 && (
-                <p className="px-4 py-10 text-center text-gray-500">{t('profile:empty_replies_message')}</p>
+                <p className="px-4 py-10 text-center app-text-muted">{t('profile:empty_replies_message')}</p>
               )}
               {!isLoadingReplies && userComments.map((comment) => {
                 const originalPost = postMap.get(comment.post_id);
                 const isEditing = editingCommentId === comment._id;
                 return (
-                  <div key={comment._id} className="border-b border-gray-100 px-4 py-3 hover:bg-gray-50">
+                  <div key={comment._id} className="border-b app-border-subtle px-4 py-3 app-hover-surface">
                     {originalPost && !isEditing && (
                       <button
                         onClick={() => router.push(`/posts/${comment.post_id}`)}
-                        className="mb-2 w-full text-left px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-sm text-gray-500 line-clamp-2 hover:bg-gray-100 transition-colors"
+                        className="mb-2 w-full text-left px-3 py-2 border app-border rounded-lg app-surface-muted text-sm app-text-muted line-clamp-2 app-hover-surface transition-colors"
                       >
                         {originalPost.content.length > 100
                           ? originalPost.content.slice(0, 100) + '…'
@@ -601,8 +601,8 @@ export default function ProfilePage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-1 text-sm">
                           <div className="flex items-center gap-1">
-                            <span className="font-bold text-gray-900">{profileUser?.name}</span>
-                            <span className="text-gray-500">@{profileUser?.username}</span>
+                            <span className="font-bold app-text">{profileUser?.name}</span>
+                            <span className="app-text-muted">@{profileUser?.username}</span>
                           </div>
                           {isOwnProfile && !isEditing && (
                             <ContextMenu
@@ -621,7 +621,7 @@ export default function ProfilePage() {
                               onChange={(e) => setEditingCommentContent(e.target.value)}
                               rows={3}
                               autoFocus
-                              className="w-full resize-none rounded-lg border border-gray-300 p-2 text-sm outline-none focus:border-teal-500"
+                              className="w-full resize-none rounded-lg border app-input p-2 text-sm outline-none focus:border-teal-500"
                             />
                             <div className="flex gap-2">
                               <button
@@ -633,14 +633,14 @@ export default function ProfilePage() {
                               </button>
                               <button
                                 onClick={() => setEditingCommentId(null)}
-                                className="rounded-full border border-gray-300 px-4 py-1 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                                className="rounded-full border app-border px-4 py-1 text-sm font-semibold app-text app-hover-surface"
                               >
                                 {t('profile:comment.cancel')}
                               </button>
                             </div>
                           </div>
                         ) : (
-                          <p className="mt-1 text-gray-900 text-[15px] whitespace-pre-wrap">{comment.content}</p>
+                          <p className="mt-1 app-text text-[15px] whitespace-pre-wrap">{comment.content}</p>
                         )}
                       </div>
                     </div>

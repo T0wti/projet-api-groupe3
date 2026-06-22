@@ -1,5 +1,6 @@
 "use client";
 
+import { AxiosError } from 'axios';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import ComposePost from '@/components/feed/ComposePost';
@@ -25,15 +26,13 @@ export default function HomeFeed() {
   const [error, setError] = useState<string | null>(null);
   const [isPosting, setIsPosting] = useState(false);
   const [postError, setPostError] = useState<string | null>(null);
+  const isPageLoading = authLoading || (Boolean(user) && isLoading);
 
   useEffect(() => {
     // Wait for auth to resolve before doing anything
     if (authLoading) return;
 
-    if (!user) {
-      setIsLoading(false);
-      return;
-    }
+    if (!user) return;
 
     async function loadFeed() {
       try {
@@ -89,8 +88,11 @@ export default function HomeFeed() {
       const bp = await createPost(content, tags.length > 0 ? tags : undefined);
       const newPost = mapBackendPost(bp, new Set(), user);
       setPosts((prev) => [newPost, ...prev]);
-    } catch (err: any) {
-      setPostError(err?.response?.data?.message ?? 'Failed to publish post.');
+    } catch (err: unknown) {
+      const message = err instanceof AxiosError && typeof err.response?.data === 'object' && err.response?.data !== null && 'message' in err.response.data
+        ? String(err.response.data.message)
+        : 'Failed to publish post.';
+      setPostError(message);
     } finally {
       setIsPosting(false);
     }
@@ -147,8 +149,8 @@ export default function HomeFeed() {
   };
 
   return (
-    <main className="w-full border-x border-gray-200 min-h-screen">
-      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-200 p-4">
+    <main className="w-full border-x app-border app-page min-h-screen">
+      <header className="sticky top-0 z-10 app-header backdrop-blur-md border-b app-border p-4">
         <h1 className="text-xl font-bold">{t('home_page.title')}</h1>
       </header>
 
@@ -158,30 +160,27 @@ export default function HomeFeed() {
         <p className="text-center text-red-500 py-2 px-4 text-sm">{postError}</p>
       )}
 
-      {isLoading && (
-        <p className="text-center text-gray-400 py-8">Loading...</p>
+      {isPageLoading && (
+        <p className="text-center app-text-soft py-8">Loading...</p>
       )}
 
       {error && (
         <p className="text-center text-red-500 py-8">{error}</p>
       )}
 
-      {!isLoading && !error && posts.length === 0 && (
-        <p className="text-center text-gray-400 py-16">{t('home_page.empty_message')}</p>
+      {!isPageLoading && !error && posts.length === 0 && (
+        <p className="text-center app-text-soft py-16">{t('home_page.empty_message')}</p>
       )}
 
       <section className="px-10 py-5 space-y-5">
-        {posts.map((post) => {
-          const PostCardAny = PostCard as any;
-          return (
-            <PostCardAny
-              key={post.id}
-              post={post}
-              onLike={() => handleToggleLike(post.id)}
-              onReply={(content: string) => handleReply(post.id, content)}
-            />
-          );
-        })}
+        {posts.map((post) => (
+          <PostCard
+            key={post.id}
+            post={post}
+            onLike={() => handleToggleLike(post.id)}
+            onReply={(content: string) => handleReply(post.id, content)}
+          />
+        ))}
       </section>
     </main>
   );

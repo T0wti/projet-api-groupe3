@@ -27,7 +27,7 @@ export default function ComposePost({ onPost, isPosting = false }: ComposePostPr
   };
 
   return (
-    <div className="border-b border-gray-200 p-4 px-12">
+    <div className="border-b app-border p-4 px-12">
       <div className="flex gap-3">
         <Avatar
           src={user?.avatarUrl}
@@ -39,10 +39,10 @@ export default function ComposePost({ onPost, isPosting = false }: ComposePostPr
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder={t('compose_post.placeholder')}
-            className="w-full bg-transparent text-xl outline-none resize-none min-h-15 placeholder-gray-500"
+            className="w-full bg-transparent text-xl outline-none resize-none min-h-15 app-text placeholder:app-text-muted"
             maxLength={280}
           />
-          <div className="flex justify-between items-center mt-2 border-t border-gray-100 pt-2">
+          <div className="flex justify-between items-center mt-2 border-t app-border-subtle pt-2">
             <div className="text-brand">
               <ImageIcon size={20} />
             </div>
