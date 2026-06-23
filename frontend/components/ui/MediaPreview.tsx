@@ -17,7 +17,7 @@ interface MediaPreviewProps {
   isCropping: boolean;
   srcUrl: string | null;
   crop: Crop | undefined;
-  imgRef: React.RefObject<HTMLImageElement> | null;
+  imgRef: React.RefObject<HTMLImageElement|null>;
   onImageLoad: (e: React.SyntheticEvent<HTMLImageElement>) => void;
   onCropChange: (crop: Crop) => void;
   onCropComplete: (crop: PixelCrop) => void;
