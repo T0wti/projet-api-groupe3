@@ -127,7 +127,7 @@ services:
       - key: PORT
         value: 8080
       - key: CORS_ORIGIN
-        value: https://breezy-frontend-umja.onrender.com
+        value: https://breezy-frontend-l9si.onrender.com
       - key: AUTH_SERVICE_URL
         value: https://breezy-auth-service.onrender.com
       - key: USER_SERVICE_URL
