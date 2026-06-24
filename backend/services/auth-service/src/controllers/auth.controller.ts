@@ -14,6 +14,7 @@ const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
 const USER_SERVICE_URL       = process.env.USER_SERVICE_URL       || 'http://user-service:3001';
 const PROFILE_SERVICE_URL    = process.env.PROFILE_SERVICE_URL    || 'http://profile-service:3004';
 const IS_PROD                = process.env.NODE_ENV === 'production';
+const API_GATEWAY_URL = process.env.API_GATEWAY_URL || 'http://api-gateway:8080';
 
 if (!JWT_SECRET || !JWT_REFRESH_SECRET) {
   throw new Error('JWT_SECRET and JWT_REFRESH_SECRET must be defined');
@@ -87,7 +88,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     throw new AppError(400, 'username, email and password are required');
   }
 
-    if (!isValidUsername(username)) {
+  if (!isValidUsername(username)) {
     throw new AppError(400, 'Username must be 3-30 characters (letters, digits, "_", ".").');
   }
 
@@ -111,33 +112,41 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
   await prisma.authUser.create({ data: { userId, email: normalizedEmail, passwordHash } });
 
-  const userRes = await fetch(`${USER_SERVICE_URL}/api/users/`, {
+  // Token "self" généré avant la création du profil pour pouvoir appeler la gateway
+  // comme l'utilisateur lui-même (x-user-id sera correctement injecté par authenticate.ts).
+  const { accessToken, refreshToken } = generateTokens(userId, normalizedEmail, 'user');
+
+  const userRes = await fetch(`${API_GATEWAY_URL}/api/users`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: userId, username, email: normalizedEmail, role: 'user' }),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({ username, email: normalizedEmail }),
   });
 
-    if (!userRes.ok) {
-      const body = await userRes.text();
-      console.error(`[auth] user-service rejected user creation: ${userRes.status} ${body}`);
-      await rollbackRegisteredUser(userId);
-      throw new AppError(502, 'Failed to create user profile');
-    }
+  if (!userRes.ok) {
+    const body = await userRes.text();
+    console.error(`[auth] user-service rejected user creation: ${userRes.status} ${body}`);
+    await rollbackRegisteredUser(userId);
+    throw new AppError(502, 'Failed to create user profile');
+  }
 
-    const profileRes = await fetch(`${PROFILE_SERVICE_URL}/api/profile/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: userId }),
-    });
+  const profileRes = await fetch(`${API_GATEWAY_URL}/api/profile`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({}),
+  });
 
-    if (!profileRes.ok) {
-      const body = await profileRes.text();
-      console.error(`[auth] profile-service rejected profile creation: ${profileRes.status} ${body}`);
-      await rollbackRegisteredUser(userId);
-      throw new AppError(502, 'Failed to initialize user profile');
-    }
- 
-  const { accessToken, refreshToken } = generateTokens(userId, normalizedEmail, 'user');
+  if (!profileRes.ok) {
+    const body = await profileRes.text();
+    console.error(`[auth] profile-service rejected profile creation: ${profileRes.status} ${body}`);
+    await rollbackRegisteredUser(userId);
+    throw new AppError(502, 'Failed to initialize user profile');
+  }
 
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7);

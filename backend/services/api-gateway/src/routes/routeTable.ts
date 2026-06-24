@@ -25,6 +25,7 @@ export const routeTable: RouteRule[] = [
 
 
   // Users
+  { method: 'post', path: '/api/users', target: 'user', auth: 'required' },
   { method: 'get', path: '/api/users/search', target: 'user', auth: 'required' },
   { method: 'get', path: '/api/users/username/:username/public', target: 'user', auth: 'required' },
   { method: 'get', path: '/api/users/:id/public', target: 'user', auth: 'required' },

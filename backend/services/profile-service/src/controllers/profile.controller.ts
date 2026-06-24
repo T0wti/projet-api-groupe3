@@ -8,10 +8,11 @@ import { AppError } from '../utils/AppError';
  * Also initializes user counters (followers/following)
  */
 export const createProfile = async (req: Request, res: Response): Promise<void> => {
-  const { user_id, bio, avatar_url } = req.body;
+  const user_id = req.headers['x-user-id'] as string | undefined;
+  const { bio, avatar_url } = req.body;
 
   if (!user_id) {
-    throw new AppError(400, 'user_id is required');
+    throw new AppError(401, 'Authentication required');
   }
 
   const existing = await Profile.findOne({ user_id });
