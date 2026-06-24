@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import I18nProvider from './(main)/I18nProvider';
@@ -32,6 +33,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
+        <Script id="theme-init" strategy="beforeInteractive">{`try{if(localStorage.getItem('breezy-theme')==='dark')document.documentElement.dataset.theme='dark';}catch(e){}`}</Script>
         <ThemeProvider>
           <AuthProvider>
             <I18nProvider>{children}</I18nProvider>
