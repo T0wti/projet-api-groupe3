@@ -8,10 +8,14 @@ import { AppError } from '../utils/AppError';
  * Follow a user
  */
 export const followUser = async (req: Request, res: Response): Promise<void> => {
-  const { follower_id, following_id } = req.body;
+  const follower_id = req.headers['x-user-id'] as string | undefined;
+  const { following_id } = req.body;
 
-  if (!follower_id || !following_id) {
-    throw new AppError(400, 'follower_id and following_id are required');
+  if (!follower_id) {
+    throw new AppError(401, 'Authentication required');
+  }
+  if (!following_id) {
+    throw new AppError(400, 'following_id is required');
   }
 
   if (follower_id === following_id) {
@@ -46,10 +50,14 @@ export const followUser = async (req: Request, res: Response): Promise<void> => 
  * Unfollow a user
  */
 export const unfollowUser = async (req: Request, res: Response): Promise<void> => {
-  const { follower_id, following_id } = req.body;
+  const follower_id = req.headers['x-user-id'] as string | undefined;
+  const { following_id } = req.body;
 
-  if (!follower_id || !following_id) {
-    throw new AppError(400, 'follower_id and following_id are required');
+  if (!follower_id) {
+    throw new AppError(401, 'Authentication required');
+  }
+  if (!following_id) {
+    throw new AppError(400, 'following_id is required');
   }
 
   const deleted = await Follows.findOneAndDelete({ follower_id, following_id });
