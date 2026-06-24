@@ -166,6 +166,10 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   }
 
   const userInfoRes = await fetch(`${USER_SERVICE_URL}/api/users/${user.userId}`);
+  if (!userInfoRes.ok) {
+    console.error(`[auth] failed to fetch user status from user-service: ${userInfoRes.status}`);
+    throw new AppError(502, 'Failed to verify account status');
+  }
   const userInfo = (await userInfoRes.json()) as {
     status?: string;
     statusReason?: string;
@@ -218,6 +222,10 @@ export const refresh = async (req: Request, res: Response): Promise<void> => {
     const decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET) as { user_id: string };
 
     const userInfoRes = await fetch(`${USER_SERVICE_URL}/api/users/${decoded.user_id}`);
+    if (!userInfoRes.ok) {
+      console.error(`[auth] failed to fetch user status from user-service: ${userInfoRes.status}`);
+      throw new AppError(502, 'Failed to verify account status');
+    }
     const userInfo = (await userInfoRes.json()) as {
       status?: string;
       statusReason?: string;
