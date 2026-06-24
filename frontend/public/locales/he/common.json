@@ -10,7 +10,9 @@
       "notifications": "התראות",
       "messages": "הודעות",
       "profile": "פרופיל",
-      "more": "עוד"
+      "preferences": "העדפות",
+      "more": "עוד",
+      "staff": "ניהול"
     },
     "post_button": "פרסם",
     "logout_button": "התנתקות"
@@ -28,27 +30,72 @@
   },
   "compose_post": {
     "placeholder": "מה חדש?",
-    "submit_button": "פרסם"
+    "submit_button": "פרסם",
+    "modal_title": "צור פוסט",
+    "modal_description": "שתף רעיון, עדכון או הודעה עם הקהילה שלך.",
+    "cancel": "ביטול",
+    "close": "סגור",
+    "publishing": "מפרסם...",
+    "publish_error": "לא ניתן לפרסם את הפוסט.",
+    "characters_left_one": "נותר תו אחד",
+    "characters_left_other": "נותרו {{count}} תווים"
   },
-    "post_card": {
+  "post_card": {
     "reply_placeholder": "הגב לפוסט זה...",
     "reply_button": "הגב",
     "show_more": "הצג עוד",
     "show_less": "הצג פחות",
+    "report": "דוח",
+    "report_title": "דווח על הודעה זו",
+    "report_description": "בחר את הסיבה העיקרית לדוח זה.",
+    "report_reason_label": "הסיבה",
+    "report_submit": "שלח דוח",
+    "report_success": "הפוסט הזה דווח בהצלחה.",
+    "report_error": "לא ניתן לדווח על הודעה זו.",
     "edit": "ערוך",
     "delete": "מחק",
     "save": "שמור",
     "cancel_edit": "בטל",
     "delete_confirm": "האם אתה בטוח שברצונך למחוק פוסט זה?",
-    "no_comments": "אין תגובות עדיין."
+    "no_comments": "אין תגובות עדיין.",
+    "report_reasons": {
+      "spam": "דואר זבל",
+      "harassment": "הטרדה",
+      "hate_speech": "הסתה לשנאה",
+      "violence": "אלימות",
+      "nudity": "עירום",
+      "misinformation": "מידע כוזב",
+      "other": "אחר"
+    }
   },
   "explore_page": {
     "title": "חיפוש",
     "search_placeholder": "חפש פוסטים, אנשים, #תגיות…",
-    "tabs": { "posts": "פוסטים", "people": "אנשים" },
+    "tabs": {
+      "posts": "פוסטים",
+      "people": "אנשים"
+    },
     "no_results_posts": "לא נמצאו פוסטים.",
     "no_results_people": "לא נמצאו חשבונות.",
-    "no_results_tags": "לא נמצאו פוסטים עבור תגית זו."
+    "no_results_tags": "לא נמצאו פוסטים עבור תגית זו.",
+    "search_error": "החיפוש נכשל. אנא נסה שוב."
+  },
+  "post_detail": {
+    "title": "פוסט",
+    "load_error": "לא ניתן לטעון פוסט זה."
+  },
+  "comment_detail": {
+    "title": "תגובה",
+    "load_error": "לא ניתן לטעון תגובה זו."
+  },
+  "accessibility": {
+    "options": "אפשרויות",
+    "post_options": "אפשרויות הפוסט",
+    "comment_options": "אפשרויות התגובה",
+    "close": "סגור",
+    "go_back": "חזור",
+    "avatar_self": "האווטאר שלי",
+    "view_profile": "הצג את הפרופיל של {{username}}"
   },
   "pending": "טוען...",
   "profile": {
@@ -56,5 +103,31 @@
     "edit_bio": "ערוך ביוגרפיה",
     "save": "שמור",
     "cancel": "בטל"
+  },
+  "edit": {
+    "ajust_image": "התאם תמונה",
+    "cancel": "בטל",
+    "save": "אשר"
+  },
+  "preferences_page": {
+    "title": "העדפות",
+    "description": "בחר את שפת הממשק ואת ערכת הנושא של Breezy.",
+    "language": {
+      "title": "שפה",
+      "description": "הבחירה מוחלת מיד בממשק.",
+      "label": "שפת האפליקציה"
+    },
+    "theme": {
+      "title": "ערכת נושא",
+      "description": "עבור בין מראה בהיר וכהה.",
+      "options": {
+        "light": "בהיר",
+        "dark": "כהה"
+      },
+      "help": {
+        "light": "ממשק בהיר לשימוש יומיומי.",
+        "dark": "ממשק רגוע יותר לסביבה חשוכה."
+      }
+    }
   }
 }

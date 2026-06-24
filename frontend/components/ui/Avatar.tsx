@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 interface AvatarProps {
   src?: string | null;
@@ -18,18 +18,19 @@ const sizeClasses = {
 };
 
 export default function Avatar({ src, alt, size = 'md' }: AvatarProps) {
-  const [imgSrc, setImgSrc] = useState(src || DEFAULT_AVATAR);
+  const resolvedSrc = src || DEFAULT_AVATAR;
+  const [imgSrc, setImgSrc] = useState(resolvedSrc);
 
-  useEffect(() => {
-    setImgSrc(src || DEFAULT_AVATAR);
-  }, [src]);
+  if (imgSrc !== resolvedSrc && imgSrc !== DEFAULT_AVATAR) {
+    setImgSrc(resolvedSrc);
+  }
 
   return (
     <img
       src={imgSrc}
       alt={alt}
       onError={() => setImgSrc(DEFAULT_AVATAR)}
-      className={`${sizeClasses[size]} rounded-full object-cover bg-gray-200 shrink-0`}
+      className={`${sizeClasses[size]} rounded-full object-cover app-surface-muted shrink-0`}
     />
   );
 }

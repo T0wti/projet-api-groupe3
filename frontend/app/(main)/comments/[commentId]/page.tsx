@@ -17,6 +17,7 @@ import {
 } from '@/lib/api/posts';
 import { fetchPublicUserById } from '@/lib/api/users';
 import { fetchProfileById } from '@/lib/api/profile';
+import { uploadMedia } from '@/lib/api/media';
 
 export default function CommentDetailPage() {
   const { commentId } = useParams<{ commentId: string }>();
@@ -28,13 +29,11 @@ export default function CommentDetailPage() {
   const [replies, setReplies] = useState<Reply[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const isPageLoading = authLoading || (Boolean(user) && isLoading);
 
   useEffect(() => {
     if (authLoading) return;
-    if (!user || !commentId) {
-      setIsLoading(false);
-      return;
-    }
+    if (!user || !commentId) return;
 
     async function load() {
       try {
@@ -88,14 +87,14 @@ export default function CommentDetailPage() {
           return mapped;
         }));
       } catch {
-        setError('Failed to load comment.');
+        setError(t('comment_detail.load_error'));
       } finally {
         setIsLoading(false);
       }
     }
 
     load();
-  }, [user, authLoading, commentId]);
+  }, [user, authLoading, commentId, t]);
 
   const handleLikeComment = async () => {
     if (!comment) return;
@@ -135,10 +134,15 @@ export default function CommentDetailPage() {
     }
   };
 
-  const handleReply = async (content: string) => {
+  const handleReply = async (content: string, image: File | null) => {
     if (!user || !comment) return;
     try {
-      const bc = await createComment(comment.postId, content, comment.id);
+      let uploadedImageUrl: string | null = null;
+      if (image) {
+        const { url } = await uploadMedia(image);
+        uploadedImageUrl = url;
+      }
+      const bc = await createComment(comment.postId, content,uploadedImageUrl, comment.id);
       const newReply = mapBackendComment(bc, user);
       setReplies(prev => [newReply, ...prev]);
       setComment(prev => prev ? { ...prev, commentsCount: prev.commentsCount + 1 } : prev);
@@ -148,24 +152,24 @@ export default function CommentDetailPage() {
   };
 
   return (
-    <main className="w-full border-x border-gray-200 min-h-screen">
-      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-200 px-4 py-4 flex items-center gap-4">
+    <main className="w-full border-x app-border app-page min-h-screen">
+      <header className="sticky top-0 z-10 app-header backdrop-blur-md border-b app-border px-4 py-4 flex items-center gap-4">
         <button
           onClick={() => router.back()}
-          className="text-gray-600 hover:text-gray-900 transition-colors"
-          aria-label="Go back"
+          className="app-text-muted hover:app-text transition-colors"
+          aria-label={t('accessibility.go_back')}
         >
           <ArrowLeft size={20} />
         </button>
-        <h1 className="text-xl font-bold">Comment</h1>
+        <h1 className="text-xl font-bold">{t('comment_detail.title')}</h1>
       </header>
 
-      {isLoading && <p className="text-center text-gray-400 py-8">{t('pending')}</p>}
+      {isPageLoading && <p className="text-center app-text-soft py-8">{t('pending')}</p>}
       {error && <p className="text-center text-red-500 py-8">{error}</p>}
 
-      {!isLoading && !error && comment && (
+      {!isPageLoading && !error && comment && (
         <>
-          <div className="border-b border-gray-200">
+          <div className="border-b app-border">
             <CommentCard
               comment={comment}
               onLike={handleLikeComment}
@@ -177,7 +181,7 @@ export default function CommentDetailPage() {
 
           <section>
             {replies.length === 0 && (
-              <p className="text-center text-gray-400 py-10">{t('post_card.no_comments')}</p>
+              <p className="text-center app-text-soft py-10">{t('post_card.no_comments')}</p>
             )}
             {replies.map(reply => (
               <CommentCard
@@ -185,7 +189,7 @@ export default function CommentDetailPage() {
                 comment={reply}
                 onLike={() => handleLikeReply(reply.id)}
                 onUnlike={() => handleUnlikeReply(reply.id)}
-                onReply={(content) => handleReply(content)}
+                onReply={(content: string, image: File | null) => handleReply(content, image)}
               />
             ))}
           </section>

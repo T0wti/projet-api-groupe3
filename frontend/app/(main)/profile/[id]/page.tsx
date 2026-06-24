@@ -8,6 +8,7 @@ import ContextMenu from '@/components/ui/ContextMenu';
 import Button from '@/components/ui/Button';
 import PostCard from '@/components/feed/PostCard';
 import FollowListModal from '@/components/profile/FollowListModal';
+import EditAccountModal from '@/components/profile/EditAccountModal';
 import { useAuth } from '@/context/AuthContext';
 import { createComment, fetchPosts, fetchPostsByIds, fetchUserLikedPostIds, likePost, unlikePost, updatePost, deletePost, fetchCommentsByUser, fetchPostById, updateComment, deleteComment } from '@/lib/api/posts';
 import { fetchFollowingById, fetchProfileById, followUser, unfollowUser, updateProfile } from '@/lib/api/profile';
@@ -19,7 +20,7 @@ import { User } from '@/types/user';
 export default function ProfilePage() {
   const params = useParams<{ id: string }>();
   const routeUsername = Array.isArray(params.id) ? params.id[0] : params.id;
-  const { user, isLoading: authLoading, updateUser } = useAuth();
+  const { user, isLoading: authLoading, updateUser, logout } = useAuth();
   const router = useRouter();
   const { t } = useTranslation(['common', 'profile']);
   const isProfileUnavailable = !authLoading && (!user || !routeUsername);
@@ -45,6 +46,7 @@ export default function ProfilePage() {
   const [likesLoaded, setLikesLoaded] = useState(false);
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editingCommentContent, setEditingCommentContent] = useState('');
+  const [isEditAccountModalOpen, setIsEditAccountModalOpen] = useState(false);
 
   useEffect(() => {
     if (authLoading || !user || !routeUsername) {
@@ -108,7 +110,7 @@ export default function ProfilePage() {
     }
 
     loadProfilePage();
-  }, [authLoading, routeUsername, user]);
+  }, [authLoading, routeUsername, t, user]);
 
   const handleToggleLike = async (postId: string) => {
     const post = posts.find((entry) => entry.id === postId);
@@ -120,10 +122,10 @@ export default function ProfilePage() {
       currentPosts.map((entry) =>
         entry.id === postId
           ? {
-              ...entry,
-              isLiked: !wasLiked,
-              likesCount: wasLiked ? entry.likesCount - 1 : entry.likesCount + 1,
-            }
+            ...entry,
+            isLiked: !wasLiked,
+            likesCount: wasLiked ? entry.likesCount - 1 : entry.likesCount + 1,
+          }
           : entry
       )
     );
@@ -139,31 +141,36 @@ export default function ProfilePage() {
         currentPosts.map((entry) =>
           entry.id === postId
             ? {
-                ...entry,
-                isLiked: wasLiked,
-                likesCount: wasLiked ? entry.likesCount + 1 : entry.likesCount - 1,
-              }
+              ...entry,
+              isLiked: wasLiked,
+              likesCount: wasLiked ? entry.likesCount + 1 : entry.likesCount - 1,
+            }
             : entry
         )
       );
     }
   };
 
-  const handleReply = async (postId: string, replyContent: string) => {
+  const handleReply = async (postId: string, replyContent: string, image: File | null) => {
     if (!user) return;
 
     try {
-      const backendComment = await createComment(postId, replyContent);
+      let uploadedImageUrl: string | null = null;
+      if (image) {
+        const { url } = await uploadMedia(image);
+        uploadedImageUrl = url;
+      }
+      const backendComment = await createComment(postId, replyContent, uploadedImageUrl);
       const newReply: Reply = mapBackendComment(backendComment, user);
 
       setPosts((currentPosts) =>
         currentPosts.map((entry) =>
           entry.id === postId
             ? {
-                ...entry,
-                replies: [...(entry.replies ?? []), newReply],
-                commentsCount: entry.commentsCount + 1,
-              }
+              ...entry,
+              replies: [...(entry.replies ?? []), newReply],
+              commentsCount: entry.commentsCount + 1,
+            }
             : entry
         )
       );
@@ -172,10 +179,19 @@ export default function ProfilePage() {
     }
   };
 
-  const handleEditPost = async (postId: string, newContent: string) => {
+  const handleEditPost = async (postId: string, newContent: string, newImage: File | null) => {
     const tags = [...new Set([...newContent.matchAll(/\B#(\w+)/g)].map((m) => m[1].toLowerCase()))];
-    const bp = await updatePost(postId, newContent, tags.length > 0 ? tags : []);
-    setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, content: bp.content, tags: bp.tags } : p));
+    let mediaParam: { type: 'image' | 'video'; url: string } | undefined = undefined;
+    if (newImage) {
+      const { url } = await uploadMedia(newImage);
+      const isVideo = /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(url);
+      mediaParam = {
+        type: isVideo ? 'video' : 'image',
+        url: url
+      };
+    }
+    const bp = await updatePost(postId, newContent, tags.length > 0 ? tags : [], mediaParam);
+    setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, content: bp.content, tags: bp.tags, imageUrl: bp.media?.url || undefined } : p));
   };
 
   const handleDeletePost = async (postId: string) => {
@@ -365,7 +381,7 @@ export default function ProfilePage() {
       const oldUrl = profileUser.avatarUrl;
       if (oldUrl && oldUrl.includes('/breezy-media/')) {
         const oldObjectName = oldUrl.split('/').pop();
-        if (oldObjectName) await deleteMedia(oldObjectName).catch(() => {});
+        if (oldObjectName) await deleteMedia(oldObjectName).catch(() => { });
       }
 
       await updateProfile(user.id, { avatar_url: url });
@@ -392,13 +408,30 @@ export default function ProfilePage() {
     }
   };
 
+  const handleAccountSaved = async ({ username, email, passwordChanged }: { username: string; email: string; passwordChanged: boolean }) => {
+    const previousUsername = user?.username;
+
+    setProfileUser((prev) => (prev ? { ...prev, name: username, username } : prev));
+    updateUser({ username, email });
+    setIsEditAccountModalOpen(false);
+
+    if (passwordChanged) {
+      await logout();
+      return;
+    }
+
+    if (previousUsername && previousUsername !== username) {
+      router.replace(`/profile/${encodeURIComponent(username)}`);
+    }
+  };
+
   return (
-    <main className="w-full max-w-150 border-x border-gray-200 min-h-screen bg-white">
-      <header className="sticky top-0 z-10 border-b border-gray-200 bg-white/90 px-4 py-4 backdrop-blur-md">
-        <h1 className="text-xl font-bold text-gray-900">{t('profile:header_title')}</h1>
+    <main className="w-full border-x app-border min-h-screen app-page">
+      <header className="sticky top-0 z-10 border-b app-border app-header px-4 py-4 backdrop-blur-md">
+        <h1 className="text-xl font-bold app-text">{t('profile:header_title')}</h1>
       </header>
 
-      {isLoading && <p className="px-4 py-8 text-center text-gray-400">{t('profile:loading_message')}</p>}
+      {isLoading && <p className="px-4 py-8 text-center app-text-soft">{t('profile:loading_message')}</p>}
 
       {isProfileUnavailable && <p className="px-4 py-8 text-center text-red-500">{t('profile:unavailable_message')}</p>}
 
@@ -406,8 +439,8 @@ export default function ProfilePage() {
 
       {!isLoading && !isProfileUnavailable && !error && profileUser && (
         <>
-          <section className="border-b border-gray-200 px-4 py-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <section className="border-b app-border px-4 py-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex items-start gap-4">
                 {isOwnProfile ? (
                   <label htmlFor="avatar-upload" className="relative cursor-pointer group shrink-0">
@@ -430,41 +463,53 @@ export default function ProfilePage() {
                   <Avatar src={profileUser.avatarUrl} alt={profileUser.username} size="xl" />
                 )}
                 <div className="min-w-0 pt-2">
-                  <h2 className="truncate text-2xl font-black text-gray-900">{profileUser.name}</h2>
-                  <p className="text-sm text-gray-500">@{profileUser.username}</p>
+                  <h2 className="truncate text-2xl font-black app-text">{profileUser.name}</h2>
+                  <p className="text-sm app-text-muted">@{profileUser.username}</p>
                 </div>
               </div>
 
-              {user && user.id !== profileUser.id && (
-                <Button
-                  type="button"
-                  variant={isFollowing ? 'secondary' : 'primary'}
-                  size="md"
-                  disabled={isFollowPending}
-                  onClick={handleToggleFollow}
-                  className="sm:self-start"
-                >
-                  {isFollowPending ? t('pending') : isFollowing ? t('profile:follow_button.unfollow') : t('profile:follow_button.follow')}
-                </Button>
-              )}
+              <div className="flex flex-col gap-3 sm:ml-auto sm:items-end">
+                {user && user.id !== profileUser.id && (
+                  <Button
+                    type="button"
+                    variant={isFollowing ? 'secondary' : 'primary'}
+                    size="md"
+                    disabled={isFollowPending}
+                    onClick={handleToggleFollow}
+                    className="self-start sm:self-end"
+                  >
+                    {isFollowPending ? t('pending') : isFollowing ? t('profile:follow_button.unfollow') : t('profile:follow_button.follow')}
+                  </Button>
+                )}
 
-              <div className="flex gap-6 text-sm text-gray-600">
-                <p>
-                  <span className="font-bold text-gray-900">{posts.length}</span> {t('profile:stats.posts')}
-                </p>
-                <button
-                  onClick={() => setFollowModal('followers')}
-                  className="hover:underline text-left"
-                >
-                  <span className="font-bold text-gray-900">{profileUser.followersCount ?? 0}</span> {t('profile:stats.followers')}
-                </button>
-                <button
-                  onClick={() => setFollowModal('following')}
-                  className="hover:underline text-left"
-                >
-                  <span className="font-bold text-gray-900">{profileUser.followingCount ?? 0}</span> {t('profile:stats.following')}
-                </button>
+                {isOwnProfile && (
+                  <button
+                    type="button"
+                    onClick={() => setIsEditAccountModalOpen(true)}
+                    className="shrink-0 self-start text-xs text-teal-600 hover:underline sm:self-end"
+                  >
+                    {t('profile:account_modal.open')}
+                  </button>
+                )}
               </div>
+            </div>
+
+            <div className="mt-4 flex justify-end gap-6 text-sm app-text-muted">
+              <p>
+                <span className="font-bold app-text">{posts.length}</span> {t('profile:stats.posts')}
+              </p>
+              <button
+                onClick={() => setFollowModal('followers')}
+                className="hover:underline text-left"
+              >
+                <span className="font-bold app-text">{profileUser.followersCount ?? 0}</span> {t('profile:stats.followers')}
+              </button>
+              <button
+                onClick={() => setFollowModal('following')}
+                className="hover:underline text-left"
+              >
+                <span className="font-bold app-text">{profileUser.followingCount ?? 0}</span> {t('profile:stats.following')}
+              </button>
             </div>
 
             {avatarError && <p className="mt-2 text-sm text-red-500">{avatarError}</p>}
@@ -478,7 +523,7 @@ export default function ProfilePage() {
                     maxLength={160}
                     rows={3}
                     autoFocus
-                    className="w-full max-w-2xl resize-none rounded-lg border border-gray-300 p-2 text-sm outline-none focus:border-teal-500"
+                    className="w-full max-w-2xl resize-none rounded-lg border app-input p-2 text-sm outline-none focus:border-teal-500"
                   />
                   <div className="flex gap-2">
                     <button
@@ -490,7 +535,7 @@ export default function ProfilePage() {
                     </button>
                     <button
                       onClick={() => { setIsEditingBio(false); setBioInput(profileUser.bio ?? ''); }}
-                      className="rounded-full border border-gray-300 px-4 py-1 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                      className="rounded-full border app-border px-4 py-1 text-sm font-semibold app-text app-hover-surface"
                     >
                       {t('profile.cancel')}
                     </button>
@@ -498,7 +543,7 @@ export default function ProfilePage() {
                 </div>
               ) : (
                 <div className="flex items-start gap-3">
-                  <p className={`max-w-2xl whitespace-pre-wrap text-sm ${profileUser.bio ? 'text-gray-700' : 'italic text-gray-400'}`}>
+                  <p className={`max-w-2xl whitespace-pre-wrap text-sm ${profileUser.bio ? 'app-text-muted' : 'italic app-text-soft'}`}>
                     {profileUser.bio || t('profile.no_bio')}
                   </p>
                   {isOwnProfile && (
@@ -514,80 +559,84 @@ export default function ProfilePage() {
             </div>
           </section>
 
-          <div className="flex border-b border-gray-200">
+          <div className="flex border-b app-border">
             <button
               onClick={() => handleTabChange('posts')}
-              className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === 'posts' ? 'border-b-2 border-teal-600 text-teal-600' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === 'posts' ? 'border-b-2 border-teal-600 text-teal-600' : 'app-text-muted hover:app-text'}`}
             >
               {t('profile:tabs.posts')}
             </button>
             <button
               onClick={() => handleTabChange('replies')}
-              className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === 'replies' ? 'border-b-2 border-teal-600 text-teal-600' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === 'replies' ? 'border-b-2 border-teal-600 text-teal-600' : 'app-text-muted hover:app-text'}`}
             >
               {t('profile:tabs.posts_replies')}
             </button>
             <button
               onClick={() => handleTabChange('likes')}
-              className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === 'likes' ? 'border-b-2 border-teal-600 text-teal-600' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === 'likes' ? 'border-b-2 border-teal-600 text-teal-600' : 'app-text-muted hover:app-text'}`}
             >
               {t('profile:tabs.likes')}
             </button>
           </div>
 
           {activeTab === 'posts' && (
-            <section>
-              {posts.length === 0 && (
-                <p className="px-4 py-10 text-center text-gray-500">{t('profile:empty_posts_message')}</p>
-              )}
-              {posts.map((post) => (
-                <PostCard
-                  key={post.id}
-                  post={post}
-                  onLike={() => handleToggleLike(post.id)}
-                  onReply={(content: string) => handleReply(post.id, content)}
-                  {...(isOwnProfile && { onEdit: handleEditPost, onDelete: handleDeletePost })}
-                />
-              ))}
-            </section>
+            <div className="px-8 py-4">
+              <section className="flex flex-col gap-4">
+                {posts.length === 0 && (
+                  <p className="px-4 py-10 text-center app-text-muted">{t('profile:empty_posts_message')}</p>
+                )}
+                {posts.map((post) => (
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    onLike={() => handleToggleLike(post.id)}
+                    onReply={(content: string, image: File | null) => handleReply(post.id, content, image)}
+                    {...(isOwnProfile && { onEdit: handleEditPost, onDelete: handleDeletePost })}
+                  />
+                ))}
+              </section>
+            </div>
           )}
 
           {activeTab === 'likes' && (
-            <section>
-              {isLoadingLikes && (
-                <p className="px-4 py-10 text-center text-gray-400">{t('pending')}</p>
-              )}
-              {!isLoadingLikes && likedPosts.length === 0 && (
-                <p className="px-4 py-10 text-center text-gray-500">{t('profile:empty_likes_message')}</p>
-              )}
-              {!isLoadingLikes && likedPosts.map((post) => (
-                <PostCard
-                  key={post.id}
-                  post={post}
-                  onLike={() => handleToggleLikedPost(post.id)}
-                  onReply={(content: string) => handleReply(post.id, content)}
-                />
-              ))}
-            </section>
+            <div className="px-8 py-4">
+              <section className="flex flex-col gap-4">
+                {isLoadingLikes && (
+                  <p className="px-4 py-10 text-center app-text-soft">{t('pending')}</p>
+                )}
+                {!isLoadingLikes && likedPosts.length === 0 && (
+                  <p className="px-4 py-10 text-center app-text-muted">{t('profile:empty_likes_message')}</p>
+                )}
+                {!isLoadingLikes && likedPosts.map((post) => (
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    onLike={() => handleToggleLikedPost(post.id)}
+                    onReply={(content: string) => handleReply(post.id, content)}
+                  />
+                ))}
+              </section>
+            </div>
           )}
 
           {activeTab === 'replies' && (
             <section>
               {isLoadingReplies && (
-                <p className="px-4 py-10 text-center text-gray-400">{t('pending')}</p>
+                <p className="px-4 py-10 text-center app-text-soft">{t('pending')}</p>
               )}
               {!isLoadingReplies && userComments.length === 0 && (
-                <p className="px-4 py-10 text-center text-gray-500">{t('profile:empty_replies_message')}</p>
+                <p className="px-4 py-10 text-center app-text-muted">{t('profile:empty_replies_message')}</p>
               )}
               {!isLoadingReplies && userComments.map((comment) => {
                 const originalPost = postMap.get(comment.post_id);
                 const isEditing = editingCommentId === comment._id;
                 return (
-                  <div key={comment._id} className="border-b border-gray-100 px-4 py-3 hover:bg-gray-50">
+                  <div key={comment._id} className="border-b app-border-subtle px-4 py-3 app-hover-surface">
                     {originalPost && !isEditing && (
                       <button
                         onClick={() => router.push(`/posts/${comment.post_id}`)}
-                        className="mb-2 w-full text-left px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-sm text-gray-500 line-clamp-2 hover:bg-gray-100 transition-colors"
+                        className="mb-2 w-full text-left px-3 py-2 border app-border rounded-lg app-surface-muted text-sm app-text-muted line-clamp-2 app-hover-surface transition-colors"
                       >
                         {originalPost.content.length > 100
                           ? originalPost.content.slice(0, 100) + '…'
@@ -601,12 +650,12 @@ export default function ProfilePage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-1 text-sm">
                           <div className="flex items-center gap-1">
-                            <span className="font-bold text-gray-900">{profileUser?.name}</span>
-                            <span className="text-gray-500">@{profileUser?.username}</span>
+                            <span className="font-bold app-text">{profileUser?.name}</span>
+                            <span className="app-text-muted">@{profileUser?.username}</span>
                           </div>
                           {isOwnProfile && !isEditing && (
                             <ContextMenu
-                              ariaLabel="Comment options"
+                              ariaLabel={t('common:accessibility.comment_options')}
                               actions={[
                                 { label: t('profile:comment.edit'), onClick: () => { setEditingCommentId(comment._id); setEditingCommentContent(comment.content); } },
                                 { label: t('profile:comment.delete'), onClick: () => handleDeleteComment(comment._id), danger: true },
@@ -621,7 +670,7 @@ export default function ProfilePage() {
                               onChange={(e) => setEditingCommentContent(e.target.value)}
                               rows={3}
                               autoFocus
-                              className="w-full resize-none rounded-lg border border-gray-300 p-2 text-sm outline-none focus:border-teal-500"
+                              className="w-full resize-none rounded-lg border app-input p-2 text-sm outline-none focus:border-teal-500"
                             />
                             <div className="flex gap-2">
                               <button
@@ -633,14 +682,14 @@ export default function ProfilePage() {
                               </button>
                               <button
                                 onClick={() => setEditingCommentId(null)}
-                                className="rounded-full border border-gray-300 px-4 py-1 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                                className="rounded-full border app-border px-4 py-1 text-sm font-semibold app-text app-hover-surface"
                               >
                                 {t('profile:comment.cancel')}
                               </button>
                             </div>
                           </div>
                         ) : (
-                          <p className="mt-1 text-gray-900 text-[15px] whitespace-pre-wrap">{comment.content}</p>
+                          <p className="mt-1 app-text text-[15px] whitespace-pre-wrap">{comment.content}</p>
                         )}
                       </div>
                     </div>
@@ -656,6 +705,13 @@ export default function ProfilePage() {
           userId={profileUser.id}
           type={followModal}
           onClose={() => setFollowModal(null)}
+        />
+      )}
+      {isEditAccountModalOpen && user && (
+        <EditAccountModal
+          user={user}
+          onClose={() => setIsEditAccountModalOpen(false)}
+          onSaved={handleAccountSaved}
         />
       )}
     </main>

@@ -6,6 +6,52 @@ import { redis } from '../config/redis';
 
 const VALID_ROLES = Object.values(Role);
 
+type RequesterRole = Role | null;
+
+const getRequester = (req: Request): { id: string | null; role: RequesterRole } => {
+  const requesterIdHeader = req.headers['x-user-id'];
+  const requesterRoleHeader = req.headers['x-user-role'];
+
+  const requesterId = typeof requesterIdHeader === 'string' ? requesterIdHeader : null;
+  const requesterRole = typeof requesterRoleHeader === 'string' && VALID_ROLES.includes(requesterRoleHeader as Role)
+    ? (requesterRoleHeader as Role)
+    : null;
+
+  return { id: requesterId, role: requesterRole };
+};
+
+const assertCanManageRole = (requesterRole: RequesterRole, nextRole: Role, targetRole: Role) => {
+  if (requesterRole === 'admin') {
+    return;
+  }
+
+  if (requesterRole !== 'moderator') {
+    throw new AppError(403, 'Forbidden');
+  }
+
+  if (nextRole !== 'moderator') {
+    throw new AppError(403, 'Moderators can only assign the moderator role.');
+  }
+
+  if (targetRole !== 'user') {
+    throw new AppError(403, 'Moderators can only promote standard users.');
+  }
+};
+
+const assertCanModerateUser = (requesterRole: RequesterRole, requesterId: string | null, targetUser: { id: string; role: Role }) => {
+  if (!requesterRole) {
+    throw new AppError(403, 'Forbidden');
+  }
+
+  if (requesterId && requesterId === targetUser.id) {
+    throw new AppError(403, 'You cannot moderate your own account.');
+  }
+
+  if (requesterRole === 'moderator' && targetUser.role !== 'user') {
+    throw new AppError(403, 'Moderators can only moderate standard users.');
+  }
+};
+
 export const createUserInfos = async (req: Request, res: Response) => {
   const { id, username, email, role } = req.body;
 
@@ -79,7 +125,7 @@ export const getPublicUserSummaryByUsername = async (req: Request<{ username: st
 
 export const updateUserInfos = async (req: Request<{ id: string }>, res: Response) => {
   const { id } = req.params;
-  const { language_preference, theme_preference, username, avatar_url } = req.body;
+  const { language_preference, theme_preference, username, avatar_url, email } = req.body;
 
   try {
     const user = await prisma.user.update({
@@ -89,6 +135,7 @@ export const updateUserInfos = async (req: Request<{ id: string }>, res: Respons
         themePreference: theme_preference ?? undefined,
         username: username ?? undefined,
         avatarUrl: avatar_url ?? undefined,
+        email: email ?? undefined,
       },
     });
 
@@ -96,6 +143,9 @@ export const updateUserInfos = async (req: Request<{ id: string }>, res: Respons
   } catch (error) {
     if ((error as { code?: string }).code === 'P2025') {
       throw new AppError(404, 'User not found.');
+    }
+    if ((error as { code?: string }).code === 'P2002') {
+      throw new AppError(409, 'Username or email already in use.');
     }
     throw error;
   }
@@ -118,6 +168,7 @@ export const deleteUserInfos = async (req: Request<{ id: string }>, res: Respons
 export const updateUserRole = async (req: Request<{ id: string }>, res: Response) => {
   const { id } = req.params;
   const { role } = req.body;
+  const { role: requesterRole } = getRequester(req);
 
   if (!role) {
     throw new AppError(400, 'The role field is required.');
@@ -128,6 +179,17 @@ export const updateUserRole = async (req: Request<{ id: string }>, res: Response
   }
 
   try {
+    const existingUser = await prisma.user.findUnique({
+      where: { id },
+      select: { id: true, role: true },
+    });
+
+    if (!existingUser) {
+      throw new AppError(404, 'User not found.');
+    }
+
+    assertCanManageRole(requesterRole, role, existingUser.role);
+
     const user = await prisma.user.update({
       where: { id },
       data: { role },
@@ -146,14 +208,15 @@ export const updateUserRole = async (req: Request<{ id: string }>, res: Response
  */
 export const searchUsers = async (req: Request, res: Response) => {
   const q = (req.query.q as string | undefined)?.trim();
+  const includeInactive = req.query.includeInactive === 'true';
   if (!q) throw new AppError(400, 'Query parameter "q" is required.');
 
     const users = await prisma.user.findMany({
       where: {
         username: { contains: q, mode: 'insensitive' },
-        status: 'active', 
+        ...(includeInactive ? {} : { status: 'active' }),
       },
-      select: { id: true, username: true },
+      select: { id: true, username: true, email: true, role: true, status: true },
       take: 20,
     });
 
@@ -164,6 +227,7 @@ export const searchUsers = async (req: Request, res: Response) => {
 export const suspendUser = async (req: Request<{ id: string }>, res: Response) => {
   const { id } = req.params;
   const { until, reason } = req.body;
+  const { id: requesterId, role: requesterRole } = getRequester(req);
 
   if (!until) throw new AppError(400, 'until (date de fin de suspension) is required.');
   const suspendedUntil = new Date(until);
@@ -172,6 +236,15 @@ export const suspendUser = async (req: Request<{ id: string }>, res: Response) =
   }
 
   try {
+    const targetUser = await prisma.user.findUnique({
+      where: { id },
+      select: { id: true, role: true },
+    });
+
+    if (!targetUser) throw new AppError(404, 'User not found.');
+
+    assertCanModerateUser(requesterRole, requesterId, targetUser);
+
     const user = await prisma.user.update({
       where: { id },
       data: { status: 'suspended', suspendedUntil, statusReason: reason ?? null },
@@ -188,8 +261,18 @@ export const suspendUser = async (req: Request<{ id: string }>, res: Response) =
 export const banUser = async (req: Request<{ id: string }>, res: Response) => {
   const { id } = req.params;
   const { reason } = req.body;
+  const { id: requesterId, role: requesterRole } = getRequester(req);
 
   try {
+    const targetUser = await prisma.user.findUnique({
+      where: { id },
+      select: { id: true, role: true },
+    });
+
+    if (!targetUser) throw new AppError(404, 'User not found.');
+
+    assertCanModerateUser(requesterRole, requesterId, targetUser);
+
     const user = await prisma.user.update({
       where: { id },
       data: { status: 'banned', suspendedUntil: null, statusReason: reason ?? null },
@@ -204,8 +287,18 @@ export const banUser = async (req: Request<{ id: string }>, res: Response) => {
 
 export const reinstateUser = async (req: Request<{ id: string }>, res: Response) => {
   const { id } = req.params;
+  const { id: requesterId, role: requesterRole } = getRequester(req);
 
   try {
+    const targetUser = await prisma.user.findUnique({
+      where: { id },
+      select: { id: true, role: true },
+    });
+
+    if (!targetUser) throw new AppError(404, 'User not found.');
+
+    assertCanModerateUser(requesterRole, requesterId, targetUser);
+
     const user = await prisma.user.update({
       where: { id },
       data: { status: 'active', suspendedUntil: null, statusReason: null },

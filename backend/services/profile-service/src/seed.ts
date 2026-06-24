@@ -21,12 +21,12 @@ async function main() {
   await Profile.insertMany([
     {
       user_id: '11111111-1111-1111-1111-111111111111',
-      bio: 'Admin Breezy - passionne de produit.',
+      bio: 'Compte admin Breezy - passionne de produit.',
       avatar_url: 'https://i.pravatar.cc/150?img=1',
     },
     {
       user_id: '22222222-2222-2222-2222-222222222222',
-      bio: 'Moderateur - ici pour aider la communaute.',
+      bio: 'Compte moderateur - ici pour aider la communaute.',
       avatar_url: 'https://i.pravatar.cc/150?img=2',
     },
     {

@@ -19,6 +19,7 @@ import {
   unlikeComment,
   createComment,
 } from '@/lib/api/posts';
+import { uploadMedia } from '@/lib/api/media';
 import { fetchPublicUserById } from '@/lib/api/users';
 import { fetchProfileById } from '@/lib/api/profile';
 
@@ -32,13 +33,11 @@ export default function PostDetailPage() {
   const [comments, setComments] = useState<Reply[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const isPageLoading = authLoading || (Boolean(user) && isLoading);
 
   useEffect(() => {
     if (authLoading) return;
-    if (!user || !postId) {
-      setIsLoading(false);
-      return;
-    }
+    if (!user || !postId) return;
 
     async function load() {
       try {
@@ -90,14 +89,14 @@ export default function PostDetailPage() {
           return mapped;
         }));
       } catch {
-        setError('Failed to load post.');
+        setError(t('post_detail.load_error'));
       } finally {
         setIsLoading(false);
       }
     }
 
     load();
-  }, [user, authLoading, postId]);
+  }, [user, authLoading, postId, t]);
 
   const handleToggleLike = async () => {
     if (!post) return;
@@ -111,10 +110,15 @@ export default function PostDetailPage() {
     }
   };
 
-  const handleReply = async (content: string) => {
+  const handleReply = async (content: string, image: File | null) => {
     if (!user || !post) return;
     try {
-      const bc = await createComment(post.id, content);
+      let uploadedImageUrl: string | null = null;
+      if (image) {
+        const { url } = await uploadMedia(image);
+        uploadedImageUrl = url;
+      }
+      const bc = await createComment(post.id, content, uploadedImageUrl);
       const newComment = mapBackendComment(bc, user);
       setComments(prev => [newComment, ...prev]);
       setPost(prev => prev ? { ...prev, commentsCount: prev.commentsCount + 1 } : prev);
@@ -141,12 +145,20 @@ export default function PostDetailPage() {
     }
   };
 
-  const handleReplyToComment = async (parentCommentId: string, content: string) => {
+  const handleReplyToComment = async (parentCommentId: string, content: string, image: File | null) => {
     if (!user || !post) return;
     try {
-      await createComment(post.id, content, parentCommentId);
-      setComments(prev => prev.map(c =>
-        c.id === parentCommentId ? { ...c, commentsCount: c.commentsCount + 1 } : c
+      let uploadedImageUrl: string | null = null;
+      if (image) {
+        const { url } = await uploadMedia(image);
+        uploadedImageUrl = url;
+      }
+      const bc = await createComment(post.id, content, uploadedImageUrl, parentCommentId);
+      const newReply = mapBackendComment(bc, user);
+      setComments(prev => prev.flatMap(c =>
+        c.id === parentCommentId
+          ? [{ ...c, commentsCount: c.commentsCount + 1 }, newReply]
+          : [c]
       ));
     } catch {
       // silently fail
@@ -154,24 +166,24 @@ export default function PostDetailPage() {
   };
 
   return (
-    <main className="w-full border-x border-gray-200 min-h-screen">
-      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-200 px-4 py-4 flex items-center gap-4">
+    <main className="w-full border-x app-border app-page min-h-screen">
+      <header className="sticky top-0 z-10 app-header backdrop-blur-md border-b app-border px-4 py-4 flex items-center gap-4">
         <button
           onClick={() => router.back()}
-          className="text-gray-600 hover:text-gray-900 transition-colors"
-          aria-label="Go back"
+          className="app-text-muted hover:app-text transition-colors"
+          aria-label={t('accessibility.go_back')}
         >
           <ArrowLeft size={20} />
         </button>
-        <h1 className="text-xl font-bold">Post</h1>
+        <h1 className="text-xl font-bold">{t('post_detail.title')}</h1>
       </header>
 
-      {isLoading && <p className="text-center text-gray-400 py-8">{t('pending')}</p>}
+      {isPageLoading && <p className="text-center app-text-soft py-8">{t('pending')}</p>}
       {error && <p className="text-center text-red-500 py-8">{error}</p>}
 
-      {!isLoading && !error && post && (
+      {!isPageLoading && !error && post && (
         <>
-          <div className="px-4 py-4 border-b border-gray-200">
+          <div className="px-4 py-4 border-b app-border">
             <PostCard
               post={post}
               onLike={handleToggleLike}
@@ -182,7 +194,7 @@ export default function PostDetailPage() {
 
           <section>
             {comments.length === 0 && (
-              <p className="text-center text-gray-400 py-10">{t('post_card.no_comments')}</p>
+              <p className="text-center app-text-soft py-10">{t('post_card.no_comments')}</p>
             )}
             {comments.map(comment => (
               <CommentCard
@@ -190,7 +202,7 @@ export default function PostDetailPage() {
                 comment={comment}
                 onLike={() => handleLikeComment(comment.id)}
                 onUnlike={() => handleUnlikeComment(comment.id)}
-                onReply={(content) => handleReplyToComment(comment.id, content)}
+                onReply={(content: string, image: File | null) => handleReplyToComment(comment.id, content, image)}
               />
             ))}
           </section>

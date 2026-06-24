@@ -14,13 +14,13 @@ export const createPost = async (req: Request, res: Response) => {
   const authorId = req.headers['x-user-id'] as string;
   const { content, media, tags, parentPost } = req.body;
 
-  if (!authorId || !content) {
+  if (!authorId) {
     throw new AppError(400, 'Authenticated user and content are required.');
   }
 
     const newPost = new Post({
       authorId,
-      content,
+      content: content || "",
       media: media || { type: null, url: null },
       parentPost: parentPost || null
     });
@@ -198,7 +198,10 @@ const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     if (!postToDelete) throw new AppError(404, 'Post not found.');
 
     const requestingUserId = req.headers['x-user-id'] as string | undefined;
-    if (!requestingUserId || requestingUserId !== postToDelete.authorId.toString()) {
+    const requestingUserRole = req.headers['x-user-role'] as string | undefined;
+    const canModerate = requestingUserRole === 'moderator' || requestingUserRole === 'admin';
+
+    if (!requestingUserId || (requestingUserId !== postToDelete.authorId.toString() && !canModerate)) {
       throw new AppError(403, 'You are not allowed to delete this post.');
     }
 

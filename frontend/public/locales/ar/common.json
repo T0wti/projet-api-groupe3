@@ -10,7 +10,9 @@
       "notifications": "الاشعارات",
       "messages": "الرسائل",
       "profile": "البروفايل",
-      "more": "بزاف"
+      "preferences": "التفضيلات",
+      "more": "بزاف",
+      "staff": "الاشراف"
     },
     "post_button": "انشر",
     "logout_button": "تسجيل الخروج"
@@ -28,27 +30,72 @@
   },
   "compose_post": {
     "placeholder": "واش كاين جديد؟",
-    "submit_button": "انشر"
+    "submit_button": "انشر",
+    "modal_title": "اكتب منشور",
+    "modal_description": "شارك فكرة ولا خبر ولا رسالة مع المجتمع تاعك.",
+    "cancel": "إلغاء",
+    "close": "اغلاق",
+    "publishing": "جارٍ النشر...",
+    "publish_error": "ما قدرناش ننشرو المنشور.",
+    "characters_left_one": "باقي {{count}} حرف",
+    "characters_left_other": "باقي {{count}} حروف"
   },
-    "post_card": {
+  "post_card": {
     "reply_placeholder": "رجع على هاد المنشور...",
     "reply_button": "رجع",
     "show_more": "شوف أكثر",
     "show_less": "شوف أقل",
+    "report": "تقرير",
+    "repor_title": "الإبلاغ عن هذا المنشور",
+    "report_description": "اختر السبب الرئيسي لإعداد هذا التقرير.",
+    "report_reason_label": "السبب",
+    "report_submit": "إرسال التقرير",
+    "report_success": "تم الإبلاغ عن هذا المنشور بنجاح.",
+    "report_error": "يتعذر الإبلاغ عن هذا المنشور.",
     "edit": "عدّل",
     "delete": "احذف",
     "save": "حفظ",
     "cancel_edit": "إلغاء",
     "delete_confirm": "واش راك متأكد بلي تحب تحذف هاد المنشور؟",
-    "no_comments": "ما كانش تعليقات بعد."
+    "no_comments": "ما كانش تعليقات بعد.",
+    "report_reasons": {
+      "spam": "البريد العشوائي",
+      "harassment": "التحرش",
+      "hate_speech": "خطاب الكراهية",
+      "violence": "العنف",
+      "nudity": "العري",
+      "misinformation": "المعلومات المضللة",
+      "other": "أخرى"
+    }
   },
   "explore_page": {
     "title": "اكتشف",
     "search_placeholder": "حوس على منشورات، أشخاص، #وسوم…",
-    "tabs": { "posts": "المنشورات", "people": "الأشخاص" },
+    "tabs": {
+      "posts": "المنشورات",
+      "people": "الأشخاص"
+    },
     "no_results_posts": "ما كانش منشورات.",
     "no_results_people": "ما كانش حسابات.",
-    "no_results_tags": "ما كانش منشورات لهاد الوسم."
+    "no_results_tags": "ما كانش منشورات لهاد الوسم.",
+    "search_error": "فشل البحث. يرجى المحاولة مرة أخرى."
+  },
+  "post_detail": {
+    "title": "منشور",
+    "load_error": "تعذر تحميل هذا المنشور."
+  },
+  "comment_detail": {
+    "title": "تعليق",
+    "load_error": "تعذر تحميل هذا التعليق."
+  },
+  "accessibility": {
+    "options": "خيارات",
+    "post_options": "خيارات المنشور",
+    "comment_options": "خيارات التعليق",
+    "close": "اغلاق",
+    "go_back": "ارجع",
+    "avatar_self": "صورتي",
+    "view_profile": "شوف بروفايل {{username}}"
   },
   "pending": "جارٍ التحميل...",
   "profile": {
@@ -56,5 +103,31 @@
     "edit_bio": "عدّل الوصف",
     "save": "حفظ",
     "cancel": "إلغاء"
+  },
+  "edit": {
+    "ajust_image": "ضبط الصورة",
+    "cancel": "إلغاء",
+    "save": "تأكيد"
+  },
+  "preferences_page": {
+    "title": "التفضيلات",
+    "description": "اختر لغة الواجهة ونمط الالوان المستخدم في Breezy.",
+    "language": {
+      "title": "اللغة",
+      "description": "يتم تطبيق اختيارك فوراً داخل الواجهة.",
+      "label": "لغة التطبيق"
+    },
+    "theme": {
+      "title": "المظهر",
+      "description": "بدل بين المظهر الفاتح والداكن.",
+      "options": {
+        "light": "فاتح",
+        "dark": "داكن"
+      },
+      "help": {
+        "light": "واجهة مشرقة للاستخدام النهاري.",
+        "dark": "واجهة اهدأ للبيئات منخفضة الاضاءة."
+      }
+    }
   }
 }

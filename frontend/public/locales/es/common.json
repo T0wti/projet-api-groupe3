@@ -1,7 +1,8 @@
 ﻿{
   "home_page": {
     "title": "Inicio",
-    "empty_message": "No hay publicaciones para mostrar. Intenta seguir algunas cuentas para ver contenido aquí."
+    "empty_message": "No hay publicaciones para mostrar. Intenta seguir algunas cuentas para ver contenido aquí.",
+    "load_error": "No se pudieron cargar las publicaciones."
   },
   "sidebar": {
     "nav": {
@@ -10,7 +11,9 @@
       "notifications": "Notificaciones",
       "messages": "Mensajes",
       "profile": "Perfil",
-      "more": "Más"
+      "preferences": "Preferencias",
+      "more": "Más",
+      "staff": "Moderación"
     },
     "post_button": "Publicar",
     "logout_button": "Cerrar sesión"
@@ -28,19 +31,43 @@
   },
   "compose_post": {
     "placeholder": "¿Qué está pasando?",
-    "submit_button": "Publicar"
+    "submit_button": "Publicar",
+    "modal_title": "Crear una publicación",
+    "modal_description": "Comparte una idea, una novedad o un message con tu comunidad.",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "publishing": "Publicando...",
+    "publish_error": "No se pudo publicar la publicación.",
+    "characters_left_one": "{{count}} carácter restante",
+    "characters_left_other": "{{count}} caracteres restantes"
   },
   "post_card": {
     "reply_placeholder": "Responder a esta publicación...",
     "reply_button": "Responder",
     "show_more": "Ver más",
     "show_less": "Ver menos",
+    "report": "Reportar",
+    "report_title": "Reportar esta publicación",
+    "report_description": "Selecciona el motivo principal del reporte.",
+    "report_reason_label": "Motivo",
+    "report_submit": "Enviar reporte",
+    "report_success": "La publicación ha sido reportada correctamente.",
+    "report_error": "No se pudo reportar esta publicación.",
     "edit": "Editar",
     "delete": "Eliminar",
     "save": "Guardar",
     "cancel_edit": "Cancelar",
     "delete_confirm": "¿Estás seguro de que quieres eliminar esta publicación?",
-    "no_comments": "Aún no hay comentarios."
+    "no_comments": "Aún no hay comentarios.",
+    "report_reasons": {
+      "spam": "Spam",
+      "harassment": "Acoso",
+      "hate_speech": "Discurso de odio",
+      "violence": "Violencia",
+      "nudity": "Desnudez",
+      "misinformation": "Desinformación",
+      "other": "Otro"
+    }
   },
   "explore_page": {
     "title": "Explorar",
@@ -48,7 +75,25 @@
     "tabs": { "posts": "Posts", "people": "Personas" },
     "no_results_posts": "No se encontraron posts.",
     "no_results_people": "No se encontraron cuentas.",
-    "no_results_tags": "No se encontraron posts para este tag."
+    "no_results_tags": "No se encontraron posts para este tag.",
+    "search_error": "La búsqueda falló. Por favor, inténtalo de nuevo."
+  },
+  "post_detail": {
+    "title": "Publicación",
+    "load_error": "No se pudo cargar esta publicación."
+  },
+  "comment_detail": {
+    "title": "Comentario",
+    "load_error": "No se pudo cargar este comentario."
+  },
+  "accessibility": {
+    "options": "Opciones",
+    "post_options": "Opciones de la publicación",
+    "comment_options": "Opciones del comentario",
+    "close": "Cerrar",
+    "go_back": "Volver",
+    "avatar_self": "Mi avatar",
+    "view_profile": "Ver el perfil de {{username}}"
   },
   "pending": "Cargando...",
   "profile": {
@@ -56,5 +101,40 @@
     "edit_bio": "Editar bio",
     "save": "Guardar",
     "cancel": "Cancelar"
+  },
+  "edit": {
+    "ajust_image": "Ajustar imagen",
+    "cancel": "Cancelar",
+    "save": "Validar"
+  },
+  "preferences_page": {
+    "title": "Preferencias",
+    "description": "Elige el idioma de la interfaz y el tema de color de Breezy.",
+    "language": {
+      "title": "Idioma",
+      "description": "La seleccion se aplica inmediatamente en la interfaz.",
+      "label": "Idioma de la aplicacion",
+      "options": {
+        "french": "Francés",
+        "english": "English",
+        "spanish": "Español",
+        "arabic": "العربية",
+        "hebrew": "עברית",
+        "russian": "Русский",
+        "tahitian": "Reo Tahiti"
+      }
+    },
+    "theme": {
+      "title": "Tema",
+      "description": "Cambia entre una aparência clara y oscura.",
+      "options": {
+        "light": "Claro",
+        "dark": "Oscuro"
+      },
+      "help": {
+        "light": "Interfaz luminosa para el dia.",
+        "dark": "Interfaz mas suave para entornos oscuros."
+      }
+    }
   }
 }

@@ -16,6 +16,7 @@ import {
 const router = Router();
 
 router.post('/', createUserInfos);
+router.get('/search', searchUsers);
 router.get('/username/:username/public', getPublicUserSummaryByUsername);
 router.get('/search', searchUsers);
 router.get('/:id/public', getPublicUserSummary);

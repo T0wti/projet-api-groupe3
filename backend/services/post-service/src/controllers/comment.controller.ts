@@ -9,10 +9,10 @@ const isValidObjectId = (id: string) => mongoose.Types.ObjectId.isValid(id);
 
 export const createComment = async (req: Request, res: Response) => {
   const user_id = req.headers['x-user-id'] as string;
-  const { post_id, content, parent_comment_id, tags } = req.body;
+  const { post_id, content, media, parent_comment_id, tags } = req.body;
 
 
-  if (!post_id || !user_id || !content) {
+  if (!post_id || !user_id) {
     throw new AppError(400, 'post_id, content, and authenticated user are required.');
   }
   if (!isValidObjectId(post_id)) throw new AppError(400, 'post_id is invalid.');
@@ -28,7 +28,7 @@ export const createComment = async (req: Request, res: Response) => {
       if (!parent) throw new AppError(404, 'Parent comment not found.');
     }
 
-    const comment = await Comment.create({ post_id, user_id, content, parent_comment_id: parent_comment_id || null });
+    const comment = await Comment.create({ post_id, user_id, content, media, parent_comment_id: parent_comment_id || null });
 
     if (Array.isArray(tags) && tags.length > 0) {
       await CommentTag.insertMany(

@@ -1,7 +1,8 @@
 ﻿{
   "home_page": {
     "title": "Home",
-    "empty_message": "No posts to display. Try following some accounts to see content here."
+    "empty_message": "No posts to display. Try following some accounts to see content here.",
+    "load_error": "Unable to load posts."
   },
   "sidebar": {
     "nav": {
@@ -10,7 +11,9 @@
       "notifications": "Notifications",
       "messages": "Messages",
       "profile": "Profile",
-      "more": "More"
+      "preferences": "Preferences",
+      "more": "More",
+      "staff": "Moderation"
     },
     "post_button": "Post",
     "logout_button": "Log out"
@@ -28,27 +31,72 @@
   },
   "compose_post": {
     "placeholder": "What's happening?",
-    "submit_button": "Post"
+    "submit_button": "Post",
+    "modal_title": "Create a post",
+    "modal_description": "Share an idea, an update, or a message with your community.",
+    "cancel": "Cancel",
+    "close": "Close",
+    "publishing": "Posting...",
+    "publish_error": "Unable to publish the post.",
+    "characters_left_one": "{{count}} character left",
+    "characters_left_other": "{{count}} characters left"
   },
   "post_card": {
     "reply_placeholder": "Post your reply...",
     "reply_button": "Reply",
     "show_more": "Show more",
     "show_less": "Show less",
+    "report": "Report",
+    "report_title": "Report this post",
+    "report_description": "Choose the main reason for this report.",
+    "report_reason_label": "Reason",
+    "report_submit": "Submit report",
+    "report_success": "This post was reported successfully.",
+    "report_error": "Unable to report this post.",
     "edit": "Edit",
     "delete": "Delete",
     "save": "Save",
     "cancel_edit": "Cancel",
     "delete_confirm": "Are you sure you want to delete this post?",
-    "no_comments": "No comments yet."
+    "no_comments": "No comments yet.",
+    "report_reasons": {
+      "spam": "Spam",
+      "harassment": "Harassment",
+      "hate_speech": "Hate speech",
+      "violence": "Violence",
+      "nudity": "Nudity",
+      "misinformation": "Misinformation",
+      "other": "Other"
+    }
   },
   "explore_page": {
     "title": "Explore",
     "search_placeholder": "Search posts, people, #tags…",
-    "tabs": { "posts": "Posts", "people": "People" },
+    "tabs": {
+      "posts": "Posts",
+      "people": "People"
+    },
     "no_results_posts": "No posts found.",
     "no_results_people": "No accounts found.",
-    "no_results_tags": "No posts found for this tag."
+    "no_results_tags": "No posts found for this tag.",
+    "search_error": "Search failed. Please try again."
+  },
+  "post_detail": {
+    "title": "Post",
+    "load_error": "Unable to load this post."
+  },
+  "comment_detail": {
+    "title": "Comment",
+    "load_error": "Unable to load this comment."
+  },
+  "accessibility": {
+    "options": "Options",
+    "post_options": "Post options",
+    "comment_options": "Comment options",
+    "close": "Close",
+    "go_back": "Go back",
+    "avatar_self": "My avatar",
+    "view_profile": "View profile of {{username}}"
   },
   "pending": "Loading...",
   "profile": {
@@ -56,5 +104,40 @@
     "edit_bio": "Edit bio",
     "save": "Save",
     "cancel": "Cancel"
+  },
+  "edit": {
+    "ajust_image": "Adjust image",
+    "cancel": "Cancel",
+    "save": "Validate"
+  },
+  "preferences_page": {
+    "title": "Preferences",
+    "description": "Choose the interface language and color theme used across Breezy.",
+    "language": {
+      "title": "Language",
+      "description": "Your selection is applied immediately in the interface.",
+      "label": "Application language",
+      "options": {
+        "french": "French",
+        "english": "English",
+        "spanish": "Spanish",
+        "arabic": "Arabic",
+        "hebrew": "Hebrew",
+        "russian": "Russian",
+        "tahitian": "Tahitian"
+      }
+    },
+    "theme": {
+      "title": "Theme",
+      "description": "Switch between a light and dark appearance.",
+      "options": {
+        "light": "Light",
+        "dark": "Dark"
+      },
+      "help": {
+        "light": "Bright interface for daytime use.",
+        "dark": "Softer interface for low-light environments."
+      }
+    }
   }
 }

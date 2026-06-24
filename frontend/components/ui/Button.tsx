@@ -22,7 +22,7 @@ export default function Button({
   
   const variants = {
     primary: "bg-teal-600 hover:bg-teal-700 text-white",
-    secondary: "bg-gray-200 hover:bg-gray-300 text-gray-900",
+    secondary: "app-button-secondary",
     ghost: "bg-transparent hover:bg-teal-50 text-teal-600",
     danger: "bg-transparent hover:bg-red-50 text-red-500",
   };
