@@ -19,7 +19,8 @@
     "search_placeholder": "Rechercher",
     "who_to_follow": {
       "title": "Suggestions de comptes",
-      "empty_message": "Les utilisateurs suggérés apparaîtront ici."
+      "empty_message": "Les utilisateurs suggérés apparaîtront ici.",
+      "follow_button": "Suivre"
     },
     "trending": {
       "title": "Tendances"
