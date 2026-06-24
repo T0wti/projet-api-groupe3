@@ -21,7 +21,8 @@
     "search_placeholder": "Поиск",
     "who_to_follow": {
       "title": "Кого читать",
-      "empty_message": "Рекомендованные пользователи появятся здесь."
+      "empty_message": "Рекомендованные пользователи появятся здесь.",
+      "follow_button": "Подписаться"
     },
     "trending": {
       "title": "Актуальные темы"

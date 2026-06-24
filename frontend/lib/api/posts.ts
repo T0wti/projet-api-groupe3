@@ -49,6 +49,11 @@ export async function searchPosts(q: string): Promise<BackendPost[]> {
   return res.data;
 }
 
+export async function fetchTrendingTags(): Promise<{ tag: string; count: number }[]> {
+  const res = await api.get<{ tag: string; count: number }[]>('/posts/trending-tags');
+  return res.data;
+}
+
 export async function fetchPostsByTag(tag: string): Promise<BackendPost[]> {
   const res = await api.get<BackendPost[]>(`/posts/tags/${encodeURIComponent(tag)}`);
   return res.data;

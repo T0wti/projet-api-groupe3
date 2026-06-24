@@ -1,33 +1,41 @@
 @import "tailwindcss";
 
-:root {
-  --app-bg: #f8fafc;
-  --app-surface: #ffffff;
-  --app-surface-elevated: #ffffff;
-  --app-muted-surface: #f3f4f6;
-  --app-border: #e5e7eb;
-  --app-border-subtle: #edf2f7;
-  --app-text: #111827;
-  --app-text-muted: #6b7280;
-  --app-text-soft: #94a3b8;
-  --app-hover: #eef2f7;
-  --app-header: rgba(255, 255, 255, 0.84);
-  --app-overlay: rgba(15, 23, 42, 0.48);
-}
+@layer base {
+  :root {
+    --app-bg: #f8fafc;
+    --app-surface: #ffffff;
+    --app-surface-elevated: #ffffff;
+    --app-muted-surface: #f3f4f6;
+    --app-border: #e5e7eb;
+    --app-border-subtle: #edf2f7;
+    --app-text: #111827;
+    --app-text-muted: #6b7280;
+    --app-text-soft: #94a3b8;
+    --app-hover: #eef2f7;
+    --app-header: rgba(255, 255, 255, 0.84);
+    --app-overlay: rgba(15, 23, 42, 0.48);
+  }
 
-html[data-theme='dark'] {
-  --app-bg: #0f172a;
-  --app-surface: #111827;
-  --app-surface-elevated: #172033;
-  --app-muted-surface: #1f2937;
-  --app-border: #334155;
-  --app-border-subtle: #1f2937;
-  --app-text: #f8fafc;
-  --app-text-muted: #94a3b8;
-  --app-text-soft: #64748b;
-  --app-hover: #1e293b;
-  --app-header: rgba(17, 24, 39, 0.84);
-  --app-overlay: rgba(2, 6, 23, 0.72);
+  html[data-theme='dark'] {
+    --app-bg: #0f172a;
+    --app-surface: #111827;
+    --app-surface-elevated: #172033;
+    --app-muted-surface: #1f2937;
+    --app-border: #334155;
+    --app-border-subtle: #1f2937;
+    --app-text: #f8fafc;
+    --app-text-muted: #94a3b8;
+    --app-text-soft: #64748b;
+    --app-hover: #1e293b;
+    --app-header: rgba(17, 24, 39, 0.84);
+    --app-overlay: rgba(2, 6, 23, 0.72);
+  }
+
+  body {
+    background-color: var(--app-bg);
+    color: var(--app-text);
+    transition: background-color 180ms ease, color 180ms ease;
+  }
 }
 
 @theme {
@@ -42,13 +50,6 @@ html[data-theme='dark'] {
   --color-gray-light: #E5E7EB;
   --color-gray-dark: #374151;
   --color-primary-blue: #3B82F6;
-}
-
-body {
-  @apply antialiased;
-  background-color: var(--app-bg);
-  color: var(--app-text);
-  transition: background-color 180ms ease, color 180ms ease;
 }
 
 @layer components {

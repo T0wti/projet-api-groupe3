@@ -21,7 +21,8 @@
     "search_placeholder": "حوس هنا...",
     "who_to_follow": {
       "title": "اقتراحات الحسابات",
-      "empty_message": "المستخدمين المقترحين راح يبانو هنايا."
+      "empty_message": "المستخدمين المقترحين راح يبانو هنايا.",
+      "follow_button": "متابعة"
     },
     "trending": {
       "title": "الترندات"

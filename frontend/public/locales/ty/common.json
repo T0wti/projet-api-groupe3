@@ -21,8 +21,9 @@
   "right_sidebar": {
     "search_placeholder": "Paha’imi...",
     "who_to_follow": {
-      "title": "Mau 'āfata rorouira e pe’e",
-      "empty_message": "E fā mai te mau ta’ata e fa’ahiahia hia i ’onei."
+      "title": "Mau ‘āfata rorouira e pe’e",
+      "empty_message": "E fā mai te mau ta’ata e fa’ahiahia hia i ‘onei.",
+      "follow_button": "Haere pū"
     },
     "trending": {
       "title": "Te parau nui"

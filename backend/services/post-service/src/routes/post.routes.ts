@@ -6,6 +6,7 @@ import {
   getPostsByIds,
   getPostWithReplies,
   getRepliesForPost,
+  getTrendingTags,
   getPostsByTag,
   searchPosts,
   updatePost,
@@ -19,6 +20,7 @@ router.get('/', getAllMainPosts);
 router.get('/feed', getFeedPosts);
 router.get('/batch', getPostsByIds);
 router.get('/search', searchPosts);
+router.get('/trending-tags', getTrendingTags);
 router.get('/tags/:tag', getPostsByTag);
 router.get('/:id', getPostWithReplies);
 router.get('/:id/replies', getRepliesForPost);

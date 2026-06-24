@@ -83,7 +83,7 @@ export default function PostDetailPage() {
         });
 
         const likedCommentSet = new Set(likedCommentIds);
-        setComments(backendComments.map(bc => {
+        setComments(backendComments.filter(bc => !bc.parent_comment_id).map(bc => {
           const mapped = mapBackendComment(bc, user!, cAuthorMap, cAvatarMap);
           mapped.isLiked = likedCommentSet.has(bc._id);
           return mapped;
@@ -153,12 +153,9 @@ export default function PostDetailPage() {
         const { url } = await uploadMedia(image);
         uploadedImageUrl = url;
       }
-      const bc = await createComment(post.id, content, uploadedImageUrl, parentCommentId);
-      const newReply = mapBackendComment(bc, user);
-      setComments(prev => prev.flatMap(c =>
-        c.id === parentCommentId
-          ? [{ ...c, commentsCount: c.commentsCount + 1 }, newReply]
-          : [c]
+      await createComment(post.id, content, uploadedImageUrl, parentCommentId);
+      setComments(prev => prev.map(c =>
+        c.id === parentCommentId ? { ...c, commentsCount: c.commentsCount + 1 } : c
       ));
     } catch {
       // silently fail

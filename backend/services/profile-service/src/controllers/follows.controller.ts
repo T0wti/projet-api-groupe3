@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { Follows } from '../models/follows.model';
 import { UserCounters } from '../models/userCounters.model';
+import { Profile } from '../models/profile.model';
 import { AppError } from '../utils/AppError';
 
 /**
@@ -79,6 +80,42 @@ export const getFollowers = async (req: Request, res: Response): Promise<void> =
   const followers = followDocs.map((doc) => doc.follower_id);
 
   res.status(200).json({ user_id: userId, followers });
+};
+
+/**
+ * Get suggested accounts: top 3 by followers_count, excluding already-followed users and self
+ */
+export const getSuggestedAccounts = async (req: Request, res: Response): Promise<void> => {
+  const userId = req.query.userId as string;
+  if (!userId) throw new AppError(400, 'userId query param is required');
+
+  const followingDocs = await Follows.find({ follower_id: userId }).select('following_id');
+  const excludeIds = new Set(followingDocs.map((d) => d.following_id));
+  excludeIds.add(userId);
+
+  const suggestions = await Profile.aggregate([
+    { $match: { user_id: { $nin: Array.from(excludeIds) } } },
+    {
+      $lookup: {
+        from: 'usercounters',
+        localField: 'user_id',
+        foreignField: 'user_id',
+        as: 'counters',
+      },
+    },
+    {
+      $addFields: {
+        followers_count: {
+          $ifNull: [{ $arrayElemAt: ['$counters.followers_count', 0] }, 0],
+        },
+      },
+    },
+    { $sort: { followers_count: -1 } },
+    { $limit: 3 },
+    { $project: { _id: 0, user_id: 1, followers_count: 1 } },
+  ]);
+
+  res.status(200).json(suggestions);
 };
 
 /**

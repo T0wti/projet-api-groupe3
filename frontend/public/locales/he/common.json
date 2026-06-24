@@ -21,7 +21,8 @@
     "search_placeholder": "חיפוש",
     "who_to_follow": {
       "title": "הצעות למעקב",
-      "empty_message": "משתמשים מומלצים יופיעו כאן."
+      "empty_message": "משתמשים מומלצים יופיעו כאן.",
+      "follow_button": "עקוב"
     },
     "trending": {
       "title": "טרנדים"
