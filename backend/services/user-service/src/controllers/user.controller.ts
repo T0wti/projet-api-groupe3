@@ -53,18 +53,18 @@ const assertCanModerateUser = (requesterRole: RequesterRole, requesterId: string
 };
 
 export const createUserInfos = async (req: Request, res: Response) => {
-  const { id, username, email, role } = req.body;
+  const id = req.headers['x-user-id'] as string | undefined;
+  const { username, email } = req.body;
 
-  if (!id || !username || !email) {
-    throw new AppError(400, 'Required fields missing (id, username, email).');
+  if (!id) {
+    throw new AppError(401, 'Authentication required.');
   }
-
-  if (role !== undefined && !VALID_ROLES.includes(role)) {
-    throw new AppError(400, `role must be one of: ${VALID_ROLES.join(', ')}`);
+  if (!username || !email) {
+    throw new AppError(400, 'Required fields missing (username, email).');
   }
 
     const user = await prisma.user.create({
-      data: { id, username, email, role: role ?? 'user' },
+      data: { id, username, email, role: 'user' },
     });
     return res.status(201).json(user);
 };
