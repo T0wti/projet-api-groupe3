@@ -106,6 +106,14 @@ export const updateComment = async (req: Request, res: Response) => {
   if (!isValidObjectId(id)) throw new AppError(400, 'Comment ID is invalid.');
   if (!content) throw new AppError(400, 'content is required.');
 
+    const existingComment = await Comment.findById(id);
+    if (!existingComment) throw new AppError(404, 'Comment not found.');
+
+    const requestingUserId = req.headers['x-user-id'] as string | undefined;
+    if (!requestingUserId || requestingUserId !== existingComment.user_id.toString()) {
+      throw new AppError(403, 'You are not allowed to edit this comment.');
+    }
+
     const updated = await Comment.findByIdAndUpdate(id, { content }, { new: true, runValidators: true });
     if (!updated) throw new AppError(404, 'Comment not found.');
 
@@ -131,6 +139,11 @@ export const deleteComment = async (req: Request, res: Response) => {
     const comment = await Comment.findById(id);
     if (!comment) throw new AppError(404, 'Comment not found.');
 
+    const requestingUserId = req.headers['x-user-id'] as string | undefined;
+    if (!requestingUserId || requestingUserId !== comment.user_id.toString()) {
+      throw new AppError(403, 'You are not allowed to delete this comment.');
+    }
+
     await Comment.findByIdAndDelete(id);
     await Comment.deleteMany({ parent_comment_id: id });
     await CommentTag.deleteMany({ comment_id: id });
@@ -141,7 +154,6 @@ export const deleteComment = async (req: Request, res: Response) => {
     }
 
     return res.status(200).json({ message: 'Comment deleted successfully.' });
- 
 };
 
 export const getCommentById = async (req: Request, res: Response) => {
