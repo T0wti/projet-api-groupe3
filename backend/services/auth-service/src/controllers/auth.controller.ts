@@ -7,13 +7,17 @@ import { isValidEmail, getPasswordIssues, isValidUsername } from '../utils/valid
 import { AppError } from '../utils/AppError';
 
 
-const JWT_SECRET             = process.env.JWT_SECRET             || 'secret';
-const JWT_REFRESH_SECRET     = process.env.JWT_REFRESH_SECRET     || 'refresh_secret';
+const JWT_SECRET             = process.env.JWT_SECRET;
+const JWT_REFRESH_SECRET     = process.env.JWT_REFRESH_SECRET;
 const JWT_EXPIRES_IN         = process.env.JWT_EXPIRES_IN         || '15m';
 const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
 const USER_SERVICE_URL       = process.env.USER_SERVICE_URL       || 'http://user-service:3001';
 const PROFILE_SERVICE_URL    = process.env.PROFILE_SERVICE_URL    || 'http://profile-service:3004';
 const IS_PROD                = process.env.NODE_ENV === 'production';
+
+if (!JWT_SECRET || !JWT_REFRESH_SECRET) {
+  throw new Error('JWT_SECRET and JWT_REFRESH_SECRET must be defined');
+}
 
 const ACCESS_COOKIE_MAX_AGE  = 15 * 60 * 1000;           // 15 min in ms
 const REFRESH_COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days in ms
