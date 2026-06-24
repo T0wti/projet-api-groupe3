@@ -117,6 +117,16 @@ export const getRepliesForPost = async (req: Request, res: Response) => {
 
 };
 
+export const getTrendingTags = async (_req: Request, res: Response) => {
+  const results = await Tag.aggregate([
+    { $group: { _id: '$tag', count: { $sum: 1 } } },
+    { $sort: { count: -1 } },
+    { $limit: 3 },
+    { $project: { _id: 0, tag: '$_id', count: 1 } },
+  ]);
+  return res.status(200).json(results);
+};
+
 export const getPostsByTag = async (req: Request, res: Response) => {
   const rawTag = Array.isArray(req.params.tag) ? req.params.tag[0] : req.params.tag;
   const tag = (rawTag || '').toLowerCase().trim();

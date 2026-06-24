@@ -23,8 +23,8 @@ mongoose.connect(MONGO_URI)
     process.exit(1);
   });
 
-app.use('/api/profile', profileRoutes);
 app.use('/api/profile', followsRoutes);
+app.use('/api/profile', profileRoutes);
 
 app.use(errorHandler); 
 
