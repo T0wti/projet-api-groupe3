@@ -1,14 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { Home, Search, Bell, LogOut, Settings } from 'lucide-react';
+import { Home, Search, Shield, LogOut, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import PublishPostModal from '../feed/PublishPostModal';
 import { useAuth } from '@/context/AuthContext';
 
 export default function MobileBottomNav() {
   const { t } = useTranslation('common');
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
+  const isStaff = user?.role === 'admin' || user?.role === 'moderator';
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 app-surface border-t app-border py-3 px-4 z-50 md:hidden">
@@ -22,9 +23,11 @@ export default function MobileBottomNav() {
 
         <PublishPostModal triggerVariant="mobile" />
 
-        <Link href="/notifications" className="app-text-muted hover:text-brand transition-colors p-2">
-          <Bell size={24} />
-        </Link>
+        {isStaff && (
+          <Link href="/staff" className="app-text-muted hover:text-brand transition-colors p-2" aria-label={t('sidebar.nav.staff')}>
+            <Shield size={24} />
+          </Link>
+        )}
 
         <Link href="/preferences" className="app-text-muted hover:text-brand transition-colors p-2" aria-label={t('sidebar.nav.preferences')}>
           <Settings size={24} />
