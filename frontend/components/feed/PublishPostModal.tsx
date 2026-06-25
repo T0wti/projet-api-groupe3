@@ -34,7 +34,6 @@ export default function PublishPostModal({ triggerVariant }: PublishPostModalPro
   const [isPosting, setIsPosting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const remainingCharacters = 280 - content.length;
-
   const {
     selectedFile,
     previewUrl,
@@ -67,7 +66,9 @@ export default function PublishPostModal({ triggerVariant }: PublishPostModalPro
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!user || (content.trim().length === 0 && !selectedFile) || isPosting) return;
+    if (!user || (content.trim().length === 0 && !selectedFile) || isPosting) {
+      return;
+    }
 
     setIsPosting(true);
     setError(null);
@@ -148,39 +149,44 @@ export default function PublishPostModal({ triggerVariant }: PublishPostModalPro
                   />
 
                   {previewUrl && selectedFile && (
-                    <MediaPreview
-                      previewUrl={previewUrl}
-                      isVideo={isVideo}
-                      isGif={isGif}
-                      onTriggerCrop={handleTriggerCrop}
-                      onRemove={handleRemoveImage}
-                      isCropping={isCropping}
-                      srcUrl={srcUrl}
-                      crop={crop}
-                      imgRef={imgRef}
-                      onImageLoad={onImageLoad}
-                      onCropChange={setCrop}
-                      onCropComplete={setCompletedCrop}
-                      onCropSave={handleCropComplete}
-                      onCropCancel={cancelCrop}
-                    />
+                    <div className="mt-4">
+                      <MediaPreview
+                        previewUrl={previewUrl}
+                        isVideo={isVideo}
+                        isGif={isGif}
+                        onTriggerCrop={handleTriggerCrop}
+                        onRemove={handleRemoveImage}
+                        isCropping={isCropping}
+                        srcUrl={srcUrl}
+                        crop={crop}
+                        imgRef={imgRef}
+                        onImageLoad={onImageLoad}
+                        onCropChange={setCrop}
+                        onCropComplete={setCompletedCrop}
+                        onCropSave={handleCropComplete}
+                        onCropCancel={cancelCrop}
+                      />
+                    </div>
                   )}
 
                   <div className="mt-4 flex items-center justify-between gap-4 rounded-[1.5rem] border app-border-subtle app-surface-muted px-4 py-3">
                     <div className="flex items-center gap-3 text-sm app-text-muted">
-                      <div
-                        className="text-brand cursor-pointer hover:opacity-80 p-1 rounded-full hover:bg-brand/10 transition-colors"
+                      <button
+                        type="button"
                         onClick={handleIconClick}
+                        disabled={isPosting}
+                        className="rounded-full p-1 text-brand transition-colors hover:bg-brand/10 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
+                        aria-label={t('compose_post.submit_button')}
                       >
-                        <ImageIcon size={18} />
-                        <input
-                          type="file"
-                          ref={fileInputRef}
-                          onChange={handleFileChange}
-                          accept="image/png, image/jpeg, image/webp, image/gif, video/mp4, video/webm"
-                          className="hidden"
-                        />
-                      </div>
+                        <ImageIcon size={18} className="text-brand" />
+                      </button>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        accept="image/png, image/jpeg, image/webp, image/gif, video/mp4, video/webm"
+                        className="hidden"
+                      />
                       <span>
                         {t(
                           remainingCharacters === 1

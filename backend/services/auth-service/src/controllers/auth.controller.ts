@@ -7,13 +7,16 @@ import { isValidEmail, getPasswordIssues, isValidUsername } from '../utils/valid
 import { AppError } from '../utils/AppError';
 
 
-const JWT_SECRET             = process.env.JWT_SECRET             || 'secret';
-const JWT_REFRESH_SECRET     = process.env.JWT_REFRESH_SECRET     || 'refresh_secret';
+const JWT_SECRET             = process.env.JWT_SECRET;
+const JWT_REFRESH_SECRET     = process.env.JWT_REFRESH_SECRET;
 const JWT_EXPIRES_IN         = process.env.JWT_EXPIRES_IN         || '15m';
 const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
-const USER_SERVICE_URL       = process.env.USER_SERVICE_URL       || 'http://user-service:3001';
-const PROFILE_SERVICE_URL    = process.env.PROFILE_SERVICE_URL    || 'http://profile-service:3004';
 const IS_PROD                = process.env.NODE_ENV === 'production';
+const API_GATEWAY_URL = process.env.API_GATEWAY_URL || 'http://api-gateway:8080';
+
+if (!JWT_SECRET || !JWT_REFRESH_SECRET) {
+  throw new Error('JWT_SECRET and JWT_REFRESH_SECRET must be defined');
+}
 
 const ACCESS_COOKIE_MAX_AGE  = 15 * 60 * 1000;           // 15 min in ms
 const REFRESH_COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days in ms
@@ -39,17 +42,6 @@ const generateTokens = (userId: string, email: string, role: string) => {
   return { accessToken, refreshToken };
 };
 
-const fetchUserRole = async (userId: string): Promise<string> => {
-  try {
-    const response = await fetch(`${USER_SERVICE_URL}/api/users/${userId}`);
-    if (!response.ok) return 'user';
-    const data = (await response.json()) as { role?: string };
-    return typeof data.role === 'string' ? data.role : 'user';
-  } catch {
-    return 'user';
-  }
-};
-
 const setAuthCookies = (res: Response, accessToken: string, refreshToken: string) => {
   res.cookie('breezy_access', accessToken, {
     ...COOKIE_BASE,
@@ -66,11 +58,14 @@ const clearAuthCookies = (res: Response) => {
   res.clearCookie('breezy_refresh', COOKIE_BASE);
 };
 
-const rollbackRegisteredUser = async (userId: string) => {
+const rollbackRegisteredUser = async (userId: string, accessToken: string) => {
   await prisma.authUser.delete({ where: { userId } }).catch(() => {});
 
   try {
-    await fetch(`${USER_SERVICE_URL}/api/users/${userId}`, { method: 'DELETE' });
+    await fetch(`${API_GATEWAY_URL}/api/users/${userId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${accessToken}` },
+    });
   } catch {
     // Best-effort cleanup only.
   }
@@ -83,7 +78,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     throw new AppError(400, 'username, email and password are required');
   }
 
-    if (!isValidUsername(username)) {
+  if (!isValidUsername(username)) {
     throw new AppError(400, 'Username must be 3-30 characters (letters, digits, "_", ".").');
   }
 
@@ -107,33 +102,41 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
   await prisma.authUser.create({ data: { userId, email: normalizedEmail, passwordHash } });
 
-  const userRes = await fetch(`${USER_SERVICE_URL}/api/users/`, {
+  // Token "self" généré avant la création du profil pour pouvoir appeler la gateway
+  // comme l'utilisateur lui-même (x-user-id sera correctement injecté par authenticate.ts).
+  const { accessToken, refreshToken } = generateTokens(userId, normalizedEmail, 'user');
+
+  const userRes = await fetch(`${API_GATEWAY_URL}/api/users`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: userId, username, email: normalizedEmail, role: 'user' }),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({ username, email: normalizedEmail }),
   });
 
-    if (!userRes.ok) {
-      const body = await userRes.text();
-      console.error(`[auth] user-service rejected user creation: ${userRes.status} ${body}`);
-      await rollbackRegisteredUser(userId);
-      throw new AppError(502, 'Failed to create user profile');
-    }
+  if (!userRes.ok) {
+    const body = await userRes.text();
+    console.error(`[auth] user-service rejected user creation: ${userRes.status} ${body}`);
+    await rollbackRegisteredUser(userId, accessToken);
+    throw new AppError(502, 'Failed to create user profile');
+  }
 
-    const profileRes = await fetch(`${PROFILE_SERVICE_URL}/api/profile/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: userId }),
-    });
+  const profileRes = await fetch(`${API_GATEWAY_URL}/api/profile`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({}),
+  });
 
-    if (!profileRes.ok) {
-      const body = await profileRes.text();
-      console.error(`[auth] profile-service rejected profile creation: ${profileRes.status} ${body}`);
-      await rollbackRegisteredUser(userId);
-      throw new AppError(502, 'Failed to initialize user profile');
-    }
- 
-  const { accessToken, refreshToken } = generateTokens(userId, normalizedEmail, 'user');
+  if (!profileRes.ok) {
+    const body = await profileRes.text();
+    console.error(`[auth] profile-service rejected profile creation: ${profileRes.status} ${body}`);
+    await rollbackRegisteredUser(userId, accessToken);
+    throw new AppError(502, 'Failed to initialize user profile');
+  }
 
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7);
@@ -155,21 +158,32 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   if (!user) {
     throw new AppError(401, 'Invalid credentials');
   }
-  
+
   const isValid = await bcrypt.compare(password, user.passwordHash);
   if (!isValid) {
     throw new AppError(401, 'Invalid credentials');
   }
 
-  const userInfoRes = await fetch(`${USER_SERVICE_URL}/api/users/${user.userId}`);
+  // Token "self" provisoire (rôle 'user' par défaut, jamais envoyé au client) pour
+  // interroger le statut/rôle réel via la gateway, comme l'utilisateur lui-même.
+  const { accessToken: probeToken } = generateTokens(user.userId, user.email, 'user');
+
+  const userInfoRes = await fetch(`${API_GATEWAY_URL}/api/users/${user.userId}`, {
+    headers: { 'Authorization': `Bearer ${probeToken}` },
+  });
+  if (!userInfoRes.ok) {
+    console.error(`[auth] failed to fetch user status from user-service: ${userInfoRes.status}`);
+    throw new AppError(502, 'Failed to verify account status');
+  }
   const userInfo = (await userInfoRes.json()) as {
+    role?: string;
     status?: string;
     statusReason?: string;
     suspendedUntil?: string;
   };
 
   if (userInfo.status === 'banned') {
-  throw new AppError(403, `This account has been banned.${userInfo.statusReason ? ' Reason: ' + userInfo.statusReason : ''}`);
+    throw new AppError(403, `This account has been banned.${userInfo.statusReason ? ' Reason: ' + userInfo.statusReason : ''}`);
   }
   if (userInfo.status === 'suspended' && userInfo.suspendedUntil && new Date(userInfo.suspendedUntil) > new Date()) {
     throw new AppError(403, `This account is suspended until ${userInfo.suspendedUntil}.`);
@@ -180,7 +194,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     data: { lastLogin: new Date() },
   });
 
-  const role = await fetchUserRole(user.userId);
+  const role = typeof userInfo.role === 'string' ? userInfo.role : 'user';
   const { accessToken, refreshToken } = generateTokens(user.userId, user.email, role);
 
   const expiresAt = new Date();
@@ -210,40 +224,54 @@ export const refresh = async (req: Request, res: Response): Promise<void> => {
     throw new AppError(401, 'Invalid or expired refresh token');
   }
 
+  let decoded: { user_id: string };
   try {
-    const decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET) as { user_id: string };
+    decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET) as { user_id: string };
+  } catch {
+    clearAuthCookies(res);
+    throw new AppError(401, 'Invalid refresh token');
+  }
 
-    const userInfoRes = await fetch(`${USER_SERVICE_URL}/api/users/${decoded.user_id}`);
-    const userInfo = (await userInfoRes.json()) as {
-      status?: string;
-      statusReason?: string;
-      suspendedUntil?: string;
-    };
-    
+  const user = await prisma.authUser.findUnique({
+    where: { userId: decoded.user_id },
+    select: { email: true },
+  });
+  if (!user) {
+    clearAuthCookies(res);
+    throw new AppError(401, 'Invalid refresh token');
+  }
+
+  const { accessToken: probeToken } = generateTokens(decoded.user_id, user.email, 'user');
+
+  const userInfoRes = await fetch(`${API_GATEWAY_URL}/api/users/${decoded.user_id}`, {
+    headers: { 'Authorization': `Bearer ${probeToken}` },
+  });
+  if (!userInfoRes.ok) {
+    console.error(`[auth] failed to fetch user status from user-service: ${userInfoRes.status}`);
+    throw new AppError(502, 'Failed to verify account status');
+  }
+  const userInfo = (await userInfoRes.json()) as {
+    role?: string;
+    status?: string;
+    statusReason?: string;
+    suspendedUntil?: string;
+  };
+
   if (userInfo.status === 'banned' || (userInfo.status === 'suspended' && userInfo.suspendedUntil && new Date(userInfo.suspendedUntil) > new Date())) {
     clearAuthCookies(res);
     await prisma.refreshToken.deleteMany({ where: { userId: decoded.user_id } });
     throw new AppError(403, 'This account is no longer active.');
   }
 
-    const user = await prisma.authUser.findUnique({
-      where: { userId: decoded.user_id },
-      select: { email: true },
-    });
+  const role = typeof userInfo.role === 'string' ? userInfo.role : 'user';
+  const { accessToken } = generateTokens(decoded.user_id, user.email, role);
 
-    const role = await fetchUserRole(decoded.user_id);
-    const { accessToken } = generateTokens(decoded.user_id, user!.email, role);
+  res.cookie('breezy_access', accessToken, {
+    ...COOKIE_BASE,
+    maxAge: ACCESS_COOKIE_MAX_AGE,
+  });
 
-    res.cookie('breezy_access', accessToken, {
-      ...COOKIE_BASE,
-      maxAge: ACCESS_COOKIE_MAX_AGE,
-    });
-
-    res.status(200).json({ ok: true });
-  } catch {
-    clearAuthCookies(res);
-    throw new AppError(401, 'Invalid refresh token');
-  }
+  res.status(200).json({ ok: true });
 };
 
 export const logout = async (req: Request, res: Response): Promise<void> => {
@@ -312,6 +340,7 @@ export const changePassword = async (req: Request, res: Response): Promise<void>
 
 export const changeEmail = async (req: Request, res: Response): Promise<void> => {
   const userId = req.headers['x-user-id'] as string;
+  const authHeader = req.headers.authorization;
   const { newEmail, currentPassword } = req.body;
 
   if (!userId) {
@@ -343,9 +372,12 @@ export const changeEmail = async (req: Request, res: Response): Promise<void> =>
 
   await prisma.authUser.update({ where: { userId }, data: { email: normalizedEmail } });
 
-  const userRes = await fetch(`${USER_SERVICE_URL}/api/users/${userId}`, {
+  const userRes = await fetch(`${API_GATEWAY_URL}/api/users/${userId}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(authHeader ? { 'Authorization': authHeader } : {}),
+    },
     body: JSON.stringify({ email: normalizedEmail }),
   });
 
