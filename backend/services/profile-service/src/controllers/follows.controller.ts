@@ -78,6 +78,7 @@ export const unfollowUser = async (req: Request, res: Response): Promise<void> =
   res.status(200).json({ message: 'User unfollowed successfully' });
 };
 
+
 /**
  * Get list of followers of a user
  */

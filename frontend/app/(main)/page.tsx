@@ -73,31 +73,33 @@ export default function HomeFeed() {
     return () => window.removeEventListener('breezy:post-created', handleCreatedPost);
   }, [user]);
 
-  const handleAddNewPost = async (content: string, image: File | null) => {
-    if (!user) return;
-    setIsPosting(true);
-    setPostError(null);
-    try {
-      const tags = [...new Set(
-        [...content.matchAll(/\B#(\w+)/g)].map((m) => m[1].toLowerCase())
-      )];
-      let uploadedImageUrl: string | null = null;
-      if (image) {
-        const { url } = await uploadMedia(image);
-        uploadedImageUrl = url;
-      }
-      const bp = await createPost(content, tags.length > 0 ? tags : undefined, uploadedImageUrl);
-      const newPost = mapBackendPost(bp, new Set(), user);
-      setPosts((prev) => [newPost, ...prev]);
-    } catch (err: unknown) {
-      const message = err instanceof AxiosError && typeof err.response?.data === 'object' && err.response?.data !== null && 'message' in err.response.data
-        ? String(err.response.data.message)
-        : t('compose_post.publish_error');
-      setPostError(message);
-    } finally {
-      setIsPosting(false);
+const handleAddNewPost = async (content: string, image: File | null) => {
+  if (!user) return;
+  setIsPosting(true);
+  setPostError(null);
+  try {
+    const tags = [...new Set(
+      [...content.matchAll(/\B#(\w+)/g)].map((m) => m[1].toLowerCase())
+    )];
+    let uploadedImageUrl: string | null = null;
+    let uploadedObjectName: string | null = null;
+    if (image) {
+      const { url, object_name } = await uploadMedia(image);
+      uploadedImageUrl = url;
+      uploadedObjectName = object_name;
     }
-  };
+    const bp = await createPost(content, tags.length > 0 ? tags : undefined, uploadedImageUrl, uploadedObjectName);
+    const newPost = mapBackendPost(bp, new Set(), user);
+    setPosts((prev) => [newPost, ...prev]);
+  } catch (err: unknown) {
+    const message = err instanceof AxiosError && typeof err.response?.data === 'object' && err.response?.data !== null && 'message' in err.response.data
+      ? String(err.response.data.message)
+      : t('compose_post.publish_error');
+    setPostError(message);
+  } finally {
+    setIsPosting(false);
+  }
+};
 
   const handleToggleLike = async (postId: string) => {
     const post = posts.find((p) => p.id === postId);

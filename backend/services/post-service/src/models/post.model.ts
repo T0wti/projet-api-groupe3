@@ -5,6 +5,7 @@ export type MediaType = 'image' | 'video' | null;
 export interface Media {
   type: MediaType;
   url: string | null;
+  object_name?: string | null;
 }
 
 export interface IPost extends Document {
@@ -29,7 +30,8 @@ const PostSchema = new Schema<IPost>(
         enum: ['image', 'video', null],
         default: null
       },
-      url: { type: String, default: null }
+      url: { type: String, default: null },
+      object_name: { type: String, default: null }
     },
     likesCount: { type: Number, default: 0 },
     commentsCount: { type: Number, default: 0 },
