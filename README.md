@@ -1,10 +1,10 @@
-# 🌬️💨 Breezy — Projet API Groupe 3
+# 🌬️💨 Breezy : Projet API Groupe 3
 
 > Application web de type réseau social, construite sur une architecture **microservices** en **TypeScript**, orchestrée avec **Docker Compose**.
 
 ---
 
-## 📋 Table des matières
+## Table des matières
 
 - [Présentation](#présentation)
 - [Architecture](#architecture)
@@ -27,7 +27,7 @@
 
 ## Architecture
 
-![Diagram showing microservices architecture with backend services connected through an API Gateway to databases and external services](documentations/schemas/architecture%20schema.png)
+![Diagram showing microservices architecture with backend services connected through an API Gateway to databases and external services](documentations/schemas/Architecture%20Breezy Groupe%203.png)
 Tous les services communiquent exclusivement via l'**API Gateway**, qui gère l'authentification JWT et le routage.
 
 ---
