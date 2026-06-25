@@ -18,9 +18,12 @@ import {
   likeComment,
   unlikeComment,
   createComment,
+  updateComment,
+  deleteComment,
 } from '@/lib/api/posts';
 import { uploadMedia } from '@/lib/api/media';
 import { enrichAuthors } from '@/lib/utils/enrichAuthors';
+import { toastSuccess, toastError } from '@/lib/utils/alerts';
 
 export default function PostDetailPage() {
   const { postId } = useParams<{ postId: string }>();
@@ -117,6 +120,26 @@ export default function PostDetailPage() {
     }
   };
 
+  const handleEditComment = async (commentId: string, newContent: string) => {
+    try {
+      await updateComment(commentId, newContent);
+      setComments((prev) => prev.map((c) => c.id === commentId ? { ...c, content: newContent } : c));
+      toastSuccess(t('post_card.edit_success'));
+    } catch {
+      toastError(t('post_card.edit_error'));
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    try {
+      await deleteComment(commentId);
+      setComments((prev) => prev.filter((c) => c.id !== commentId));
+      toastSuccess(t('post_card.delete_success'));
+    } catch {
+      toastError(t('post_card.delete_error'));
+    }
+  };
+
   const handleReplyToComment = async (parentCommentId: string, content: string, image: File | null) => {
     if (!user || !post) return;
     try {
@@ -172,6 +195,8 @@ export default function PostDetailPage() {
                 onLike={() => handleLikeComment(comment.id)}
                 onUnlike={() => handleUnlikeComment(comment.id)}
                 onReply={(content: string, image: File | null) => handleReplyToComment(comment.id, content, image)}
+                onEdit={(newContent) => handleEditComment(comment.id, newContent)}
+                onDelete={() => handleDeleteComment(comment.id)}
               />
             ))}
           </section>

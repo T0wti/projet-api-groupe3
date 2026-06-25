@@ -14,9 +14,12 @@ import {
   likeComment,
   unlikeComment,
   createComment,
+  updateComment,
+  deleteComment,
 } from '@/lib/api/posts';
 import { uploadMedia } from '@/lib/api/media';
 import { enrichAuthors } from '@/lib/utils/enrichAuthors';
+import { toastSuccess, toastError } from '@/lib/utils/alerts';
 
 export default function CommentDetailPage() {
   const { commentId } = useParams<{ commentId: string }>();
@@ -101,6 +104,48 @@ export default function CommentDetailPage() {
     }
   };
 
+  const handleEditComment = async (newContent: string) => {
+    if (!comment) return;
+    try {
+      await updateComment(comment.id, newContent);
+      setComment((prev) => prev ? { ...prev, content: newContent } : prev);
+      toastSuccess(t('post_card.edit_success'));
+    } catch {
+      toastError(t('post_card.edit_error'));
+    }
+  };
+
+  const handleDeleteComment = async () => {
+    if (!comment) return;
+    try {
+      await deleteComment(comment.id);
+      router.back();
+    } catch {
+      toastError(t('post_card.delete_error'));
+    }
+  };
+
+  const handleEditReply = async (replyId: string, newContent: string) => {
+    try {
+      await updateComment(replyId, newContent);
+      setReplies((prev) => prev.map((r) => r.id === replyId ? { ...r, content: newContent } : r));
+      toastSuccess(t('post_card.edit_success'));
+    } catch {
+      toastError(t('post_card.edit_error'));
+    }
+  };
+
+  const handleDeleteReply = async (replyId: string) => {
+    try {
+      await deleteComment(replyId);
+      setReplies((prev) => prev.filter((r) => r.id !== replyId));
+      setComment((prev) => prev ? { ...prev, commentsCount: prev.commentsCount - 1 } : prev);
+      toastSuccess(t('post_card.delete_success'));
+    } catch {
+      toastError(t('post_card.delete_error'));
+    }
+  };
+
   const handleReply = async (content: string, image: File | null) => {
     if (!user || !comment) return;
     try {
@@ -142,6 +187,8 @@ export default function CommentDetailPage() {
               onLike={handleLikeComment}
               onUnlike={handleUnlikeComment}
               onReply={handleReply}
+              onEdit={handleEditComment}
+              onDelete={handleDeleteComment}
               disableNavigation
             />
           </div>
@@ -157,6 +204,8 @@ export default function CommentDetailPage() {
                 onLike={() => handleLikeReply(reply.id)}
                 onUnlike={() => handleUnlikeReply(reply.id)}
                 onReply={(content: string, image: File | null) => handleReply(content, image)}
+                onEdit={(newContent) => handleEditReply(reply.id, newContent)}
+                onDelete={() => handleDeleteReply(reply.id)}
               />
             ))}
           </section>
