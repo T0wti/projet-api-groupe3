@@ -46,7 +46,7 @@ export default function MediaPreview({
   return (
     <>
       {/* Zone d'aperçu */}
-      <div className="relative my-3 w-full overflow-hidden rounded-2xl border border-gray-100 bg-gray-50 group">
+      <div className="relative my-3 w-full overflow-hidden rounded-2xl border app-border app-muted-surface group">
         {isVideo ? (
           <video
             src={previewUrl}
@@ -87,9 +87,9 @@ export default function MediaPreview({
       {/* Modale de recadrage */}
       {isCropping && srcUrl && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl p-4 max-w-lg w-full flex flex-col max-h-[90vh]">
-            <h3 className="text-lg font-bold mb-3 text-gray-900">{t('edit.ajust_image')}</h3>
-            <div className="overflow-auto flex-1 flex justify-center items-center bg-gray-100 rounded-xl p-2">
+          <div className="app-surface rounded-2xl p-4 max-w-lg w-full flex flex-col max-h-[90vh]">
+            <h3 className="text-lg font-bold mb-3 app-text">{t('edit.ajust_image')}</h3>
+            <div className="overflow-auto flex-1 flex justify-center items-center app-muted-surface rounded-xl p-2">
               <ReactCrop
                 crop={crop}
                 onChange={onCropChange}
@@ -109,7 +109,7 @@ export default function MediaPreview({
               <button
                 type="button"
                 onClick={onCropCancel}
-                className="px-4 py-2 border border-gray-300 rounded-full text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                className="px-4 py-2 border app-border rounded-full text-sm font-semibold app-text app-hover-surface"
               >
                 {t('edit.cancel')}
               </button>

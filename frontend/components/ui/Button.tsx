@@ -1,29 +1,26 @@
 import React from 'react';
 
-// 1. Define the custom props we want, AND inherit all standard HTML button props
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
   size?: 'sm' | 'md' | 'lg';
   fullWidth?: boolean;
 }
 
-export default function Button({ 
-  children, 
-  variant = 'primary', 
-  size = 'md', 
+export default function Button({
+  children,
+  variant = 'primary',
+  size = 'md',
   fullWidth = false,
-  className = '', // Allow adding extra custom classes if needed
+  className = '',
   disabled,
-  ...props // Catch any other standard props like onClick or type="submit"
+  ...props
 }: ButtonProps) {
-  
-  // 2. Map out the styles for different variants
   const baseStyles = "inline-flex items-center justify-center font-bold rounded-full transition-colors focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed";
-  
+
   const variants = {
-    primary: "bg-teal-600 hover:bg-teal-700 text-white",
+    primary: "bg-brand hover:bg-brand-hover text-white",
     secondary: "app-button-secondary",
-    ghost: "bg-transparent hover:bg-teal-50 text-teal-600",
+    ghost: "bg-transparent hover:bg-brand/10 text-brand",
     danger: "bg-transparent hover:bg-red-50 text-red-500",
   };
 
@@ -33,17 +30,10 @@ export default function Button({
     lg: "px-6 py-3 text-lg",
   };
 
-  // 3. Combine them all together
-  const classes = `
-    ${baseStyles} 
-    ${variants[variant]} 
-    ${sizes[size]} 
-    ${fullWidth ? 'w-full' : ''} 
-    ${className}
-  `;
+  const classes = `${baseStyles} ${variants[variant]} ${sizes[size]} ${fullWidth ? 'w-full' : ''} ${className}`.trim();
 
   return (
-    <button className={classes.trim()} disabled={disabled} {...props}>
+    <button className={classes} disabled={disabled} {...props}>
       {children}
     </button>
   );

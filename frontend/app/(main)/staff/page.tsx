@@ -325,10 +325,10 @@ export default function StaffPage() {
     return (
       <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(13,148,136,0.16),_transparent_42%)] px-4 py-12 sm:px-6 app-page">
         <section className="mx-auto max-w-3xl rounded-[2rem] border app-border app-surface-elevated p-10 text-center shadow-[0_30px_80px_rgba(15,23,42,0.16)] backdrop-blur">
-          <Shield className="mx-auto mb-4 text-teal-600" size={36} />
+          <Shield className="mx-auto mb-4 text-brand" size={36} />
           <h1 className="text-3xl font-black app-text">{t('guard.title')}</h1>
           <p className="mt-3 text-sm app-text-muted">{t('guard.description')}</p>
-          <Link href="/" className="mt-6 inline-flex rounded-full bg-teal-600 px-5 py-2 text-sm font-bold text-white hover:bg-teal-700">
+          <Link href="/" className="mt-6 inline-flex rounded-full bg-brand px-5 py-2 text-sm font-bold text-white hover:bg-brand-hover">
             {t('guard.back_home')}
           </Link>
         </section>
@@ -341,14 +341,14 @@ export default function StaffPage() {
       <section className="mx-auto max-w-6xl rounded-[2rem] border app-border app-surface-elevated p-6 shadow-[0_30px_80px_rgba(15,23,42,0.16)] backdrop-blur sm:p-8">
         <div className="flex flex-col gap-4 border-b app-border pb-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.32em] text-teal-700">{t('header.eyebrow')}</p>
+            <p className="text-xs font-bold uppercase tracking-[0.32em] text-brand">{t('header.eyebrow')}</p>
             <h1 className="mt-2 text-3xl font-black tracking-tight app-text">{t('header.title')}</h1>
             <p className="mt-2 max-w-2xl text-sm app-text-muted">
               {t('header.description')}
             </p>
           </div>
 
-          <div className="rounded-2xl border border-teal-500/20 bg-teal-500/10 px-4 py-3 text-sm text-teal-700 dark:text-teal-300">
+          <div className="rounded-2xl border border-brand/20 bg-brand/10 px-4 py-3 text-sm text-brand">
             {t('header.connected_as')} <span className="font-bold">{ROLE_LABELS[user.role]}</span>
           </div>
         </div>
@@ -411,7 +411,7 @@ export default function StaffPage() {
                       <span className="rounded-full border border-red-500/20 bg-red-500/10 px-3 py-1 text-xs font-bold text-red-700 dark:text-red-300">
                         {t('reports.count', { count: reportCount })}
                       </span>
-                      <Link href={`/posts/${report.target_id}`} className="text-sm font-semibold text-teal-700 hover:underline">
+                      <Link href={`/posts/${report.target_id}`} className="text-sm font-semibold text-brand hover:underline">
                         {t('reports.view_post')}
                       </Link>
                     </div>
@@ -464,7 +464,7 @@ export default function StaffPage() {
               <article key={entry.id} className="overflow-hidden rounded-[1.75rem] border app-border app-surface p-5 shadow-sm">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0 flex-1">
-                    <Link href={`/profile/${encodeURIComponent(entry.username)}`} className="block break-all text-lg font-black app-text hover:text-teal-700">
+                    <Link href={`/profile/${encodeURIComponent(entry.username)}`} className="block break-all text-lg font-black app-text hover:text-brand">
                       @{entry.username}
                     </Link>
                     <p className="mt-1 break-all text-sm app-text-muted">{entry.email}</p>
@@ -491,7 +491,7 @@ export default function StaffPage() {
                         value={currentRoleSelection}
                         onChange={(event) => setRoleSelections((current) => ({ ...current, [entry.id]: event.target.value as UserRole }))}
                         disabled={!canEditRole || isPending}
-                        className="min-w-0 w-full rounded-2xl border app-input px-4 py-3 text-sm font-medium outline-none focus:border-teal-500 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="min-w-0 w-full rounded-2xl border app-input px-4 py-3 text-sm font-medium outline-none focus:border-brand disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {availableRoleOptions.map((roleOption) => (
                           <option key={roleOption} value={roleOption}>{ROLE_LABELS[roleOption]}</option>
@@ -512,7 +512,7 @@ export default function StaffPage() {
                         value={suspendUntilByUser[entry.id] ?? ''}
                         onChange={(event) => setSuspendUntilByUser((current) => ({ ...current, [entry.id]: event.target.value }))}
                         disabled={!canModerate || isPending}
-                        className="min-w-0 w-full rounded-2xl border app-input px-4 py-3 text-sm outline-none focus:border-teal-500 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="min-w-0 w-full rounded-2xl border app-input px-4 py-3 text-sm outline-none focus:border-brand disabled:cursor-not-allowed disabled:opacity-60"
                       />
                     </label>
 
@@ -524,7 +524,7 @@ export default function StaffPage() {
                         onChange={(event) => setReasons((current) => ({ ...current, [entry.id]: event.target.value }))}
                         placeholder={t('accounts.reason_placeholder')}
                         disabled={!canModerate || isPending}
-                        className="min-w-0 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-teal-500 disabled:cursor-not-allowed disabled:bg-slate-100"
+                        className="min-w-0 w-full rounded-2xl border app-input px-4 py-3 text-sm outline-none focus:border-brand disabled:cursor-not-allowed disabled:opacity-60"
                       />
                     </label>
                   </div>

@@ -9,7 +9,7 @@ import Avatar from "@/components/ui/Avatar";
 import Button from '@/components/ui/Button';
 import ContextMenu from "@/components/ui/ContextMenu";
 import { useAuth } from '@/context/AuthContext';
-import { useMediaPicker } from '@/src/hooks/useMediaPicker';
+import { useMediaPicker } from '@/hooks/useMediaPicker';
 import MediaPreview from '@/components/ui/MediaPreview';
 
 import { createPostReport } from '@/lib/api/posts';
@@ -154,7 +154,7 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
                 onChange={(e) => setEditContent(e.target.value)}
                 rows={3}
                 autoFocus
-                className="w-full resize-none rounded-lg border app-input p-2 text-sm outline-none focus:border-teal-500"
+                className="w-full resize-none rounded-lg border app-input p-2 text-sm outline-none focus:border-brand"
               />
               <div className="flex gap-2">
                 <div
@@ -173,7 +173,7 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
                 <button
                   onClick={handleSaveEdit}
                   disabled={!editContent.trim()}
-                  className="rounded-full bg-teal-600 px-4 py-1 text-sm font-semibold text-white disabled:opacity-50"
+                  className="rounded-full bg-brand px-4 py-1 text-sm font-semibold text-white disabled:opacity-50"
                 >
                   {t('post_card.save')}
                 </button>
@@ -219,7 +219,7 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
           )}
 
           {post.imageUrl && (
-            <div className="mt-3 w-full overflow-hidden border border-gray-100 rounded-2xl flex justify-center items-center">
+            <div className="mt-3 w-full overflow-hidden border app-border rounded-2xl flex justify-center items-center">
               {isVideoUrl ? (
                 <video
                   src={post.imageUrl}
@@ -339,7 +339,7 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
               <select
                 value={reportReason}
                 onChange={(e) => setReportReason(e.target.value as ReportReason)}
-                className="mt-2 w-full rounded-xl border app-input px-3 py-2 text-sm outline-none focus:border-teal-500"
+                className="mt-2 w-full rounded-xl border app-input px-3 py-2 text-sm outline-none focus:border-brand"
                 disabled={isSubmittingReport}
               >
                 {REPORT_REASONS.map((reason) => (
@@ -357,7 +357,7 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
                 className="rounded-full border app-border px-4 py-2 text-sm font-semibold app-text app-hover-surface"
                 disabled={isSubmittingReport}
               >
-                {t('post_card.cancel_edit')}
+                {t('compose_post.cancel')}
               </button>
               <button
                 type="button"

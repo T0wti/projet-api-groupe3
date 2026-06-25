@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import Avatar from '@/components/ui/Avatar';
 import Button from '@/components/ui/Button';
 import { useAuth } from '@/context/AuthContext';
-import { useMediaPicker } from '@/src/hooks/useMediaPicker';
+import { useMediaPicker } from '@/hooks/useMediaPicker';
 import MediaPreview from '@/components/ui/MediaPreview';
 
 interface ComposePostProps {
@@ -86,7 +86,7 @@ export default function ComposePost({ onPost, isPosting = false }: ComposePostPr
             />
           )}
 
-          <div className="flex justify-between items-center mt-2 border-t border-gray-100 pt-2">
+          <div className="flex justify-between items-center mt-2 border-t app-border pt-2">
             <div
               className="text-brand cursor-pointer hover:opacity-80 p-1 rounded-full hover:bg-brand/10 transition-colors"
               onClick={handleIconClick}
