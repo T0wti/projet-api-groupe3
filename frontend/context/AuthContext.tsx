@@ -55,6 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const userRes = await fetch(`/api/users/${payload.user_id}`);
       if (userRes.ok) {
         const userData = await userRes.json();
+        // profile-service is the avatar source of truth; user-service avatarUrl is always null
         const avatarUrl = await fetchAvatarUrl(payload.user_id);
         setUser({ ...userData, avatarUrl: avatarUrl ?? userData.avatarUrl });
       } else {
@@ -68,6 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
+    // Defer to next tick so window is available after hydration
     const timeoutId = window.setTimeout(() => {
       void restoreSession();
     }, 0);

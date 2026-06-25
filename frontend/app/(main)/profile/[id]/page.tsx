@@ -83,6 +83,7 @@ export default function ProfilePage() {
           id: publicUser.id,
           name: publicUser.username,
           username: publicUser.username,
+          // profile-service is the avatar source of truth; user-service avatarUrl is always null
           avatarUrl: backendProfile?.avatar_url ?? publicUser.avatarUrl,
           bio: backendProfile?.bio,
           followersCount: backendProfile?.counters?.followers_count,
@@ -184,6 +185,7 @@ export default function ProfilePage() {
   };
 
   const handleEditPost = async (postId: string, newContent: string, newImage: File | null) => {
+    // \B# matches hashtags not at a word boundary; deduped and lowercased for backend consistency
     const tags = [...new Set([...newContent.matchAll(/\B#(\w+)/g)].map((m) => m[1].toLowerCase()))];
     let mediaParam: { type: 'image' | 'video'; url: string } | undefined = undefined;
     if (newImage) {
@@ -296,6 +298,7 @@ export default function ProfilePage() {
   const handleToggleLikedPost = async (postId: string) => {
     const post = likedPosts.find(p => p.id === postId);
     if (!post) return;
+    // Posts appear here because the user liked them — default true if the flag is somehow missing
     const wasLiked = post.isLiked ?? true;
 
     setLikedPosts(prev =>

@@ -35,5 +35,6 @@ export default function proxy(req: NextRequest) {
 }
 
 export const config = {
+  // Excludes Next.js internals, static assets, and locale JSON from middleware
   matcher: ['/((?!_next/static|_next/image|favicon.ico|locales|.*\\.png$).*)'],
 };

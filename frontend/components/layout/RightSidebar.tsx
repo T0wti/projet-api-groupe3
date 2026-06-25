@@ -37,6 +37,7 @@ export default function RightSidebar() {
       .then(async (raw) => {
         const enriched = await Promise.allSettled(
           raw.map(async (s) => {
+            // username from user-service, avatar from profile-service (avatar source of truth)
             const [pub, profile] = await Promise.all([
               fetchPublicUserById(s.user_id),
               fetchProfileById(s.user_id).catch(() => null),
