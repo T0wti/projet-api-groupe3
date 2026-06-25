@@ -4,6 +4,8 @@ import Post from '../models/post.model';
 import { Tag } from '../models/post-tag.model';
 import { AppError } from '../utils/AppError';
 
+const API_GATEWAY_URL = process.env.API_GATEWAY_URL || 'http://api-gateway:8080';
+
 // Helper function to validate MongoDB ObjectId
 const isValidObjectId = (id: string) => mongoose.Types.ObjectId.isValid(id);
 
@@ -189,30 +191,40 @@ export const updatePost = async (req: Request, res: Response) => {
  * Delete a post
  */
 export const deletePost = async (req: Request, res: Response) => {
-const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   if (!isValidObjectId(id)) {
     throw new AppError(400, 'Post ID is invalid.');
   }
 
-    const postToDelete = await Post.findById(id);
-    if (!postToDelete) throw new AppError(404, 'Post not found.');
+  const postToDelete = await Post.findById(id);
+  if (!postToDelete) throw new AppError(404, 'Post not found.');
 
-    const requestingUserId = req.headers['x-user-id'] as string | undefined;
-    const requestingUserRole = req.headers['x-user-role'] as string | undefined;
-    const canModerate = requestingUserRole === 'moderator' || requestingUserRole === 'admin';
+  const requestingUserId = req.headers['x-user-id'] as string | undefined;
+  const requestingUserRole = req.headers['x-user-role'] as string | undefined;
+  const canModerate = requestingUserRole === 'moderator' || requestingUserRole === 'admin';
 
-    if (!requestingUserId || (requestingUserId !== postToDelete.authorId.toString() && !canModerate)) {
-      throw new AppError(403, 'You are not allowed to delete this post.');
-    }
+  if (!requestingUserId || (requestingUserId !== postToDelete.authorId.toString() && !canModerate)) {
+    throw new AppError(403, 'You are not allowed to delete this post.');
+  }
 
-    if (postToDelete.parentPost) {
-      await Post.findByIdAndUpdate(postToDelete.parentPost, { $inc: { commentsCount: -1 } });
-    }
+  if (postToDelete.parentPost) {
+    await Post.findByIdAndUpdate(postToDelete.parentPost, { $inc: { commentsCount: -1 } });
+  }
 
-    await Post.findByIdAndDelete(id);
-    await Tag.deleteMany({ post_id: id });
-    return res.status(200).json({ message: 'Post deleted successfully.' });
+  await Post.findByIdAndDelete(id);
+  await Tag.deleteMany({ post_id: id });
 
+  if (postToDelete.media?.object_name) {
+    const authHeader = req.headers.authorization;
+    fetch(`${API_GATEWAY_URL}/api/media/${postToDelete.media.object_name}`, {
+      method: 'DELETE',
+      headers: authHeader ? { 'Authorization': authHeader } : {},
+    }).catch((err) => {
+      console.error(`[post-service] failed to delete media ${postToDelete.media.object_name}:`, err);
+    });
+  }
+
+  return res.status(200).json({ message: 'Post deleted successfully.' });
 };
 
 /**

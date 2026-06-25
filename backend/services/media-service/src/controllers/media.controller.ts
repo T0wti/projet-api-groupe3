@@ -32,7 +32,9 @@ export const deleteMedia = async (req: Request, res: Response) => {
     throw new AppError(401, 'Authentication required.');
   }
 
-  const objectName = Array.isArray(req.params.objectName) ? req.params.objectName[0] : req.params.objectName;
+  const objectName = Array.isArray(req.params.objectName)
+    ? req.params.objectName.join('/')
+    : req.params.objectName;
 
   const isOwner = objectName.startsWith(`${userId}/`);
   const canModerate = userRole === 'moderator' || userRole === 'admin';
