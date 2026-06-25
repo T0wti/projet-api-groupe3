@@ -20,6 +20,7 @@ import {
 import { searchUsers, fetchPublicUserById } from '@/lib/api/users';
 import { fetchProfileById } from '@/lib/api/profile';
 import { uploadMedia } from '@/lib/api/media';
+import { enrichAuthors } from '@/lib/utils/enrichAuthors';
 
 type PersonResult = { id: string; username: string; avatarUrl?: string | null };
 type SearchMode = 'idle' | 'tags' | 'normal';
@@ -44,14 +45,7 @@ function ExplorePage() {
       if (!user) return [];
       const likedSet = new Set(likedIds);
       const otherAuthorIds = [...new Set(backendPosts.map((p) => p.authorId).filter((id) => id !== user.id))];
-      const [userResults, profileResults] = await Promise.all([
-        Promise.allSettled(otherAuthorIds.map(fetchPublicUserById)),
-        Promise.allSettled(otherAuthorIds.map(fetchProfileById)),
-      ]);
-      const authorMap = new Map<string, string>();
-      const avatarMap = new Map<string, string | null | undefined>();
-      userResults.forEach((r, i) => { if (r.status === 'fulfilled') authorMap.set(otherAuthorIds[i], r.value.username); });
-      profileResults.forEach((r, i) => { if (r.status === 'fulfilled') avatarMap.set(otherAuthorIds[i], r.value.avatar_url ?? null); });
+      const { authorMap, avatarMap } = await enrichAuthors(otherAuthorIds);
       return backendPosts.map((bp) => mapBackendPost(bp, likedSet, user, authorMap, avatarMap));
     },
     [user]

@@ -15,9 +15,9 @@ import {
   unlikePost,
   createComment,
 } from '@/lib/api/posts';
-import { fetchPublicUserById } from '@/lib/api/users';
-import { fetchProfileById, fetchFollowingById } from '@/lib/api/profile';
+import { fetchFollowingById } from '@/lib/api/profile';
 import { uploadMedia } from '@/lib/api/media';
+import { enrichAuthors } from '@/lib/utils/enrichAuthors';
 
 export default function HomeFeed() {
   const { user, isLoading: authLoading } = useAuth();
@@ -30,9 +30,7 @@ export default function HomeFeed() {
   const isPageLoading = authLoading || (Boolean(user) && isLoading);
 
   useEffect(() => {
-    // Wait for auth to resolve before doing anything
     if (authLoading) return;
-
     if (!user) return;
 
     async function loadFeed() {
@@ -46,26 +44,10 @@ export default function HomeFeed() {
         const backendPosts = await fetchFeedPosts(allIds);
         const likedSet = new Set(likedIds);
 
-        // Fetch usernames and avatars for authors that are not the current user
         const otherAuthorIds = [...new Set(
           backendPosts.map((p) => p.authorId).filter((id) => id !== user!.id)
         )];
-        const [userResults, profileResults] = await Promise.all([
-          Promise.allSettled(otherAuthorIds.map(fetchPublicUserById)),
-          Promise.allSettled(otherAuthorIds.map(fetchProfileById)),
-        ]);
-        const authorMap = new Map<string, string>();
-        const avatarMap = new Map<string, string | null | undefined>();
-        userResults.forEach((result, i) => {
-          if (result.status === 'fulfilled') {
-            authorMap.set(otherAuthorIds[i], result.value.username);
-          }
-        });
-        profileResults.forEach((result, i) => {
-          if (result.status === 'fulfilled') {
-            avatarMap.set(otherAuthorIds[i], result.value.avatar_url ?? null);
-          }
-        });
+        const { authorMap, avatarMap } = await enrichAuthors(otherAuthorIds);
 
         setPosts(backendPosts.map((bp) => mapBackendPost(bp, likedSet, user!, authorMap, avatarMap)));
       } catch {
@@ -79,9 +61,7 @@ export default function HomeFeed() {
   }, [user, authLoading, t]);
 
   useEffect(() => {
-    if (!user) {
-      return;
-    }
+    if (!user) return;
 
     const handleCreatedPost = (event: WindowEventMap['breezy:post-created']) => {
       const newPost = mapBackendPost(event.detail, new Set(), user);
@@ -103,7 +83,7 @@ export default function HomeFeed() {
       )];
       let uploadedImageUrl: string | null = null;
       if (image) {
-        const {url} = await uploadMedia(image);
+        const { url } = await uploadMedia(image);
         uploadedImageUrl = url;
       }
       const bp = await createPost(content, tags.length > 0 ? tags : undefined, uploadedImageUrl);
@@ -125,7 +105,6 @@ export default function HomeFeed() {
 
     const wasLiked = post.isLiked ?? false;
 
-    // Optimistic update
     setPosts((prev) =>
       prev.map((p) =>
         p.id === postId
@@ -135,13 +114,9 @@ export default function HomeFeed() {
     );
 
     try {
-      if (wasLiked) {
-        await unlikePost(postId);
-      } else {
-        await likePost(postId);
-      }
+      if (wasLiked) await unlikePost(postId);
+      else await likePost(postId);
     } catch {
-      // Revert on error
       setPosts((prev) =>
         prev.map((p) =>
           p.id === postId
@@ -199,17 +174,14 @@ export default function HomeFeed() {
       )}
 
       <section className="px-10 py-5 space-y-5">
-        {posts.map((post) => {
-          const PostCardAny = PostCard as any;
-          return (
-            <PostCardAny
-              key={post.id}
-              post={post}
-              onLike={() => handleToggleLike(post.id)}
-              onReply={(content: string, image: File | null) => handleReply(post.id, content, image)}
-            />
-          );
-        })}
+        {posts.map((post) => (
+          <PostCard
+            key={post.id}
+            post={post}
+            onLike={() => handleToggleLike(post.id)}
+            onReply={(content: string, image: File | null) => handleReply(post.id, content, image)}
+          />
+        ))}
       </section>
     </main>
   );
