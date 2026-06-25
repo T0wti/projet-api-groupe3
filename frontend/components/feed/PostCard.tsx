@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { MessageCircle, Heart, Image as ImageIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Avatar from "@/components/ui/Avatar";
-import Button from '@/components/ui/Button';
 import ContextMenu from "@/components/ui/ContextMenu";
 import { useAuth } from '@/context/AuthContext';
 import { useMediaPicker } from '@/src/hooks/useMediaPicker';
@@ -27,7 +26,7 @@ interface PostCardProps {
   isPosting?: boolean;
 }
 
-export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disableNavigation, isPosting = false }: PostCardProps) {
+export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disableNavigation }: PostCardProps) {
   const { t } = useTranslation('common');
   const { user } = useAuth();
   const router = useRouter();
@@ -51,6 +50,48 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
   // Deux instances séparées du hook : une pour l'édition, une pour la réponse
   const editPicker = useMediaPicker();
   const replyPicker = useMediaPicker();
+  const {
+    selectedFile: editSelectedFile,
+    previewUrl: editPreviewUrl,
+    isCropping: editIsCropping,
+    srcUrl: editSrcUrl,
+    crop: editCrop,
+    isVideo: editIsVideo,
+    isGif: editIsGif,
+    fileInputRef: editFileInputRef,
+    imgRef: editImgRef,
+    handleIconClick: handleEditIconClick,
+    handleFileChange: handleEditFileChange,
+    handleTriggerCrop: handleEditTriggerCrop,
+    onImageLoad: onEditImageLoad,
+    handleCropComplete: handleEditCropComplete,
+    handleRemoveImage: handleEditRemoveImage,
+    cancelCrop: cancelEditCrop,
+    setCrop: setEditCrop,
+    setCompletedCrop: setEditCompletedCrop,
+    reset: resetEditPicker,
+  } = editPicker;
+  const {
+    selectedFile: replySelectedFile,
+    previewUrl: replyPreviewUrl,
+    isCropping: replyIsCropping,
+    srcUrl: replySrcUrl,
+    crop: replyCrop,
+    isVideo: replyIsVideo,
+    isGif: replyIsGif,
+    fileInputRef: replyFileInputRef,
+    imgRef: replyImgRef,
+    handleIconClick: handleReplyIconClick,
+    handleFileChange: handleReplyFileChange,
+    handleTriggerCrop: handleReplyTriggerCrop,
+    onImageLoad: onReplyImageLoad,
+    handleCropComplete: handleReplyCropComplete,
+    handleRemoveImage: handleReplyRemoveImage,
+    cancelCrop: cancelReplyCrop,
+    setCrop: setReplyCrop,
+    setCompletedCrop: setReplyCompletedCrop,
+    reset: resetReplyPicker,
+  } = replyPicker;
 
   const TRUNCATE_LIMIT = 140;
   const isTruncatable = post.content.length > TRUNCATE_LIMIT;
@@ -58,25 +99,59 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
     ? post.content.slice(0, TRUNCATE_LIMIT) + '…'
     : post.content;
 
+  const renderContentWithClickableTags = (text: string) => {
+    const nodes: React.ReactNode[] = [];
+    const tagRegex = /\B#(\w+)/g;
+    let lastIndex = 0;
+
+    for (const match of text.matchAll(tagRegex)) {
+      const fullMatch = match[0];
+      const tag = match[1];
+      const matchIndex = match.index ?? 0;
+
+      if (matchIndex > lastIndex) {
+        nodes.push(text.slice(lastIndex, matchIndex));
+      }
+
+      nodes.push(
+        <Link
+          key={`${tag}-${matchIndex}`}
+          href={`/explore?q=${encodeURIComponent(`#${tag}`)}`}
+          className="font-medium text-blue-500 transition-colors hover:text-blue-600 hover:underline"
+        >
+          {fullMatch}
+        </Link>
+      );
+
+      lastIndex = matchIndex + fullMatch.length;
+    }
+
+    if (lastIndex < text.length) {
+      nodes.push(text.slice(lastIndex));
+    }
+
+    return nodes.length > 0 ? nodes : text;
+  };
+
   const submitReply = () => {
-    if (replyText.trim().length === 0 && !replyPicker.selectedFile) return;
-    onReply(replyText, replyPicker.selectedFile);
+    if (replyText.trim().length === 0 && !replySelectedFile) return;
+    onReply(replyText, replySelectedFile);
     setReplyText('');
-    replyPicker.reset();
+    resetReplyPicker();
     setIsReplying(false);
   };
 
   const handleSaveEdit = async () => {
     if (!onEdit || !editContent.trim()) return;
-    await onEdit(post.id, editContent.trim(), editPicker.selectedFile);
+    await onEdit(post.id, editContent.trim(), editSelectedFile);
     setIsEditing(false);
-    editPicker.reset();
+    resetEditPicker();
   };
 
   const handleCancelEdit = () => {
     setEditContent(post.content);
     setIsEditing(false);
-    editPicker.reset();
+    resetEditPicker();
   };
 
   const handleCardClick = (e: React.MouseEvent) => {
@@ -159,13 +234,13 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
               <div className="flex gap-2">
                 <div
                   className="text-brand cursor-pointer hover:opacity-80 p-1 rounded-full hover:bg-brand/10 transition-colors"
-                  onClick={editPicker.handleIconClick}
+                  onClick={handleEditIconClick}
                 >
                   <ImageIcon size={20} />
                   <input
                     type="file"
-                    ref={editPicker.fileInputRef}
-                    onChange={editPicker.handleFileChange}
+                    ref={editFileInputRef}
+                    onChange={handleEditFileChange}
                     accept="image/png, image/jpeg, image/webp, image/gif, video/mp4, video/webm"
                     className="hidden"
                   />
@@ -185,28 +260,30 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
                 </button>
               </div>
 
-              {editPicker.previewUrl && editPicker.selectedFile && (
+              {editPreviewUrl && editSelectedFile && (
                 <MediaPreview
-                  previewUrl={editPicker.previewUrl}
-                  isVideo={editPicker.isVideo}
-                  isGif={editPicker.isGif}
-                  onTriggerCrop={editPicker.handleTriggerCrop}
-                  onRemove={editPicker.handleRemoveImage}
-                  isCropping={editPicker.isCropping}
-                  srcUrl={editPicker.srcUrl}
-                  crop={editPicker.crop}
-                  imgRef={editPicker.imgRef}
-                  onImageLoad={editPicker.onImageLoad}
-                  onCropChange={editPicker.setCrop}
-                  onCropComplete={editPicker.setCompletedCrop}
-                  onCropSave={editPicker.handleCropComplete}
-                  onCropCancel={editPicker.cancelCrop}
+                  previewUrl={editPreviewUrl}
+                  isVideo={editIsVideo}
+                  isGif={editIsGif}
+                  onTriggerCrop={handleEditTriggerCrop}
+                  onRemove={handleEditRemoveImage}
+                  isCropping={editIsCropping}
+                  srcUrl={editSrcUrl}
+                  crop={editCrop}
+                  imgRef={editImgRef}
+                  onImageLoad={onEditImageLoad}
+                  onCropChange={setEditCrop}
+                  onCropComplete={setEditCompletedCrop}
+                  onCropSave={handleEditCropComplete}
+                  onCropCancel={cancelEditCrop}
                 />
               )}
             </div>
           ) : (
             <>
-              <p className="mt-1 app-text text-[15px] whitespace-pre-wrap wrap-break-word">{displayContent}</p>
+              <p className="mt-1 app-text text-[15px] whitespace-pre-wrap wrap-break-word">
+                {renderContentWithClickableTags(displayContent)}
+              </p>
               {isTruncatable && (
                 <button
                   onClick={() => setExpanded(!expanded)}
@@ -268,42 +345,42 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
                 />
                 <div
                   className="text-brand cursor-pointer hover:opacity-80 p-1 rounded-full hover:bg-brand/10 transition-colors"
-                  onClick={replyPicker.handleIconClick}
+                  onClick={handleReplyIconClick}
                 >
                   <ImageIcon size={20} />
                   <input
                     type="file"
-                    ref={replyPicker.fileInputRef}
-                    onChange={replyPicker.handleFileChange}
+                    ref={replyFileInputRef}
+                    onChange={handleReplyFileChange}
                     accept="image/png, image/jpeg, image/webp, image/gif, video/mp4, video/webm"
                     className="hidden"
                   />
                 </div>
                 <button
                   onClick={submitReply}
-                  disabled={!replyText.trim() && !replyPicker.selectedFile}
+                  disabled={!replyText.trim() && !replySelectedFile}
                   className="bg-brand text-white px-4 py-1 rounded-full text-sm font-bold disabled:opacity-50"
                 >
                   {t('post_card.reply_button')}
                 </button>
               </div>
 
-              {replyPicker.previewUrl && replyPicker.selectedFile && (
+              {replyPreviewUrl && replySelectedFile && (
                 <MediaPreview
-                  previewUrl={replyPicker.previewUrl}
-                  isVideo={replyPicker.isVideo}
-                  isGif={replyPicker.isGif}
-                  onTriggerCrop={replyPicker.handleTriggerCrop}
-                  onRemove={replyPicker.handleRemoveImage}
-                  isCropping={replyPicker.isCropping}
-                  srcUrl={replyPicker.srcUrl}
-                  crop={replyPicker.crop}
-                  imgRef={replyPicker.imgRef}
-                  onImageLoad={replyPicker.onImageLoad}
-                  onCropChange={replyPicker.setCrop}
-                  onCropComplete={replyPicker.setCompletedCrop}
-                  onCropSave={replyPicker.handleCropComplete}
-                  onCropCancel={replyPicker.cancelCrop}
+                  previewUrl={replyPreviewUrl}
+                  isVideo={replyIsVideo}
+                  isGif={replyIsGif}
+                  onTriggerCrop={handleReplyTriggerCrop}
+                  onRemove={handleReplyRemoveImage}
+                  isCropping={replyIsCropping}
+                  srcUrl={replySrcUrl}
+                  crop={replyCrop}
+                  imgRef={replyImgRef}
+                  onImageLoad={onReplyImageLoad}
+                  onCropChange={setReplyCrop}
+                  onCropComplete={setReplyCompletedCrop}
+                  onCropSave={handleReplyCropComplete}
+                  onCropCancel={cancelReplyCrop}
                 />
               )}
             </div>
