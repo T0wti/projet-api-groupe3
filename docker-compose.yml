@@ -120,11 +120,7 @@ services:
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
       - JWT_EXPIRES_IN=15m
       - JWT_REFRESH_EXPIRES_IN=7d
-      - USER_SERVICE_URL=http://user-service:3001
-      - PROFILE_SERVICE_URL=http://profile-service:3004
       - API_GATEWAY_URL=http://api-gateway:8080
-      - USER_SERVICE_URL=http://user-service:3001
-      - PROFILE_SERVICE_URL=http://profile-service:3004
     depends_on:
       auth-db:
         condition: service_healthy
