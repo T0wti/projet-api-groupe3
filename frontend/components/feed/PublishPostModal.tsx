@@ -12,6 +12,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useMediaPicker } from '@/hooks/useMediaPicker';
 import { createPost } from '@/lib/api/posts';
 import { uploadMedia } from '@/lib/api/media';
+import { toastSuccess } from '@/lib/utils/alerts';
 import type { BackendPost } from '@/types/post';
 
 type TriggerVariant = 'sidebar' | 'mobile';
@@ -83,6 +84,7 @@ export default function PublishPostModal({ triggerVariant }: PublishPostModalPro
       const newPost = await createPost(content, tags.length > 0 ? tags : undefined, uploadedImageUrl);
       window.dispatchEvent(new CustomEvent('breezy:post-created', { detail: newPost }));
       closeModal();
+      toastSuccess(t('compose_post.success'));
     } catch (caughtError: unknown) {
       const message = caughtError instanceof AxiosError
         && typeof caughtError.response?.data === 'object'

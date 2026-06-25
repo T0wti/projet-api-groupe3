@@ -13,6 +13,7 @@ import MediaPreview from '@/components/ui/MediaPreview';
 
 import { createPostReport } from '@/lib/api/posts';
 import { Post, ReportReason } from '@/types/post';
+import { confirmDelete, toastSuccess, toastError } from '@/lib/utils/alerts';
 
 const REPORT_REASONS: ReportReason[] = ['spam', 'harassment', 'hate_speech', 'violence', 'nudity', 'misinformation', 'other'];
 
@@ -143,7 +144,12 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
 
   const handleSaveEdit = async () => {
     if (!onEdit || !editContent.trim()) return;
-    await onEdit(post.id, editContent.trim(), editSelectedFile);
+    try {
+      await onEdit(post.id, editContent.trim(), editSelectedFile);
+      toastSuccess(t('post_card.edit_success'));
+    } catch {
+      toastError(t('post_card.edit_error'));
+    }
     setIsEditing(false);
     resetEditPicker();
   };
@@ -185,7 +191,13 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
     ...(showAuthorMenu
       ? [
         ...(onEdit ? [{ label: t('post_card.edit'), onClick: () => { setIsEditing(true); setEditContent(post.content); } }] : []),
-        ...(onDelete ? [{ label: t('post_card.delete'), onClick: () => { if (window.confirm(t('post_card.delete_confirm'))) onDelete(post.id); }, danger: true }] : []),
+        ...(onDelete ? [{ label: t('post_card.delete'), onClick: async () => {
+          const ok = await confirmDelete({ title: t('post_card.delete_confirm'), confirmText: t('post_card.delete'), cancelText: t('compose_post.cancel') });
+          if (ok) {
+            try { await onDelete(post.id); toastSuccess(t('post_card.delete_success')); }
+            catch { toastError(t('post_card.delete_error')); }
+          }
+        }, danger: true }] : []),
       ]
       : []),
     ...(canReport ? [{ label: t('post_card.report'), onClick: openReportDialog, danger: true }] : []),

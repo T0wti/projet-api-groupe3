@@ -15,6 +15,7 @@ import { fetchFollowingById, fetchProfileById, followUser, unfollowUser, updateP
 import { uploadMedia, deleteMedia, ALLOWED_AVATAR_TYPES, MAX_UPLOAD_SIZE_BYTES } from '@/lib/api/media';
 import { fetchPublicUserById, fetchPublicUserByUsername } from '@/lib/api/users';
 import { enrichAuthors } from '@/lib/utils/enrichAuthors';
+import { toastSuccess, toastError, confirmDelete } from '@/lib/utils/alerts';
 import { Post, Reply, BackendComment, BackendPost, mapBackendComment, mapBackendPost } from '@/types/post';
 import { User } from '@/types/user';
 
@@ -186,29 +187,52 @@ export default function ProfilePage() {
     if (newImage) {
       const { url } = await uploadMedia(newImage);
       const isVideo = /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(url);
-      mediaParam = {
-        type: isVideo ? 'video' : 'image',
-        url: url
-      };
+      mediaParam = { type: isVideo ? 'video' : 'image', url };
     }
-    const bp = await updatePost(postId, newContent, tags.length > 0 ? tags : [], mediaParam);
-    setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, content: bp.content, tags: bp.tags, imageUrl: bp.media?.url || undefined } : p));
+    try {
+      const bp = await updatePost(postId, newContent, tags.length > 0 ? tags : [], mediaParam);
+      setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, content: bp.content, tags: bp.tags, imageUrl: bp.media?.url || undefined } : p));
+      toastSuccess(t('post_card.edit_success'));
+    } catch {
+      toastError(t('post_card.edit_error'));
+    }
   };
 
   const handleDeletePost = async (postId: string) => {
-    await deletePost(postId);
-    setPosts((prev) => prev.filter((p) => p.id !== postId));
+    try {
+      await deletePost(postId);
+      setPosts((prev) => prev.filter((p) => p.id !== postId));
+      toastSuccess(t('post_card.delete_success'));
+    } catch {
+      toastError(t('post_card.delete_error'));
+    }
   };
 
   const handleEditComment = async (commentId: string, newContent: string) => {
-    await updateComment(commentId, newContent);
-    setUserComments((prev) => prev.map((c) => c._id === commentId ? { ...c, content: newContent } : c));
-    setEditingCommentId(null);
+    try {
+      await updateComment(commentId, newContent);
+      setUserComments((prev) => prev.map((c) => c._id === commentId ? { ...c, content: newContent } : c));
+      setEditingCommentId(null);
+      toastSuccess(t('post_card.edit_success'));
+    } catch {
+      toastError(t('post_card.edit_error'));
+    }
   };
 
   const handleDeleteComment = async (commentId: string) => {
-    await deleteComment(commentId);
-    setUserComments((prev) => prev.filter((c) => c._id !== commentId));
+    const ok = await confirmDelete({
+      title: t('post_card.delete_confirm'),
+      confirmText: t('post_card.delete'),
+      cancelText: t('compose_post.cancel'),
+    });
+    if (!ok) return;
+    try {
+      await deleteComment(commentId);
+      setUserComments((prev) => prev.filter((c) => c._id !== commentId));
+      toastSuccess(t('post_card.delete_success'));
+    } catch {
+      toastError(t('post_card.delete_error'));
+    }
   };
 
   const loadReplies = async (profileId: string) => {
@@ -340,8 +364,9 @@ export default function ProfilePage() {
       await updateProfile(user.id, { bio: bioInput });
       setProfileUser((prev) => (prev ? { ...prev, bio: bioInput } : prev));
       setIsEditingBio(false);
+      toastSuccess(t('post_card.edit_success'));
     } catch {
-      // Save failed silently — user can retry
+      toastError(t('post_card.edit_error'));
     } finally {
       setIsSavingBio(false);
     }
@@ -377,6 +402,7 @@ export default function ProfilePage() {
       await updateProfile(user.id, { avatar_url: url });
       setProfileUser((prev) => (prev ? { ...prev, avatarUrl: url } : prev));
       updateUser({ avatarUrl: url });
+      toastSuccess(t('profile:avatar.change'));
     } catch (err: unknown) {
       console.error('[Avatar upload]', err);
       let msg = t('profile:avatar.error_upload');
@@ -404,6 +430,7 @@ export default function ProfilePage() {
     setProfileUser((prev) => (prev ? { ...prev, name: username, username } : prev));
     updateUser({ username, email });
     setIsEditAccountModalOpen(false);
+    toastSuccess(t('profile:account_modal.success'));
 
     if (passwordChanged) {
       await logout();
