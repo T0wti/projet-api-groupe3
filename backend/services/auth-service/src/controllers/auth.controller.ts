@@ -139,6 +139,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   }
 
   const expiresAt = new Date();
+  // Must stay in sync with JWT_REFRESH_EXPIRES_IN (7d) — DB expiry gates rotation even if the JWT is still valid
   expiresAt.setDate(expiresAt.getDate() + 7);
   await prisma.refreshToken.create({ data: { userId, token: refreshToken, expiresAt } });
 
@@ -241,6 +242,7 @@ export const refresh = async (req: Request, res: Response): Promise<void> => {
     throw new AppError(401, 'Invalid refresh token');
   }
 
+  // Minimal token to query user-service for current role/status before issuing a new access token
   const { accessToken: probeToken } = generateTokens(decoded.user_id, user.email, 'user');
 
   const userInfoRes = await fetch(`${API_GATEWAY_URL}/api/users/${decoded.user_id}`, {
@@ -331,7 +333,7 @@ export const changePassword = async (req: Request, res: Response): Promise<void>
   const newPasswordHash = await bcrypt.hash(newPassword, 10);
   await prisma.authUser.update({ where: { userId }, data: { passwordHash: newPasswordHash } });
 
-  // Disconnect all the existent session
+  // Invalidate all sessions — forces re-login on every device
   await prisma.refreshToken.deleteMany({ where: { userId } });
   clearAuthCookies(res);
 

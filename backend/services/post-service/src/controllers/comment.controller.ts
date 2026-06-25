@@ -147,6 +147,7 @@ export const deleteComment = async (req: Request, res: Response) => {
     }
 
     await Comment.findByIdAndDelete(id);
+    // Cascade: remove child replies so they don't become orphans
     await Comment.deleteMany({ parent_comment_id: id });
     await CommentTag.deleteMany({ comment_id: id });
     await Post.findByIdAndUpdate(comment.post_id, { $inc: { commentsCount: -1 } });
@@ -155,6 +156,7 @@ export const deleteComment = async (req: Request, res: Response) => {
       await Comment.findByIdAndUpdate(comment.parent_comment_id, { $inc: { commentsCount: -1 } });
     }
 
+    // Fire-and-forget: media cleanup must not block the 200 response
     if (comment.media?.object_name) {
       const authHeader = req.headers.authorization;
       fetch(`${API_GATEWAY_URL}/api/media/${comment.media.object_name}`, {

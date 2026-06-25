@@ -214,6 +214,7 @@ export const deletePost = async (req: Request, res: Response) => {
   await Post.findByIdAndDelete(id);
   await Tag.deleteMany({ post_id: id });
 
+  // Fire-and-forget: media cleanup must not block the 200 response
   if (postToDelete.media?.object_name) {
     const authHeader = req.headers.authorization;
     fetch(`${API_GATEWAY_URL}/api/media/${postToDelete.media.object_name}`, {
