@@ -40,7 +40,8 @@
     "publishing": "جارٍ النشر...",
     "publish_error": "ما قدرناش ننشرو المنشور.",
     "characters_left_one": "باقي {{count}} حرف",
-    "characters_left_other": "باقي {{count}} حروف"
+    "characters_left_other": "باقي {{count}} حروف",
+    "success": "تم نشر المنشور!"
   },
   "post_card": {
     "reply_placeholder": "رجع على هاد المنشور...",
@@ -59,6 +60,10 @@
     "save": "حفظ",
     "cancel_edit": "إلغاء",
     "delete_confirm": "واش راك متأكد بلي تحب تحذف هاد المنشور؟",
+    "edit_success": "تم التحديث بنجاح.",
+    "edit_error": "فشل التحديث.",
+    "delete_success": "تم الحذف بنجاح.",
+    "delete_error": "فشل الحذف.",
     "no_comments": "ما كانش تعليقات بعد.",
     "report_reasons": {
       "spam": "البريد العشوائي",

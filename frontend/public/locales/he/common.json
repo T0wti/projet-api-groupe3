@@ -40,7 +40,8 @@
     "publishing": "מפרסם...",
     "publish_error": "לא ניתן לפרסם את הפוסט.",
     "characters_left_one": "נותר תו אחד",
-    "characters_left_other": "נותרו {{count}} תווים"
+    "characters_left_other": "נותרו {{count}} תווים",
+    "success": "הפוסט פורסם!"
   },
   "post_card": {
     "reply_placeholder": "הגב לפוסט זה...",
@@ -59,6 +60,10 @@
     "save": "שמור",
     "cancel_edit": "בטל",
     "delete_confirm": "האם אתה בטוח שברצונך למחוק פוסט זה?",
+    "edit_success": "עודכן בהצלחה.",
+    "edit_error": "העדכון נכשל.",
+    "delete_success": "נמחק בהצלחה.",
+    "delete_error": "המחיקה נכשלה.",
     "no_comments": "אין תגובות עדיין.",
     "report_reasons": {
       "spam": "דואר זבל",

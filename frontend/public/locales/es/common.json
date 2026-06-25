@@ -41,7 +41,8 @@
     "publishing": "Publicando...",
     "publish_error": "No se pudo publicar la publicación.",
     "characters_left_one": "{{count}} carácter restante",
-    "characters_left_other": "{{count}} caracteres restantes"
+    "characters_left_other": "{{count}} caracteres restantes",
+    "success": "¡Publicación creada!"
   },
   "post_card": {
     "reply_placeholder": "Responder a esta publicación...",
@@ -60,6 +61,10 @@
     "save": "Guardar",
     "cancel_edit": "Cancelar",
     "delete_confirm": "¿Estás seguro de que quieres eliminar esta publicación?",
+    "edit_success": "Actualizado correctamente.",
+    "edit_error": "Error al actualizar.",
+    "delete_success": "Eliminado correctamente.",
+    "delete_error": "Error al eliminar.",
     "no_comments": "Aún no hay comentarios.",
     "report_reasons": {
       "spam": "Spam",

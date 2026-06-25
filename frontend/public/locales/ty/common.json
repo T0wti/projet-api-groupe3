@@ -41,7 +41,8 @@
     "publishing": "Te fa'aterehia nei...",
     "publish_error": "Aita i manuia te nene'iraa o te parau.",
     "characters_left_one": "{{count}} reta toe",
-    "characters_left_other": "{{count}} mau reta toe"
+    "characters_left_other": "{{count}} mau reta toe",
+    "success": "Ua piha'ihohia te parau!"
   },
   "post_card": {
     "reply_placeholder": "Pāhono i teie parau...",
@@ -60,6 +61,10 @@
     "save": "Fa'atāpura'a",
     "cancel_edit": "Ha'uti",
     "delete_confirm": "E nehenehe anei oe e horo'a i teie tātā'ura'a?",
+    "edit_success": "Ua fa'ahou maitai.",
+    "edit_error": "Aita i manuia te fa'ahoura'a.",
+    "delete_success": "Ua horo'a maitai.",
+    "delete_error": "Aita i manuia te horo'ara'a.",
     "no_comments": "Aore pāhono.",
     "report_reasons": {
       "spam": "Spam",

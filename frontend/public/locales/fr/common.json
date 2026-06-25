@@ -41,7 +41,8 @@
     "publishing": "Publication...",
     "publish_error": "Impossible de publier le post.",
     "characters_left_one": "{{count}} caractere restant",
-    "characters_left_other": "{{count}} caracteres restants"
+    "characters_left_other": "{{count}} caracteres restants",
+    "success": "Post publié !"
   },
   "post_card": {
     "reply_placeholder": "Répondre à ce post...",
@@ -60,6 +61,10 @@
     "save": "Enregistrer",
     "cancel_edit": "Annuler",
     "delete_confirm": "Êtes-vous sûr de vouloir supprimer ce post ?",
+    "edit_success": "Mis à jour avec succès.",
+    "edit_error": "Échec de la mise à jour.",
+    "delete_success": "Supprimé avec succès.",
+    "delete_error": "Échec de la suppression.",
     "no_comments": "Aucun commentaire pour l'instant.",
     "report_reasons": {
       "spam": "Spam",
