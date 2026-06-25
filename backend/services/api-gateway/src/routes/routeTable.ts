@@ -25,10 +25,10 @@ export const routeTable: RouteRule[] = [
 
 
   // Users
+  { method: 'get', path: '/api/users/search', target: 'user', auth: 'required' },
   { method: 'get', path: '/api/users/username/:username/public', target: 'user', auth: 'required' },
   { method: 'get', path: '/api/users/:id/public', target: 'user', auth: 'required' },
   { method: 'get', path: '/api/users/:id', target: 'user', auth: 'required' },
-  { method: 'get', path: '/api/users/search', target: 'user', auth: 'required' },
   { method: 'put', path: '/api/users/:id', target: 'user', auth: 'required', selfParam: 'id', bypassRoles: ['admin'] },
   { method: 'delete', path: '/api/users/:id', target: 'user', auth: 'required', selfParam: 'id', bypassRoles: ['admin'] },
   { method: 'patch', path: '/api/users/:id/role', target: 'user', auth: 'required', roles: ['admin'] },
@@ -40,6 +40,7 @@ export const routeTable: RouteRule[] = [
   
   // Posts
   { method: 'post', path: '/api/posts', target: 'post', auth: 'required' },
+  { method: 'get', path: '/api/posts/trending-tags', target: 'post', auth: 'required' },
   { method: 'get', path: '/api/posts/tags/:tag', target: 'post', auth: 'required' },
   { method: 'get', path: '/api/posts', target: 'post', auth: 'required' },
   { method: 'get', path: '/api/posts/feed', target: 'post', auth: 'required' },
@@ -86,6 +87,7 @@ export const routeTable: RouteRule[] = [
   { method: 'post', path: '/api/profile/unfollow', target: 'profile', auth: 'required' },
   { method: 'delete', path: '/api/profile/follow', target: 'profile', auth: 'required' },
 
+  { method: 'get', path: '/api/profile/suggestions', target: 'profile', auth: 'required' },
   { method: 'get', path: '/api/profile/:userId/followers', target: 'profile', auth: 'required' },
   { method: 'get', path: '/api/profile/:userId/following', target: 'profile', auth: 'required' },
 

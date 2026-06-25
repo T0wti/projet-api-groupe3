@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface AvatarProps {
   src?: string | null;
@@ -18,12 +18,11 @@ const sizeClasses = {
 };
 
 export default function Avatar({ src, alt, size = 'md' }: AvatarProps) {
-  const resolvedSrc = src || DEFAULT_AVATAR;
-  const [imgSrc, setImgSrc] = useState(resolvedSrc);
+  const [imgSrc, setImgSrc] = useState(src || DEFAULT_AVATAR);
 
-  if (imgSrc !== resolvedSrc && imgSrc !== DEFAULT_AVATAR) {
-    setImgSrc(resolvedSrc);
-  }
+  useEffect(() => {
+    setImgSrc(src || DEFAULT_AVATAR);
+  }, [src]);
 
   return (
     <img

@@ -22,7 +22,8 @@
     "search_placeholder": "Buscar",
     "who_to_follow": {
       "title": "A quién seguir",
-      "empty_message": "Las cuentas recomendadas aparecerán aquí."
+      "empty_message": "Las cuentas recomendadas aparecerán aquí.",
+      "follow_button": "Seguir"
     },
     "trending": {
       "title": "Tendencias"

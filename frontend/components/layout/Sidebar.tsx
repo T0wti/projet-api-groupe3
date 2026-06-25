@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
-import { Home, Search, Bell, Mail, User, MoreHorizontal, LogOut, Wind, Shield, Settings } from 'lucide-react';
+import { Home, Search, User, MoreHorizontal, LogOut, Wind, Shield, Settings } from 'lucide-react';
 import Avatar from '@/components/ui/Avatar';
 import PublishPostModal from '../feed/PublishPostModal';
 import { useAuth } from '@/context/AuthContext';
@@ -10,8 +10,6 @@ import { useAuth } from '@/context/AuthContext';
 const NAV_ITEMS = [
   { key: 'home',          icon: Home,          href: '/' },
   { key: 'explore',       icon: Search,        href: '/explore' },
-  { key: 'notifications', icon: Bell,          href: '#' },
-  { key: 'messages',      icon: Mail,          href: '#' },
   { key: 'profile',       icon: User,          href: '#' },
   { key: 'preferences',   icon: Settings,      href: '/preferences' },
   { key: 'more',          icon: MoreHorizontal,href: '#' },

@@ -26,6 +26,7 @@ mongoose.connect(MONGO_URI)
 app.get('/healthz', (_req, res) => res.status(200).json({ status: 'ok' }));
 app.use('/api/profile', profileRoutes);
 app.use('/api/profile', followsRoutes);
+app.use('/api/profile', profileRoutes);
 
 app.use(errorHandler); 
 

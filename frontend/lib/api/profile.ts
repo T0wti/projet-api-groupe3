@@ -30,6 +30,11 @@ export async function unfollowUser(followerId: string, followingId: string): Pro
   });
 }
 
+export async function fetchSuggestedAccounts(userId: string): Promise<{ user_id: string; followers_count: number }[]> {
+  const res = await api.get<{ user_id: string; followers_count: number }[]>('/profile/suggestions', { params: { userId } });
+  return res.data;
+}
+
 export async function updateProfile(userId: string, data: { bio?: string; avatar_url?: string }): Promise<BackendProfile> {
   const res = await api.put<BackendProfile>(`/profile/${userId}`, data);
   return res.data;
