@@ -21,6 +21,7 @@ export default function ContextMenu({ actions, ariaLabel }: ContextMenuProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Only attach when open — avoids a permanent document-level listener
     if (!isOpen) return;
     const handleClickOutside = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
