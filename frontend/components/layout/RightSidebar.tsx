@@ -7,7 +7,7 @@ import { Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
 import { fetchTrendingTags } from '@/lib/api/posts';
-import { fetchSuggestedAccounts, followUser } from '@/lib/api/profile';
+import { fetchSuggestedAccounts, fetchProfileById, followUser } from '@/lib/api/profile';
 import { fetchPublicUserById } from '@/lib/api/users';
 import Avatar from '@/components/ui/Avatar';
 
@@ -37,11 +37,14 @@ export default function RightSidebar() {
       .then(async (raw) => {
         const enriched = await Promise.allSettled(
           raw.map(async (s) => {
-            const pub = await fetchPublicUserById(s.user_id);
+            const [pub, profile] = await Promise.all([
+              fetchPublicUserById(s.user_id),
+              fetchProfileById(s.user_id).catch(() => null),
+            ]);
             return {
               userId: s.user_id,
               username: pub.username,
-              avatarUrl: pub.avatarUrl ?? null,
+              avatarUrl: profile?.avatar_url ?? pub.avatarUrl ?? null,
               followersCount: s.followers_count,
             };
           })

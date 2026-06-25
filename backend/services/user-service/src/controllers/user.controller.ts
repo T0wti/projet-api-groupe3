@@ -90,6 +90,7 @@ export const getPublicUserSummary = async (req: Request<{ id: string }>, res: Re
       select: {
         id: true,
         username: true,
+        avatarUrl: true,
       },
     });
 
