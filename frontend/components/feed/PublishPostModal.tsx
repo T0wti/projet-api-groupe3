@@ -7,8 +7,11 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import Avatar from '../ui/Avatar';
 import Button from '../ui/Button';
+import MediaPreview from '../ui/MediaPreview';
 import { useAuth } from '../../context/AuthContext';
+import { uploadMedia } from '../../lib/api/media';
 import { createPost } from '../../lib/api/posts';
+import { useMediaPicker } from '../../src/hooks/useMediaPicker';
 import type { BackendPost } from '../../types/post';
 
 type TriggerVariant = 'sidebar' | 'mobile';
@@ -31,17 +34,39 @@ export default function PublishPostModal({ triggerVariant }: PublishPostModalPro
   const [isPosting, setIsPosting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const remainingCharacters = 280 - content.length;
+  const {
+    selectedFile,
+    previewUrl,
+    isCropping,
+    srcUrl,
+    crop,
+    isVideo,
+    isGif,
+    fileInputRef,
+    imgRef,
+    handleIconClick,
+    handleFileChange,
+    handleTriggerCrop,
+    onImageLoad,
+    handleCropComplete,
+    handleRemoveImage,
+    cancelCrop,
+    setCrop,
+    setCompletedCrop,
+    reset,
+  } = useMediaPicker();
 
   const closeModal = () => {
     if (isPosting) return;
     setIsOpen(false);
     setContent('');
     setError(null);
+    reset();
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!user || content.trim().length === 0 || isPosting) {
+    if (!user || (content.trim().length === 0 && !selectedFile) || isPosting) {
       return;
     }
 
@@ -50,7 +75,14 @@ export default function PublishPostModal({ triggerVariant }: PublishPostModalPro
 
     try {
       const tags = [...new Set([...content.matchAll(/\B#(\w+)/g)].map((match) => match[1].toLowerCase()))];
-      const newPost = await createPost(content, tags.length > 0 ? tags : undefined);
+      let uploadedImageUrl: string | null = null;
+
+      if (selectedFile) {
+        const { url } = await uploadMedia(selectedFile);
+        uploadedImageUrl = url;
+      }
+
+      const newPost = await createPost(content, tags.length > 0 ? tags : undefined, uploadedImageUrl);
       window.dispatchEvent(new CustomEvent('breezy:post-created', { detail: newPost }));
       closeModal();
     } catch (caughtError: unknown) {
@@ -122,9 +154,45 @@ export default function PublishPostModal({ triggerVariant }: PublishPostModalPro
                     autoFocus
                   />
 
+                  {previewUrl && selectedFile && (
+                    <div className="mt-4">
+                      <MediaPreview
+                        previewUrl={previewUrl}
+                        isVideo={isVideo}
+                        isGif={isGif}
+                        onTriggerCrop={handleTriggerCrop}
+                        onRemove={handleRemoveImage}
+                        isCropping={isCropping}
+                        srcUrl={srcUrl}
+                        crop={crop}
+                        imgRef={imgRef}
+                        onImageLoad={onImageLoad}
+                        onCropChange={setCrop}
+                        onCropComplete={setCompletedCrop}
+                        onCropSave={handleCropComplete}
+                        onCropCancel={cancelCrop}
+                      />
+                    </div>
+                  )}
+
                   <div className="mt-4 flex items-center justify-between gap-4 rounded-[1.5rem] border app-border-subtle app-surface-muted px-4 py-3">
                     <div className="flex items-center gap-3 text-sm app-text-muted">
-                      <ImageIcon size={18} className="text-brand" />
+                      <button
+                        type="button"
+                        onClick={handleIconClick}
+                        disabled={isPosting}
+                        className="rounded-full p-1 text-brand transition-colors hover:bg-brand/10 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
+                        aria-label={t('compose_post.submit_button')}
+                      >
+                        <ImageIcon size={18} className="text-brand" />
+                      </button>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        accept="image/png, image/jpeg, image/webp, image/gif, video/mp4, video/webm"
+                        className="hidden"
+                      />
                       <span>
                         {t(
                           remainingCharacters === 1
@@ -139,7 +207,7 @@ export default function PublishPostModal({ triggerVariant }: PublishPostModalPro
                       <Button type="button" variant="ghost" onClick={closeModal} disabled={isPosting}>
                         {t('compose_post.cancel')}
                       </Button>
-                      <Button type="submit" disabled={content.trim().length === 0 || isPosting}>
+                      <Button type="submit" disabled={(content.trim().length === 0 && !selectedFile) || isPosting}>
                         {isPosting ? t('compose_post.publishing') : t('compose_post.submit_button')}
                       </Button>
                     </div>
