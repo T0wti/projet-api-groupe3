@@ -22,7 +22,6 @@ export interface Post {
   commentsCount: number;
   tags?: string[];
   imageUrl?: string;
-  repostsCount: number;
   isLiked?: boolean;
   replies?: Reply[];
 }
@@ -102,7 +101,6 @@ export function mapBackendPost(
     commentsCount: bp.commentsCount,
     tags: bp.tags,
     imageUrl: bp.media?.url || undefined,
-    repostsCount: 0,
     isLiked: likedIds.has(bp._id),
   };
 }
@@ -112,6 +110,7 @@ export function mapBackendComment(
   currentUser: AuthUser,
   authorMap: Map<string, string> = new Map(),
   avatarMap: Map<string, string | null | undefined> = new Map(),
+  likedIds: Set<string> = new Set(),
 ): Reply {
   const isCurrentUser = bc.user_id === currentUser.id;
   const username = isCurrentUser
@@ -126,7 +125,7 @@ export function mapBackendComment(
     parentCommentId: bc.parent_comment_id,
     likesCount: bc.likesCount ?? 0,
     commentsCount: bc.commentsCount ?? 0,
-    isLiked: false,
+    isLiked: likedIds.has(bc._id),
     imageUrl: bc.media?.url || undefined,
   };
 }
