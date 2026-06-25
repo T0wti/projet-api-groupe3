@@ -40,7 +40,8 @@
     "publishing": "Публикация...",
     "publish_error": "Не удалось опубликовать пост.",
     "characters_left_one": "Остался {{count}} символ",
-    "characters_left_other": "Осталось {{count}} символов"
+    "characters_left_other": "Осталось {{count}} символов",
+    "success": "Пост опубликован!"
   },
   "post_card": {
     "reply_placeholder": "Ответить на этот пост...",
@@ -59,6 +60,10 @@
     "save": "Сохранить",
     "cancel_edit": "Отмена",
     "delete_confirm": "Вы уверены, что хотите удалить этот пост?",
+    "edit_success": "Обновлено успешно.",
+    "edit_error": "Ошибка обновления.",
+    "delete_success": "Удалено успешно.",
+    "delete_error": "Ошибка удаления.",
     "no_comments": "Комментариев пока нет.",
     "report_reasons": {
       "spam": "Спам",

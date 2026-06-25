@@ -41,7 +41,8 @@
     "publishing": "Posting...",
     "publish_error": "Unable to publish the post.",
     "characters_left_one": "{{count}} character left",
-    "characters_left_other": "{{count}} characters left"
+    "characters_left_other": "{{count}} characters left",
+    "success": "Post published!"
   },
   "post_card": {
     "reply_placeholder": "Post your reply...",
@@ -60,6 +61,10 @@
     "save": "Save",
     "cancel_edit": "Cancel",
     "delete_confirm": "Are you sure you want to delete this post?",
+    "edit_success": "Updated successfully.",
+    "edit_error": "Failed to update.",
+    "delete_success": "Deleted successfully.",
+    "delete_error": "Failed to delete.",
     "no_comments": "No comments yet.",
     "report_reasons": {
       "spam": "Spam",
