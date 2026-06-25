@@ -15,9 +15,8 @@ import {
   unlikeComment,
   createComment,
 } from '@/lib/api/posts';
-import { fetchPublicUserById } from '@/lib/api/users';
-import { fetchProfileById } from '@/lib/api/profile';
 import { uploadMedia } from '@/lib/api/media';
+import { enrichAuthors } from '@/lib/utils/enrichAuthors';
 
 export default function CommentDetailPage() {
   const { commentId } = useParams<{ commentId: string }>();
@@ -45,47 +44,15 @@ export default function CommentDetailPage() {
 
         const likedSet = new Set(likedIds);
 
-        // Enrich focal comment author
         const focalAuthorIds = bc.user_id !== user!.id ? [bc.user_id] : [];
-        const [fuResults, fpResults] = await Promise.all([
-          Promise.allSettled(focalAuthorIds.map(fetchPublicUserById)),
-          Promise.allSettled(focalAuthorIds.map(fetchProfileById)),
-        ]);
-        const fAuthorMap = new Map<string, string>();
-        const fAvatarMap = new Map<string, string | null | undefined>();
-        fuResults.forEach((r, i) => {
-          if (r.status === 'fulfilled') fAuthorMap.set(focalAuthorIds[i], r.value.username);
-        });
-        fpResults.forEach((r, i) => {
-          if (r.status === 'fulfilled') fAvatarMap.set(focalAuthorIds[i], r.value.avatar_url ?? null);
-        });
+        const { authorMap: fAuthorMap, avatarMap: fAvatarMap } = await enrichAuthors(focalAuthorIds);
+        setComment(mapBackendComment(bc, user!, fAuthorMap, fAvatarMap, likedSet));
 
-        const mappedComment = mapBackendComment(bc, user!, fAuthorMap, fAvatarMap);
-        mappedComment.isLiked = likedSet.has(bc._id);
-        setComment(mappedComment);
-
-        // Enrich reply authors
         const replyAuthorIds = [...new Set(
           backendReplies.map(r => r.user_id).filter(id => id !== user!.id)
         )];
-        const [ruResults, rpResults] = await Promise.all([
-          Promise.allSettled(replyAuthorIds.map(fetchPublicUserById)),
-          Promise.allSettled(replyAuthorIds.map(fetchProfileById)),
-        ]);
-        const rAuthorMap = new Map<string, string>();
-        const rAvatarMap = new Map<string, string | null | undefined>();
-        ruResults.forEach((r, i) => {
-          if (r.status === 'fulfilled') rAuthorMap.set(replyAuthorIds[i], r.value.username);
-        });
-        rpResults.forEach((r, i) => {
-          if (r.status === 'fulfilled') rAvatarMap.set(replyAuthorIds[i], r.value.avatar_url ?? null);
-        });
-
-        setReplies(backendReplies.map(r => {
-          const mapped = mapBackendComment(r, user!, rAuthorMap, rAvatarMap);
-          mapped.isLiked = likedSet.has(r._id);
-          return mapped;
-        }));
+        const { authorMap: rAuthorMap, avatarMap: rAvatarMap } = await enrichAuthors(replyAuthorIds);
+        setReplies(backendReplies.map(r => mapBackendComment(r, user!, rAuthorMap, rAvatarMap, likedSet)));
       } catch {
         setError(t('comment_detail.load_error'));
       } finally {

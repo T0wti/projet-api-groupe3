@@ -99,7 +99,7 @@ export default function RightSidebar() {
                 </Link>
                 <Link href={`/profile/${s.username}`} className="flex-1 min-w-0">
                   <p className="font-medium text-sm truncate">{s.username}</p>
-                  <p className="text-xs app-text-muted">{s.followersCount} followers</p>
+                  <p className="text-xs app-text-muted">{t('right_sidebar.who_to_follow.followers_count', { count: s.followersCount })}</p>
                 </Link>
                 <button
                   onClick={() => handleFollow(s.userId)}
@@ -117,7 +117,7 @@ export default function RightSidebar() {
       <div className="card">
         <h2 className="font-bold text-lg mb-4">{t('right_sidebar.trending.title')}</h2>
         {trendingTags.length === 0 ? (
-          <p className="text-sm app-text-muted">No trending tags yet.</p>
+          <p className="text-sm app-text-muted">{t('right_sidebar.trending.empty_message')}</p>
         ) : (
           <ul className="space-y-2">
             {trendingTags.map(({ tag }) => (

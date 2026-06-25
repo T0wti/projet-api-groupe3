@@ -7,7 +7,7 @@ import { MessageCircle, Heart, ImageIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Avatar from '@/components/ui/Avatar';
 import { Reply } from '@/types/post';
-import { useMediaPicker } from '@/src/hooks/useMediaPicker';
+import { useMediaPicker } from '@/hooks/useMediaPicker';
 import MediaPreview from '@/components/ui/MediaPreview';
 
 interface CommentCardProps {
@@ -98,7 +98,7 @@ export default function CommentCard({ comment, onLike, onUnlike, onReply, disabl
           <p className="mt-1 app-text text-[15px] whitespace-pre-wrap wrap-break-word">{comment.content}</p>
 
           {comment.imageUrl && (
-            <div className="mt-3 w-full overflow-hidden border border-gray-100 rounded-2xl flex justify-center items-center">
+            <div className="mt-3 w-full overflow-hidden border app-border rounded-2xl flex justify-center items-center">
               {isVideoUrl ? (
                 <video
                   src={comment.imageUrl}

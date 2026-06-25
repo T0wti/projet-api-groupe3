@@ -32,6 +32,10 @@
     "save": "Fa'a'ite",
     "cancel": "Fa'a'ore"
   },
+  "bio": {
+    "no_bio": "Aore ra'a parau.",
+    "edit": "Fa'ahou ra'a parau"
+  },
   "avatar": {
     "uploading": "Fa'ahou...",
     "change": "Huri",

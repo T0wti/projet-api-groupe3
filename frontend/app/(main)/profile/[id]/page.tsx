@@ -14,6 +14,7 @@ import { createComment, fetchPosts, fetchPostsByIds, fetchUserLikedPostIds, like
 import { fetchFollowingById, fetchProfileById, followUser, unfollowUser, updateProfile } from '@/lib/api/profile';
 import { uploadMedia, deleteMedia, ALLOWED_AVATAR_TYPES, MAX_UPLOAD_SIZE_BYTES } from '@/lib/api/media';
 import { fetchPublicUserById, fetchPublicUserByUsername } from '@/lib/api/users';
+import { enrichAuthors } from '@/lib/utils/enrichAuthors';
 import { Post, Reply, BackendComment, BackendPost, mapBackendComment, mapBackendPost } from '@/types/post';
 import { User } from '@/types/user';
 
@@ -238,24 +239,13 @@ export default function ProfilePage() {
       const backendPosts = await fetchPostsByIds(likedIds);
 
       const uniqueAuthorIds = [...new Set(backendPosts.map(p => p.authorId))];
-      const [userResults, profileResults] = await Promise.all([
-        Promise.allSettled(uniqueAuthorIds.map(fetchPublicUserById)),
-        Promise.allSettled(uniqueAuthorIds.map(fetchProfileById)),
-      ]);
-
-      const authorMap = new Map<string, string>();
-      const avatarMap = new Map<string, string>();
-      uniqueAuthorIds.forEach((id, i) => {
-        if (userResults[i].status === 'fulfilled') authorMap.set(id, userResults[i].value.username);
-        if (profileResults[i].status === 'fulfilled') avatarMap.set(id, profileResults[i].value.avatar_url ?? '');
-      });
+      const { authorMap, avatarMap } = await enrichAuthors(uniqueAuthorIds);
 
       const likedSet = new Set(likedIds);
       const mapped = backendPosts.map(bp => {
         const username = authorMap.get(bp.authorId) ?? bp.authorId;
-        const avatarUrl = avatarMap.get(bp.authorId) ?? '';
-        const post = mapBackendPost(bp, likedSet, user!, authorMap);
-        return { ...post, author: { id: bp.authorId, name: username, username, avatarUrl } };
+        const avatarUrl = avatarMap.get(bp.authorId) ?? null;
+        return { ...mapBackendPost(bp, likedSet, user!, authorMap, avatarMap), author: { id: bp.authorId, name: username, username, avatarUrl } };
       });
 
       setLikedPosts(mapped);
@@ -486,7 +476,7 @@ export default function ProfilePage() {
                   <button
                     type="button"
                     onClick={() => setIsEditAccountModalOpen(true)}
-                    className="shrink-0 self-start text-xs text-teal-600 hover:underline sm:self-end"
+                    className="shrink-0 self-start text-xs text-brand hover:underline sm:self-end"
                   >
                     {t('profile:account_modal.open')}
                   </button>
@@ -523,35 +513,35 @@ export default function ProfilePage() {
                     maxLength={160}
                     rows={3}
                     autoFocus
-                    className="w-full max-w-2xl resize-none rounded-lg border app-input p-2 text-sm outline-none focus:border-teal-500"
+                    className="w-full max-w-2xl resize-none rounded-lg border app-input p-2 text-sm outline-none focus:border-brand"
                   />
                   <div className="flex gap-2">
                     <button
                       onClick={handleSaveBio}
                       disabled={isSavingBio}
-                      className="rounded-full bg-teal-600 px-4 py-1 text-sm font-semibold text-white disabled:opacity-50"
+                      className="rounded-full bg-brand px-4 py-1 text-sm font-semibold text-white disabled:opacity-50"
                     >
-                      {isSavingBio ? '...' : t('profile.save')}
+                      {isSavingBio ? '...' : t('profile:comment.save')}
                     </button>
                     <button
                       onClick={() => { setIsEditingBio(false); setBioInput(profileUser.bio ?? ''); }}
                       className="rounded-full border app-border px-4 py-1 text-sm font-semibold app-text app-hover-surface"
                     >
-                      {t('profile.cancel')}
+                      {t('profile:comment.cancel')}
                     </button>
                   </div>
                 </div>
               ) : (
                 <div className="flex items-start gap-3">
                   <p className={`max-w-2xl whitespace-pre-wrap text-sm ${profileUser.bio ? 'app-text-muted' : 'italic app-text-soft'}`}>
-                    {profileUser.bio || t('profile.no_bio')}
+                    {profileUser.bio || t('profile:bio.no_bio')}
                   </p>
                   {isOwnProfile && (
                     <button
                       onClick={() => { setIsEditingBio(true); setBioInput(profileUser.bio ?? ''); }}
-                      className="shrink-0 text-xs text-teal-600 hover:underline"
+                      className="shrink-0 text-xs text-brand hover:underline"
                     >
-                      {t('profile.edit_bio')}
+                      {t('profile:bio.edit')}
                     </button>
                   )}
                 </div>
@@ -562,19 +552,19 @@ export default function ProfilePage() {
           <div className="flex border-b app-border">
             <button
               onClick={() => handleTabChange('posts')}
-              className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === 'posts' ? 'border-b-2 border-teal-600 text-teal-600' : 'app-text-muted hover:app-text'}`}
+              className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === 'posts' ? 'border-b-2 border-brand text-brand' : 'app-text-muted hover:app-text'}`}
             >
               {t('profile:tabs.posts')}
             </button>
             <button
               onClick={() => handleTabChange('replies')}
-              className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === 'replies' ? 'border-b-2 border-teal-600 text-teal-600' : 'app-text-muted hover:app-text'}`}
+              className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === 'replies' ? 'border-b-2 border-brand text-brand' : 'app-text-muted hover:app-text'}`}
             >
               {t('profile:tabs.posts_replies')}
             </button>
             <button
               onClick={() => handleTabChange('likes')}
-              className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === 'likes' ? 'border-b-2 border-teal-600 text-teal-600' : 'app-text-muted hover:app-text'}`}
+              className={`flex-1 py-3 text-sm font-semibold transition-colors ${activeTab === 'likes' ? 'border-b-2 border-brand text-brand' : 'app-text-muted hover:app-text'}`}
             >
               {t('profile:tabs.likes')}
             </button>
@@ -670,13 +660,13 @@ export default function ProfilePage() {
                               onChange={(e) => setEditingCommentContent(e.target.value)}
                               rows={3}
                               autoFocus
-                              className="w-full resize-none rounded-lg border app-input p-2 text-sm outline-none focus:border-teal-500"
+                              className="w-full resize-none rounded-lg border app-input p-2 text-sm outline-none focus:border-brand"
                             />
                             <div className="flex gap-2">
                               <button
                                 onClick={() => handleEditComment(comment._id, editingCommentContent)}
                                 disabled={!editingCommentContent.trim()}
-                                className="rounded-full bg-teal-600 px-4 py-1 text-sm font-semibold text-white disabled:opacity-50"
+                                className="rounded-full bg-brand px-4 py-1 text-sm font-semibold text-white disabled:opacity-50"
                               >
                                 {t('profile:comment.save')}
                               </button>

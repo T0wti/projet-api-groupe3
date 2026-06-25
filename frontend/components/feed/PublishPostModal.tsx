@@ -5,14 +5,14 @@ import { useState } from 'react';
 import { Image as ImageIcon, Plus, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import Avatar from '../ui/Avatar';
-import Button from '../ui/Button';
-import MediaPreview from '../ui/MediaPreview';
-import { useAuth } from '../../context/AuthContext';
-import { uploadMedia } from '../../lib/api/media';
-import { createPost } from '../../lib/api/posts';
-import { useMediaPicker } from '../../src/hooks/useMediaPicker';
-import type { BackendPost } from '../../types/post';
+import Avatar from '@/components/ui/Avatar';
+import Button from '@/components/ui/Button';
+import MediaPreview from '@/components/ui/MediaPreview';
+import { useAuth } from '@/context/AuthContext';
+import { useMediaPicker } from '@/hooks/useMediaPicker';
+import { createPost } from '@/lib/api/posts';
+import { uploadMedia } from '@/lib/api/media';
+import type { BackendPost } from '@/types/post';
 
 type TriggerVariant = 'sidebar' | 'mobile';
 
@@ -76,12 +76,10 @@ export default function PublishPostModal({ triggerVariant }: PublishPostModalPro
     try {
       const tags = [...new Set([...content.matchAll(/\B#(\w+)/g)].map((match) => match[1].toLowerCase()))];
       let uploadedImageUrl: string | null = null;
-
       if (selectedFile) {
         const { url } = await uploadMedia(selectedFile);
         uploadedImageUrl = url;
       }
-
       const newPost = await createPost(content, tags.length > 0 ? tags : undefined, uploadedImageUrl);
       window.dispatchEvent(new CustomEvent('breezy:post-created', { detail: newPost }));
       closeModal();
@@ -93,16 +91,12 @@ export default function PublishPostModal({ triggerVariant }: PublishPostModalPro
         ? String(caughtError.response.data.message)
         : t('compose_post.publish_error');
       setError(message);
+    } finally {
       setIsPosting(false);
-      return;
     }
-
-    setIsPosting(false);
   };
 
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
   return (
     <>
@@ -122,7 +116,7 @@ export default function PublishPostModal({ triggerVariant }: PublishPostModalPro
         </button>
       )}
 
-        {typeof document !== 'undefined' && isOpen && createPortal(
+      {typeof document !== 'undefined' && isOpen && createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center app-overlay px-4 py-8">
           <div className="w-full max-w-2xl overflow-hidden rounded-[2rem] border app-border app-surface-elevated shadow-[0_30px_80px_rgba(15,23,42,0.25)]">
             <div className="flex items-center justify-between border-b app-border px-6 py-4">
@@ -149,7 +143,7 @@ export default function PublishPostModal({ triggerVariant }: PublishPostModalPro
                     value={content}
                     onChange={(event) => setContent(event.target.value)}
                     placeholder={t('compose_post.placeholder')}
-                    className="min-h-40 w-full resize-none rounded-[1.5rem] border app-input px-5 py-4 text-base outline-none transition-colors placeholder:app-text-muted focus:border-teal-500"
+                    className="min-h-40 w-full resize-none rounded-[1.5rem] border app-input px-5 py-4 text-base outline-none transition-colors placeholder:app-text-muted focus:border-brand"
                     maxLength={280}
                     autoFocus
                   />

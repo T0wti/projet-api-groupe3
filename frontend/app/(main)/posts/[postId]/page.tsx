@@ -20,8 +20,7 @@ import {
   createComment,
 } from '@/lib/api/posts';
 import { uploadMedia } from '@/lib/api/media';
-import { fetchPublicUserById } from '@/lib/api/users';
-import { fetchProfileById } from '@/lib/api/profile';
+import { enrichAuthors } from '@/lib/utils/enrichAuthors';
 
 export default function PostDetailPage() {
   const { postId } = useParams<{ postId: string }>();
@@ -48,46 +47,19 @@ export default function PostDetailPage() {
           fetchUserLikedCommentIds(user!.id),
         ]);
 
-        // Enrich post author if not the current user
         const postAuthorIds = bp.authorId !== user!.id ? [bp.authorId] : [];
-        const [postUserResults, postProfileResults] = await Promise.all([
-          Promise.allSettled(postAuthorIds.map(fetchPublicUserById)),
-          Promise.allSettled(postAuthorIds.map(fetchProfileById)),
-        ]);
-        const authorMap = new Map<string, string>();
-        const avatarMap = new Map<string, string | null | undefined>();
-        postUserResults.forEach((r, i) => {
-          if (r.status === 'fulfilled') authorMap.set(postAuthorIds[i], r.value.username);
-        });
-        postProfileResults.forEach((r, i) => {
-          if (r.status === 'fulfilled') avatarMap.set(postAuthorIds[i], r.value.avatar_url ?? null);
-        });
-
+        const { authorMap, avatarMap } = await enrichAuthors(postAuthorIds);
         setPost(mapBackendPost(bp, new Set(likedIds), user!, authorMap, avatarMap));
 
-        // Enrich comment authors
         const commentAuthorIds = [...new Set(
           backendComments.map(c => c.user_id).filter(id => id !== user!.id)
         )];
-        const [cUserResults, cProfileResults] = await Promise.all([
-          Promise.allSettled(commentAuthorIds.map(fetchPublicUserById)),
-          Promise.allSettled(commentAuthorIds.map(fetchProfileById)),
-        ]);
-        const cAuthorMap = new Map<string, string>();
-        const cAvatarMap = new Map<string, string | null | undefined>();
-        cUserResults.forEach((r, i) => {
-          if (r.status === 'fulfilled') cAuthorMap.set(commentAuthorIds[i], r.value.username);
-        });
-        cProfileResults.forEach((r, i) => {
-          if (r.status === 'fulfilled') cAvatarMap.set(commentAuthorIds[i], r.value.avatar_url ?? null);
-        });
+        const { authorMap: cAuthorMap, avatarMap: cAvatarMap } = await enrichAuthors(commentAuthorIds);
 
         const likedCommentSet = new Set(likedCommentIds);
-        setComments(backendComments.filter(bc => !bc.parent_comment_id).map(bc => {
-          const mapped = mapBackendComment(bc, user!, cAuthorMap, cAvatarMap);
-          mapped.isLiked = likedCommentSet.has(bc._id);
-          return mapped;
-        }));
+        setComments(backendComments.filter(bc => !bc.parent_comment_id).map(bc =>
+          mapBackendComment(bc, user!, cAuthorMap, cAvatarMap, likedCommentSet)
+        ));
       } catch {
         setError(t('post_detail.load_error'));
       } finally {

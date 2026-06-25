@@ -23,10 +23,12 @@
     "who_to_follow": {
       "title": "A quién seguir",
       "empty_message": "Las cuentas recomendadas aparecerán aquí.",
-      "follow_button": "Seguir"
+      "follow_button": "Seguir",
+      "followers_count": "{{count}} seguidores"
     },
     "trending": {
-      "title": "Tendencias"
+      "title": "Tendencias",
+      "empty_message": "Aún no hay etiquetas en tendencia."
     }
   },
   "compose_post": {

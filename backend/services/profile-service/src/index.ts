@@ -2,8 +2,8 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { errorHandler } from './middlewares/errorHandler.middleware';
-import profileRoutes from './routes/profile.routes';
 import followsRoutes from './routes/follows.routes';
+import profileRoutes from './routes/profile.routes';
 
 dotenv.config();
 
@@ -24,7 +24,6 @@ mongoose.connect(MONGO_URI)
   });
 
 app.get('/healthz', (_req, res) => res.status(200).json({ status: 'ok' }));
-app.use('/api/profile', profileRoutes);
 app.use('/api/profile', followsRoutes);
 app.use('/api/profile', profileRoutes);
 

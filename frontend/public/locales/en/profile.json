@@ -33,6 +33,10 @@
     "save": "Save",
     "cancel": "Cancel"
   },
+  "bio": {
+    "no_bio": "No bio yet.",
+    "edit": "Edit bio"
+  },
   "avatar": {
     "uploading": "Uploading...",
     "change": "Change",

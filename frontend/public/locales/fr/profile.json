@@ -33,6 +33,10 @@
     "save": "Enregistrer",
     "cancel": "Annuler"
   },
+  "bio": {
+    "no_bio": "Aucune biographie pour l'instant.",
+    "edit": "Modifier la bio"
+  },
   "avatar": {
     "uploading": "Envoi...",
     "change": "Changer",

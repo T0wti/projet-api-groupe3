@@ -22,10 +22,12 @@
     "who_to_follow": {
       "title": "Кого читать",
       "empty_message": "Рекомендованные пользователи появятся здесь.",
-      "follow_button": "Подписаться"
+      "follow_button": "Подписаться",
+      "followers_count": "{{count}} подписчиков"
     },
     "trending": {
-      "title": "Актуальные темы"
+      "title": "Актуальные темы",
+      "empty_message": "Пока нет популярных тегов."
     }
   },
   "compose_post": {
