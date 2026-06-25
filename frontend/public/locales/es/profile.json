@@ -30,7 +30,8 @@
     "edit": "Editar",
     "delete": "Eliminar",
     "save": "Guardar",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "post_unavailable": "Comentario publicado en una publicación no disponible."
   },
   "bio": {
     "no_bio": "Sin biografía todavía.",

@@ -30,7 +30,8 @@
     "edit": "Huri",
     "delete": "Pohe",
     "save": "Fa'a'ite",
-    "cancel": "Fa'a'ore"
+    "cancel": "Fa'a'ore",
+    "post_unavailable": "Ua nene'ihia teie mana'o i ni'a i te ho'e nene'iraa aita e vai nei."
   },
   "bio": {
     "no_bio": "Aore ra'a parau.",
