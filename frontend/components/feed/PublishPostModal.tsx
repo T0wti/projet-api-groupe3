@@ -77,11 +77,13 @@ export default function PublishPostModal({ triggerVariant }: PublishPostModalPro
     try {
       const tags = [...new Set([...content.matchAll(/\B#(\w+)/g)].map((match) => match[1].toLowerCase()))];
       let uploadedImageUrl: string | null = null;
+      let uploadedObjectName: string | null = null;
       if (selectedFile) {
-        const { url } = await uploadMedia(selectedFile);
+        const { url, object_name } = await uploadMedia(selectedFile);
         uploadedImageUrl = url;
+        uploadedObjectName = object_name;
       }
-      const newPost = await createPost(content, tags.length > 0 ? tags : undefined, uploadedImageUrl);
+      const newPost = await createPost(content, tags.length > 0 ? tags : undefined, uploadedImageUrl, uploadedObjectName);
       window.dispatchEvent(new CustomEvent('breezy:post-created', { detail: newPost }));
       closeModal();
       toastSuccess(t('compose_post.success'));

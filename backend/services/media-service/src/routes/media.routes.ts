@@ -5,6 +5,6 @@ import { uploadMedia, deleteMedia } from '../controllers/media.controller';
 const router = Router();
 
 router.post('/', upload.single('file'), uploadMedia);
-router.delete('/:objectName', deleteMedia);
+router.delete('/*objectName', deleteMedia);
 
 export default router;
