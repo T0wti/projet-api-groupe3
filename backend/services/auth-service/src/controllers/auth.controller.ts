@@ -102,8 +102,8 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
   await prisma.authUser.create({ data: { userId, email: normalizedEmail, passwordHash } });
 
-  // Token "self" généré avant la création du profil pour pouvoir appeler la gateway
-  // comme l'utilisateur lui-même (x-user-id sera correctement injecté par authenticate.ts).
+  // "Self" token generated before the profile is created, so we can call the gateway
+  // as the user themselves (x-user-id will be correctly injected by authenticate.ts).
   const { accessToken, refreshToken } = generateTokens(userId, normalizedEmail, 'user');
 
   const userRes = await fetch(`${API_GATEWAY_URL}/api/users`, {
@@ -165,8 +165,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     throw new AppError(401, 'Invalid credentials');
   }
 
-  // Token "self" provisoire (rôle 'user' par défaut, jamais envoyé au client) pour
-  // interroger le statut/rôle réel via la gateway, comme l'utilisateur lui-même.
+  // Temporary "self" token (default role 'user', never sent to the client) used to
+  // query the real status/role via the gateway, as the user themselves.
   const { accessToken: probeToken } = generateTokens(user.userId, user.email, 'user');
 
   const userInfoRes = await fetch(`${API_GATEWAY_URL}/api/users/${user.userId}`, {
@@ -384,7 +384,7 @@ export const changeEmail = async (req: Request, res: Response): Promise<void> =>
   });
 
   if (!userRes.ok) {
-    // rollback pour garder les deux DB synchronisées
+    // rollback to keep both DBs in sync
     await prisma.authUser.update({ where: { userId }, data: { email: user.email } });
     throw new AppError(502, 'Failed to update user profile email');
   }

@@ -16,6 +16,6 @@ const followsSchema  = new Schema<IFollows>({
 });
 
 followsSchema.index({ follower_id: 1, following_id: 1 }, { unique: true });
-followsSchema.index({ following_id: 1 }); // pour getFollowers
+followsSchema.index({ following_id: 1 }); // for getFollowers
 
 export const Follows = model<IFollows>('Follows', followsSchema);

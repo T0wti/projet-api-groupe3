@@ -32,7 +32,7 @@ export const createPost = async (req: Request, res: Response) => {
     if (Array.isArray(tags) && tags.length > 0) {
       await Tag.insertMany(
         tags.map((tag: string) => ({ post_id: savedPost._id, tag: tag.toLowerCase().trim() })),
-        { ordered: false } // ignore les doublons de tags envoyés deux fois
+        { ordered: false } // ignore duplicate tags sent twice
       );
     }
 
@@ -64,7 +64,7 @@ const attachPostTags = async (posts: any[]) => {
  * Retrieve all main posts (excluding replies)
  */
 export const getAllMainPosts = async (_req: Request, res: Response) => {
-    const posts = await Post.find({ parentPost: null }).sort({ createdAt: -1 }); // Pour le moment on filtrr que les parents pour le get all a voir si on garde ça ?
+    const posts = await Post.find({ parentPost: null }).sort({ createdAt: -1 }); // For now we only filter root posts for the get all - TBD if we keep this
     return res.status(200).json(await attachPostTags(posts));
 
 };
