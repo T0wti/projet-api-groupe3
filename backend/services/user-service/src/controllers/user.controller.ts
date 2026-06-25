@@ -278,6 +278,7 @@ export const banUser = async (req: Request<{ id: string }>, res: Response) => {
       where: { id },
       data: { status: 'banned', suspendedUntil: null, statusReason: reason ?? null },
     });
+    // No TTL — ban is permanent; suspendUser sets EX so the key auto-expires when suspension ends
     await redis.set(`revoked:${id}`, Date.now().toString());
     return res.status(200).json(user);
   } catch (error) {

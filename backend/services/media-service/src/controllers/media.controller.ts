@@ -13,6 +13,7 @@ export const uploadMedia = async (req: Request, res: Response) => {
   }
 
   const ext = req.file.originalname.split('.').pop();
+  // userId prefix is what makes ownership verification possible at delete time
   const objectName = `${userId}/${randomUUID()}.${ext}`;
   const mediaType = req.file.mimetype.startsWith('video') ? 'video' : 'image';
 

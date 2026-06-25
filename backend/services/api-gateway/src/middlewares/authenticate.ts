@@ -34,8 +34,9 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
     const payload = jwt.verify(token, JWT_SECRET) as AccessTokenPayload;
 
     const revokedAt = await redis.get(`revoked:${payload.user_id}`);
+    // revokedAt is stored in ms; payload.iat is in seconds — multiply to compare on the same scale
     if (revokedAt && Number(revokedAt) > payload.iat * 1000) {
-      next(); // token émis avant la sanction -> traité comme non authentifié
+      next(); // token issued before the sanction — treat as unauthenticated
       return;
     }
 

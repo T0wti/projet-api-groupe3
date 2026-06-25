@@ -26,6 +26,7 @@ export const followUser = async (req: Request, res: Response): Promise<void> => 
     await Follows.create({ follower_id, following_id });
   } catch (err: any) {
     if (err.code === 11000) {
+      // 11000 = MongoDB duplicate key — unique index on (follower_id, following_id)
       throw new AppError(409, 'Already following this user');
     }
     throw err;
