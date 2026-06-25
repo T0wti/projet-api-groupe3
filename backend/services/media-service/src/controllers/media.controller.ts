@@ -20,8 +20,13 @@ export const uploadMedia = async (req: Request, res: Response) => {
     'Content-Type': req.file.mimetype,
   });
 
-  const publicUrl = `${process.env.MINIO_PUBLIC_URL || 'http://localhost:9000'}/${BUCKET_NAME}/${objectName}`;
+  const baseUrl = process.env.MINIO_PUBLIC_URL || 'http://localhost:9000';
 
+  // Si on est en local (localhost), MinIO a besoin du nom du bucket dans l'URL.
+  // En prod (Cloudflare R2), le bucket est déjà inclus dans le sous-domaine, donc on ne le remet pas.
+  const publicUrl = baseUrl.includes('localhost')
+    ? `${baseUrl}/${BUCKET_NAME}/${objectName}`
+    : `${baseUrl}/${objectName}`;
   return res.status(201).json({ type: mediaType, url: publicUrl, object_name: objectName });
 };
 
