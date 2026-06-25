@@ -18,10 +18,10 @@ export async function fetchUserLikedPostIds(userId: string): Promise<string[]> {
   return res.data.liked_posts.map(String);
 }
 
-export async function createPost(content: string, tags?: string[], imageUrl?: string | null): Promise<BackendPost> {
+export async function createPost(content: string, tags?: string[], imageUrl?: string | null, objectName?: string | null): Promise<BackendPost> {
   const mediaPayload = imageUrl
-  ? { type: 'image', url: imageUrl }
-  : { type: null, url: null };
+    ? { type: 'image', url: imageUrl, object_name: objectName }
+    : { type: null, url: null };
 
   const res = await api.post<BackendPost>('/posts', { content, tags, media: mediaPayload });
   return res.data;

@@ -99,6 +99,5 @@ export const routeTable: RouteRule[] = [
   
   // Media
   { method: 'post', path: '/api/media', target: 'media', auth: 'required' },
-  { method: 'delete', path: '/api/media/:objectName', target: 'media', auth: 'required' },
-
+  { method: 'delete', path: '/api/media/*objectName', target: 'media', auth: 'required' },
 ];
