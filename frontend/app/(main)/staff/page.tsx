@@ -11,6 +11,7 @@ import type { BackendPost, BackendReport } from '@/types/post';
 import { banUser, reinstateUser, searchUsers, suspendUser, updateUserRole } from '@/lib/api/users';
 import { deletePost, fetchPostsByIds, fetchReports, updateReportStatus } from '@/lib/api/posts';
 import { fetchPublicUserById } from '@/lib/api/users';
+import { confirmDelete, toastSuccess, toastError } from '@/lib/utils/alerts';
 
 const statusBadgeClass: Record<AccountStatus, string> = {
   active: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -35,8 +36,6 @@ export default function StaffPage() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<UserSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
   const [pendingUserId, setPendingUserId] = useState<string | null>(null);
   const [pendingReportId, setPendingReportId] = useState<string | null>(null);
   const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
@@ -112,7 +111,7 @@ export default function StaffPage() {
         });
         setReportAuthorMap(nextAuthorMap);
       } catch {
-        setError(t('errors.load_reports'));
+        toastError(t('errors.load_reports'));
       } finally {
         setIsLoadingReports(false);
       }
@@ -138,8 +137,6 @@ export default function StaffPage() {
     }
 
     setIsLoading(true);
-    setError(null);
-    setMessage(null);
 
     try {
       const foundUsers = await searchUsers(searchValue, { includeInactive: true });
@@ -155,7 +152,7 @@ export default function StaffPage() {
         return nextMap;
       });
     } catch {
-      setError(t('errors.load_accounts'));
+      toastError(t('errors.load_accounts'));
     } finally {
       setIsLoading(false);
     }
@@ -168,26 +165,21 @@ export default function StaffPage() {
 
   const handleRoleUpdate = async (targetUser: UserSearchResult) => {
     const nextRole = roleSelections[targetUser.id];
-    if (!nextRole || nextRole === targetUser.role) {
-      return;
-    }
+    if (!nextRole || nextRole === targetUser.role) return;
 
     setPendingUserId(targetUser.id);
-    setError(null);
-    setMessage(null);
-
     try {
       const updatedUser = await updateUserRole(targetUser.id, nextRole);
-      applyUserUpdate({
+      applyUserUpdate({ 
         id: updatedUser.id,
         username: updatedUser.username,
         email: updatedUser.email,
         role: updatedUser.role,
         status: updatedUser.status,
-      });
-      setMessage(t('messages.role_updated', { username: updatedUser.username }));
+       });
+      toastSuccess(t('messages.role_updated', { username: updatedUser.username }));
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : t('errors.update_role'));
+      toastError(caughtError instanceof Error ? caughtError.message : t('errors.update_role'));
     } finally {
       setPendingUserId(null);
     }
@@ -196,26 +188,23 @@ export default function StaffPage() {
   const handleSuspend = async (targetUser: UserSearchResult) => {
     const until = suspendUntilByUser[targetUser.id];
     if (!until) {
-      setError(t('errors.suspend_until_required'));
+      toastError(t('errors.suspend_until_required'));
       return;
     }
 
     setPendingUserId(targetUser.id);
-    setError(null);
-    setMessage(null);
-
     try {
       const updatedUser = await suspendUser(targetUser.id, new Date(until).toISOString(), reasons[targetUser.id]);
-      applyUserUpdate({
+      applyUserUpdate({ 
         id: updatedUser.id,
         username: updatedUser.username,
         email: updatedUser.email,
         role: updatedUser.role,
-        status: updatedUser.status,
+        status: updatedUser.status 
       });
-      setMessage(t('messages.account_suspended', { username: updatedUser.username }));
+      toastSuccess(t('messages.account_suspended', { username: updatedUser.username }));
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : t('errors.suspend_account'));
+      toastError(caughtError instanceof Error ? caughtError.message : t('errors.suspend_account'));
     } finally {
       setPendingUserId(null);
     }
@@ -223,21 +212,18 @@ export default function StaffPage() {
 
   const handleBan = async (targetUser: UserSearchResult) => {
     setPendingUserId(targetUser.id);
-    setError(null);
-    setMessage(null);
-
     try {
       const updatedUser = await banUser(targetUser.id, reasons[targetUser.id]);
-      applyUserUpdate({
+      applyUserUpdate({ 
         id: updatedUser.id,
         username: updatedUser.username,
         email: updatedUser.email,
         role: updatedUser.role,
-        status: updatedUser.status,
-      });
-      setMessage(t('messages.account_banned', { username: updatedUser.username }));
+        status: updatedUser.status
+           });
+      toastSuccess(t('messages.account_banned', { username: updatedUser.username }));
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : t('errors.ban_account'));
+      toastError(caughtError instanceof Error ? caughtError.message : t('errors.ban_account'));
     } finally {
       setPendingUserId(null);
     }
@@ -245,21 +231,12 @@ export default function StaffPage() {
 
   const handleReinstate = async (targetUser: UserSearchResult) => {
     setPendingUserId(targetUser.id);
-    setError(null);
-    setMessage(null);
-
     try {
       const updatedUser = await reinstateUser(targetUser.id);
-      applyUserUpdate({
-        id: updatedUser.id,
-        username: updatedUser.username,
-        email: updatedUser.email,
-        role: updatedUser.role,
-        status: updatedUser.status,
-      });
-      setMessage(t('messages.account_reinstated', { username: updatedUser.username }));
+      applyUserUpdate({ id: updatedUser.id, username: updatedUser.username, email: updatedUser.email, role: updatedUser.role, status: updatedUser.status });
+      toastSuccess(t('messages.account_reinstated', { username: updatedUser.username }));
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : t('errors.reinstate_account'));
+      toastError(caughtError instanceof Error ? caughtError.message : t('errors.reinstate_account'));
     } finally {
       setPendingUserId(null);
     }
@@ -267,20 +244,15 @@ export default function StaffPage() {
 
   const handleDismissReport = async (targetId: string) => {
     const reportsToDismiss = reports.filter((entry) => entry.target_id === targetId);
-    if (reportsToDismiss.length === 0) {
-      return;
-    }
+    if (reportsToDismiss.length === 0) return;
 
     setPendingReportId(targetId);
-    setError(null);
-    setMessage(null);
-
     try {
       await Promise.all(reportsToDismiss.map((report) => updateReportStatus(report._id, 'dismissed')));
       setReports((currentReports) => currentReports.filter((entry) => entry.target_id !== targetId));
-      setMessage(t('messages.report_dismissed', { count: reportsToDismiss.length }));
+      toastSuccess(t('messages.report_dismissed', { count: reportsToDismiss.length }));
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : t('errors.update_report'));
+      toastError(caughtError instanceof Error ? caughtError.message : t('errors.update_report'));
     } finally {
       setPendingReportId(null);
     }
@@ -289,29 +261,30 @@ export default function StaffPage() {
   const handleDeleteReportedPost = async (report: BackendReport) => {
     const relatedPost = reportPostMap[report.target_id];
     if (!relatedPost) {
-      setError(t('errors.reported_post_missing'));
+      toastError(t('errors.reported_post_missing'));
       return;
     }
 
-    if (!window.confirm(t('reports.delete_confirm'))) {
-      return;
-    }
+    const ok = await confirmDelete({ title: t('reports.delete_confirm'), confirmText: t('reports.delete_post') });
+    if (!ok) return;
 
     setDeletingPostId(relatedPost._id);
-    setError(null);
-    setMessage(null);
+    const reportsToResolve = reports.filter((entry) => entry.target_id === relatedPost._id);
 
     try {
-      await deletePost(relatedPost._id);
+      await Promise.all([
+        deletePost(relatedPost._id),
+        ...reportsToResolve.map((entry) => updateReportStatus(entry._id, 'reviewed')),
+      ]);
       setReports((currentReports) => currentReports.filter((entry) => entry.target_id !== relatedPost._id));
       setReportPostMap((currentMap) => {
         const nextMap = { ...currentMap };
         delete nextMap[relatedPost._id];
         return nextMap;
       });
-      setMessage(t('messages.post_deleted'));
+      toastSuccess(t('messages.post_deleted'));
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : t('errors.delete_post'));
+      toastError(caughtError instanceof Error ? caughtError.message : t('errors.delete_post'));
     } finally {
       setDeletingPostId(null);
     }
@@ -369,10 +342,7 @@ export default function StaffPage() {
           </Button>
         </form>
 
-        {error && <p className="mt-4 rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-700 dark:text-red-300">{error}</p>}
-        {message && <p className="mt-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-300">{message}</p>}
-
-        <section className="mt-6 rounded-[1.5rem] border app-border app-surface-muted p-4 sm:p-5">
+<section className="mt-6 rounded-[1.5rem] border app-border app-surface-muted p-4 sm:p-5">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="text-xl font-black app-text">{t('reports.title')}</h2>
@@ -447,7 +417,7 @@ export default function StaffPage() {
           </div>
         </section>
 
-        {results.length === 0 && !isLoading && !error && (
+        {results.length === 0 && !isLoading && !Error && (
           <div className="mt-6 rounded-[1.5rem] border border-dashed app-border px-6 py-12 text-center text-sm app-text-muted">
             {t('accounts.empty')}
           </div>
