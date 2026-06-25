@@ -158,11 +158,13 @@ export default function ProfilePage() {
 
     try {
       let uploadedImageUrl: string | null = null;
+      let uploadedObjectName: string | null = null;
       if (image) {
-        const { url } = await uploadMedia(image);
+        const { url, object_name } = await uploadMedia(image);
         uploadedImageUrl = url;
+        uploadedObjectName = object_name;
       }
-      const backendComment = await createComment(postId, replyContent, uploadedImageUrl);
+      const backendComment = await createComment(postId, replyContent, uploadedImageUrl, undefined, uploadedObjectName);
       const newReply: Reply = mapBackendComment(backendComment, user);
 
       setPosts((currentPosts) =>

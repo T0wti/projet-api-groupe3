@@ -150,11 +150,13 @@ export default function CommentDetailPage() {
     if (!user || !comment) return;
     try {
       let uploadedImageUrl: string | null = null;
+      let uploadedObjectName: string | null = null;
       if (image) {
-        const { url } = await uploadMedia(image);
+        const { url, object_name } = await uploadMedia(image);
         uploadedImageUrl = url;
+        uploadedObjectName = object_name;
       }
-      const bc = await createComment(comment.postId, content,uploadedImageUrl, comment.id);
+      const bc = await createComment(comment.postId, content, uploadedImageUrl, comment.id, uploadedObjectName);
       const newReply = mapBackendComment(bc, user);
       setReplies(prev => [newReply, ...prev]);
       setComment(prev => prev ? { ...prev, commentsCount: prev.commentsCount + 1 } : prev);

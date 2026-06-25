@@ -5,6 +5,8 @@ import { CommentTag } from '../models/comment-tag.model';
 import Post from '../models/post.model';
 import { AppError } from '../utils/AppError';
 
+const API_GATEWAY_URL = process.env.API_GATEWAY_URL || 'http://api-gateway:8080';
+
 const isValidObjectId = (id: string) => mongoose.Types.ObjectId.isValid(id);
 
 export const createComment = async (req: Request, res: Response) => {
@@ -151,6 +153,16 @@ export const deleteComment = async (req: Request, res: Response) => {
 
     if (comment.parent_comment_id) {
       await Comment.findByIdAndUpdate(comment.parent_comment_id, { $inc: { commentsCount: -1 } });
+    }
+
+    if (comment.media?.object_name) {
+      const authHeader = req.headers.authorization;
+      fetch(`${API_GATEWAY_URL}/api/media/${comment.media.object_name}`, {
+        method: 'DELETE',
+        headers: authHeader ? { 'Authorization': authHeader } : {},
+      }).catch((err) => {
+        console.error(`[post-service] failed to delete media ${comment.media.object_name}:`, err);
+      });
     }
 
     return res.status(200).json({ message: 'Comment deleted successfully.' });
