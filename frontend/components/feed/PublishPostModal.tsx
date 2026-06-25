@@ -5,11 +5,14 @@ import { useState } from 'react';
 import { Image as ImageIcon, Plus, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import Avatar from '../ui/Avatar';
-import Button from '../ui/Button';
-import { useAuth } from '../../context/AuthContext';
-import { createPost } from '../../lib/api/posts';
-import type { BackendPost } from '../../types/post';
+import Avatar from '@/components/ui/Avatar';
+import Button from '@/components/ui/Button';
+import MediaPreview from '@/components/ui/MediaPreview';
+import { useAuth } from '@/context/AuthContext';
+import { useMediaPicker } from '@/hooks/useMediaPicker';
+import { createPost } from '@/lib/api/posts';
+import { uploadMedia } from '@/lib/api/media';
+import type { BackendPost } from '@/types/post';
 
 type TriggerVariant = 'sidebar' | 'mobile';
 
@@ -32,25 +35,51 @@ export default function PublishPostModal({ triggerVariant }: PublishPostModalPro
   const [error, setError] = useState<string | null>(null);
   const remainingCharacters = 280 - content.length;
 
+  const {
+    selectedFile,
+    previewUrl,
+    isCropping,
+    srcUrl,
+    crop,
+    isVideo,
+    isGif,
+    fileInputRef,
+    imgRef,
+    handleIconClick,
+    handleFileChange,
+    handleTriggerCrop,
+    onImageLoad,
+    handleCropComplete,
+    handleRemoveImage,
+    cancelCrop,
+    setCrop,
+    setCompletedCrop,
+    reset,
+  } = useMediaPicker();
+
   const closeModal = () => {
     if (isPosting) return;
     setIsOpen(false);
     setContent('');
     setError(null);
+    reset();
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!user || content.trim().length === 0 || isPosting) {
-      return;
-    }
+    if (!user || (content.trim().length === 0 && !selectedFile) || isPosting) return;
 
     setIsPosting(true);
     setError(null);
 
     try {
       const tags = [...new Set([...content.matchAll(/\B#(\w+)/g)].map((match) => match[1].toLowerCase()))];
-      const newPost = await createPost(content, tags.length > 0 ? tags : undefined);
+      let uploadedImageUrl: string | null = null;
+      if (selectedFile) {
+        const { url } = await uploadMedia(selectedFile);
+        uploadedImageUrl = url;
+      }
+      const newPost = await createPost(content, tags.length > 0 ? tags : undefined, uploadedImageUrl);
       window.dispatchEvent(new CustomEvent('breezy:post-created', { detail: newPost }));
       closeModal();
     } catch (caughtError: unknown) {
@@ -61,16 +90,12 @@ export default function PublishPostModal({ triggerVariant }: PublishPostModalPro
         ? String(caughtError.response.data.message)
         : t('compose_post.publish_error');
       setError(message);
+    } finally {
       setIsPosting(false);
-      return;
     }
-
-    setIsPosting(false);
   };
 
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
   return (
     <>
@@ -90,7 +115,7 @@ export default function PublishPostModal({ triggerVariant }: PublishPostModalPro
         </button>
       )}
 
-        {typeof document !== 'undefined' && isOpen && createPortal(
+      {typeof document !== 'undefined' && isOpen && createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center app-overlay px-4 py-8">
           <div className="w-full max-w-2xl overflow-hidden rounded-[2rem] border app-border app-surface-elevated shadow-[0_30px_80px_rgba(15,23,42,0.25)]">
             <div className="flex items-center justify-between border-b app-border px-6 py-4">
@@ -117,14 +142,45 @@ export default function PublishPostModal({ triggerVariant }: PublishPostModalPro
                     value={content}
                     onChange={(event) => setContent(event.target.value)}
                     placeholder={t('compose_post.placeholder')}
-                    className="min-h-40 w-full resize-none rounded-[1.5rem] border app-input px-5 py-4 text-base outline-none transition-colors placeholder:app-text-muted focus:border-teal-500"
+                    className="min-h-40 w-full resize-none rounded-[1.5rem] border app-input px-5 py-4 text-base outline-none transition-colors placeholder:app-text-muted focus:border-brand"
                     maxLength={280}
                     autoFocus
                   />
 
+                  {previewUrl && selectedFile && (
+                    <MediaPreview
+                      previewUrl={previewUrl}
+                      isVideo={isVideo}
+                      isGif={isGif}
+                      onTriggerCrop={handleTriggerCrop}
+                      onRemove={handleRemoveImage}
+                      isCropping={isCropping}
+                      srcUrl={srcUrl}
+                      crop={crop}
+                      imgRef={imgRef}
+                      onImageLoad={onImageLoad}
+                      onCropChange={setCrop}
+                      onCropComplete={setCompletedCrop}
+                      onCropSave={handleCropComplete}
+                      onCropCancel={cancelCrop}
+                    />
+                  )}
+
                   <div className="mt-4 flex items-center justify-between gap-4 rounded-[1.5rem] border app-border-subtle app-surface-muted px-4 py-3">
                     <div className="flex items-center gap-3 text-sm app-text-muted">
-                      <ImageIcon size={18} className="text-brand" />
+                      <div
+                        className="text-brand cursor-pointer hover:opacity-80 p-1 rounded-full hover:bg-brand/10 transition-colors"
+                        onClick={handleIconClick}
+                      >
+                        <ImageIcon size={18} />
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          onChange={handleFileChange}
+                          accept="image/png, image/jpeg, image/webp, image/gif, video/mp4, video/webm"
+                          className="hidden"
+                        />
+                      </div>
                       <span>
                         {t(
                           remainingCharacters === 1
@@ -139,7 +195,7 @@ export default function PublishPostModal({ triggerVariant }: PublishPostModalPro
                       <Button type="button" variant="ghost" onClick={closeModal} disabled={isPosting}>
                         {t('compose_post.cancel')}
                       </Button>
-                      <Button type="submit" disabled={content.trim().length === 0 || isPosting}>
+                      <Button type="submit" disabled={(content.trim().length === 0 && !selectedFile) || isPosting}>
                         {isPosting ? t('compose_post.publishing') : t('compose_post.submit_button')}
                       </Button>
                     </div>
