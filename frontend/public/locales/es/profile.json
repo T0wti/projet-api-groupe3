@@ -32,6 +32,10 @@
     "save": "Guardar",
     "cancel": "Cancelar"
   },
+  "bio": {
+    "no_bio": "Sin biografía todavía.",
+    "edit": "Editar bio"
+  },
   "avatar": {
     "uploading": "Subiendo...",
     "change": "Cambiar",

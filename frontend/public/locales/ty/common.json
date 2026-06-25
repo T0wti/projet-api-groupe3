@@ -23,10 +23,12 @@
     "who_to_follow": {
       "title": "Mau ‘āfata rorouira e pe’e",
       "empty_message": "E fā mai te mau ta’ata e fa’ahiahia hia i ‘onei.",
-      "follow_button": "Haere pū"
+      "follow_button": "Haere pū",
+      "followers_count": "{{count}} mau tāmāto'a"
     },
     "trending": {
-      "title": "Te parau nui"
+      "title": "Te parau nui",
+      "empty_message": "Aore roa'tu ta'ata taime."
     }
   },
   "compose_post": {

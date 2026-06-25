@@ -23,10 +23,12 @@
     "who_to_follow": {
       "title": "Who to follow",
       "empty_message": "Suggested users will appear here.",
-      "follow_button": "Follow"
+      "follow_button": "Follow",
+      "followers_count": "{{count}} followers"
     },
     "trending": {
-      "title": "Trending Topics"
+      "title": "Trending Topics",
+      "empty_message": "No trending tags yet."
     }
   },
   "compose_post": {

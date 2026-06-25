@@ -22,10 +22,12 @@
     "who_to_follow": {
       "title": "اقتراحات الحسابات",
       "empty_message": "المستخدمين المقترحين راح يبانو هنايا.",
-      "follow_button": "متابعة"
+      "follow_button": "متابعة",
+      "followers_count": "{{count}} متابع"
     },
     "trending": {
-      "title": "الترندات"
+      "title": "الترندات",
+      "empty_message": "لا توجد وسوم رائجة بعد."
     }
   },
   "compose_post": {

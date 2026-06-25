@@ -22,10 +22,12 @@
     "who_to_follow": {
       "title": "הצעות למעקב",
       "empty_message": "משתמשים מומלצים יופיעו כאן.",
-      "follow_button": "עקוב"
+      "follow_button": "עקוב",
+      "followers_count": "{{count}} עוקבים"
     },
     "trending": {
-      "title": "טרנדים"
+      "title": "טרנדים",
+      "empty_message": "אין תגיות פופולריות עדיין."
     }
   },
   "compose_post": {
