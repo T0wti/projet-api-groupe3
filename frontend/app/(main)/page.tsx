@@ -133,11 +133,13 @@ const handleAddNewPost = async (content: string, image: File | null) => {
     if (!user) return;
     try {
       let uploadedImageUrl: string | null = null;
+      let uploadedObjectName: string | null = null;
       if (image) {
-        const { url } = await uploadMedia(image);
+        const { url, object_name } = await uploadMedia(image);
         uploadedImageUrl = url;
+        uploadedObjectName = object_name;
       }
-      const bc = await createComment(postId, replyContent, uploadedImageUrl);
+      const bc = await createComment(postId, replyContent, uploadedImageUrl, undefined, uploadedObjectName);
       const newReply: Reply = mapBackendComment(bc, user);
       setPosts((prev) =>
         prev.map((p) =>

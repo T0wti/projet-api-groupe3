@@ -89,11 +89,13 @@ export default function PostDetailPage() {
     if (!user || !post) return;
     try {
       let uploadedImageUrl: string | null = null;
+      let uploadedObjectName: string | null = null;
       if (image) {
-        const { url } = await uploadMedia(image);
+        const { url, object_name } = await uploadMedia(image);
         uploadedImageUrl = url;
+        uploadedObjectName = object_name;
       }
-      const bc = await createComment(post.id, content, uploadedImageUrl);
+      const bc = await createComment(post.id, content, uploadedImageUrl, undefined, uploadedObjectName);
       const newComment = mapBackendComment(bc, user);
       setComments(prev => [newComment, ...prev]);
       setPost(prev => prev ? { ...prev, commentsCount: prev.commentsCount + 1 } : prev);
@@ -144,11 +146,13 @@ export default function PostDetailPage() {
     if (!user || !post) return;
     try {
       let uploadedImageUrl: string | null = null;
+      let uploadedObjectName: string | null = null;
       if (image) {
-        const { url } = await uploadMedia(image);
+        const { url, object_name } = await uploadMedia(image);
         uploadedImageUrl = url;
+        uploadedObjectName = object_name;
       }
-      await createComment(post.id, content, uploadedImageUrl, parentCommentId);
+      await createComment(post.id, content, uploadedImageUrl, parentCommentId, uploadedObjectName);
       setComments(prev => prev.map(c =>
         c.id === parentCommentId ? { ...c, commentsCount: c.commentsCount + 1 } : c
       ));
