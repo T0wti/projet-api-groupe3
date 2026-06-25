@@ -1,31 +1,41 @@
 "use client";
 
 import Link from 'next/link';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { MessageCircle, Heart, ImageIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Avatar from '@/components/ui/Avatar';
+import ContextMenu from '@/components/ui/ContextMenu';
 import { Reply } from '@/types/post';
+import { useAuth } from '@/context/AuthContext';
 import { useMediaPicker } from '@/hooks/useMediaPicker';
 import MediaPreview from '@/components/ui/MediaPreview';
+import { confirmDelete } from '@/lib/utils/alerts';
 
 interface CommentCardProps {
   comment: Reply;
   onLike?: () => void;
   onUnlike?: () => void;
   onReply?: (content: string, media: File | null) => void;
+  onEdit?: (newContent: string) => Promise<void>;
+  onDelete?: () => Promise<void>;
   disableNavigation?: boolean;
   isPosting?: boolean;
 }
 
-export default function CommentCard({ comment, onLike, onUnlike, onReply, disableNavigation, isPosting = false }: CommentCardProps) {
+export default function CommentCard({ comment, onLike, onUnlike, onReply, onEdit, onDelete, disableNavigation, isPosting = false }: CommentCardProps) {
   const { t } = useTranslation('common');
+  const { user } = useAuth();
   const router = useRouter();
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState(comment.content);
 
   const profileHref = `/profile/${encodeURIComponent(comment.author.username)}`;
+  const isAuthor = !!user && comment.author.id === user.id;
+  const showMenu = isAuthor && (onEdit !== undefined || onDelete !== undefined);
 
   const {
     selectedFile,
@@ -71,6 +81,32 @@ export default function CommentCard({ comment, onLike, onUnlike, onReply, disabl
     setIsReplying(false);
   };
 
+  const handleSaveEdit = async () => {
+    if (!onEdit || !editContent.trim()) return;
+    await onEdit(editContent.trim());
+    setIsEditing(false);
+  };
+
+  const handleCancelEdit = () => {
+    setEditContent(comment.content);
+    setIsEditing(false);
+  };
+
+  const handleDeleteClick = async () => {
+    if (!onDelete) return;
+    const confirmed = await confirmDelete({
+      title: t('post_card.delete_confirm'),
+      confirmText: t('post_card.delete'),
+      cancelText: t('compose_post.cancel'),
+    });
+    if (confirmed) await onDelete();
+  };
+
+  const menuActions = [
+    ...(onEdit ? [{ label: t('profile:comment.edit'), onClick: () => { setIsEditing(true); setEditContent(comment.content); } }] : []),
+    ...(onDelete ? [{ label: t('profile:comment.delete'), onClick: handleDeleteClick, danger: true }] : []),
+  ];
+
   const isVideoUrl = comment.imageUrl
     ? /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(comment.imageUrl)
     : false;
@@ -88,16 +124,48 @@ export default function CommentCard({ comment, onLike, onUnlike, onReply, disabl
         </div>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1 text-sm">
+          <div className="flex items-center justify-between gap-1 text-sm">
             <Link href={profileHref} className="flex items-center gap-1">
               <span className="font-bold app-text">{comment.author.name}</span>
               <span className="app-text-muted">@{comment.author.username}</span>
             </Link>
+            {showMenu && (
+              <div onClick={(e) => e.stopPropagation()}>
+                <ContextMenu ariaLabel={t('accessibility.comment_options')} actions={menuActions} />
+              </div>
+            )}
           </div>
 
-          <p className="mt-1 app-text text-[15px] whitespace-pre-wrap wrap-break-word">{comment.content}</p>
+          {isEditing ? (
+            <div className="mt-2 flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
+              <textarea
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                rows={3}
+                autoFocus
+                className="w-full resize-none rounded-lg border app-input p-2 text-sm outline-none focus:border-brand"
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={handleSaveEdit}
+                  disabled={!editContent.trim()}
+                  className="rounded-full bg-brand px-4 py-1 text-sm font-semibold text-white disabled:opacity-50"
+                >
+                  {t('profile:comment.save')}
+                </button>
+                <button
+                  onClick={handleCancelEdit}
+                  className="rounded-full border app-border px-4 py-1 text-sm font-semibold app-text app-hover-surface"
+                >
+                  {t('profile:comment.cancel')}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <p className="mt-1 app-text text-[15px] whitespace-pre-wrap wrap-break-word">{comment.content}</p>
+          )}
 
-          {comment.imageUrl && (
+          {comment.imageUrl && !isEditing && (
             <div className="mt-3 w-full overflow-hidden border app-border rounded-2xl flex justify-center items-center">
               {isVideoUrl ? (
                 <video
