@@ -30,7 +30,8 @@
     "edit": "تعديل",
     "delete": "حذف",
     "save": "حفظ",
-    "cancel": "إلغاء"
+    "cancel": "إلغاء",
+    "post_unavailable": "تم نشر هذا التعليق على منشور غير متاح."
   },
   "avatar": {
     "uploading": "جارٍ الرفع...",

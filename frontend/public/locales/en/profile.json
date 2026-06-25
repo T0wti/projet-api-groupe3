@@ -31,7 +31,8 @@
     "edit": "Edit",
     "delete": "Delete",
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "post_unavailable": "Comment posted on an unavailable post."
   },
   "avatar": {
     "uploading": "Uploading...",

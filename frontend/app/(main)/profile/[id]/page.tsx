@@ -630,6 +630,7 @@ export default function ProfilePage() {
               )}
               {!isLoadingReplies && userComments.map((comment) => {
                 const originalPost = postMap.get(comment.post_id);
+                const isOriginalPostUnavailable = !originalPost;
                 const isEditing = editingCommentId === comment._id;
                 return (
                   <div key={comment._id} className="border-b app-border-subtle px-4 py-3 app-hover-surface">
@@ -642,6 +643,11 @@ export default function ProfilePage() {
                           ? originalPost.content.slice(0, 100) + '…'
                           : originalPost.content}
                       </button>
+                    )}
+                    {isOriginalPostUnavailable && !isEditing && (
+                      <div className="mb-2 w-full rounded-lg border app-border border-dashed px-3 py-2 text-left text-sm app-text-soft">
+                        {t('profile:comment.post_unavailable')}
+                      </div>
                     )}
                     <div className="flex gap-3">
                       <div className="shrink-0">

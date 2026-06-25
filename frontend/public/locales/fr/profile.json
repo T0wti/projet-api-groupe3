@@ -31,7 +31,8 @@
     "edit": "Modifier",
     "delete": "Supprimer",
     "save": "Enregistrer",
-    "cancel": "Annuler"
+    "cancel": "Annuler",
+    "post_unavailable": "Commentaire publié sur un post indisponible."
   },
   "avatar": {
     "uploading": "Envoi...",

@@ -30,7 +30,8 @@
     "edit": "Editar",
     "delete": "Eliminar",
     "save": "Guardar",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "post_unavailable": "Comentario publicado en una publicación no disponible."
   },
   "avatar": {
     "uploading": "Subiendo...",
