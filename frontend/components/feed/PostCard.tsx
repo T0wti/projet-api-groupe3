@@ -48,7 +48,7 @@ export default function PostCard({ post, onLike, onReply, onEdit, onDelete, disa
   const canReport = !!user && !isAuthor;
   const showMenu = showAuthorMenu || canReport;
 
-  // Deux instances séparées du hook : une pour l'édition, une pour la réponse
+  // Two separate instances of the hook: one for editing, one for replying
   const editPicker = useMediaPicker();
   const replyPicker = useMediaPicker();
   const {

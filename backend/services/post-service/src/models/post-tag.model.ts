@@ -10,7 +10,7 @@ const tagSchema = new Schema<ITag>({
   tag:     { type: String, required: true, lowercase: true, trim: true },
 });
 
-tagSchema.index({ post_id: 1, tag: 1 }, { unique: true }); // pas de doublon de tag sur un post
-tagSchema.index({ tag: 1 }); // pour "tous les posts avec ce tag"
+tagSchema.index({ post_id: 1, tag: 1 }, { unique: true }); // no duplicate tag on a post
+tagSchema.index({ tag: 1 }); // for "all posts with this tag"
 
 export const Tag = model<ITag>('Tag', tagSchema);

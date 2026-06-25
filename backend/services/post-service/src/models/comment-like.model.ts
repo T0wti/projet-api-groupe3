@@ -13,6 +13,6 @@ const commentLikeSchema = new Schema<ICommentLike>(
 );
 
 commentLikeSchema.index({ user_id: 1, comment_id: 1 }, { unique: true });
-commentLikeSchema.index({ comment_id: 1 }); // "qui a liké ce commentaire"
+commentLikeSchema.index({ comment_id: 1 }); // "who liked this comment"
 
 export const CommentLike = model<ICommentLike>('CommentLike', commentLikeSchema);

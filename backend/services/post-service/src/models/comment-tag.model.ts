@@ -11,6 +11,6 @@ const commentTagSchema = new Schema<ICommentTag>({
 });
 
 commentTagSchema.index({ comment_id: 1, tag: 1 }, { unique: true });
-commentTagSchema.index({ tag: 1 }); // "tous les comments avec ce tag"
+commentTagSchema.index({ tag: 1 }); // "all comments with this tag"
 
 export const CommentTag = model<ICommentTag>('CommentTag', commentTagSchema);
