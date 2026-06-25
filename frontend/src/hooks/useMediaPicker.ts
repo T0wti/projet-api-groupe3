@@ -13,8 +13,8 @@ export interface UseMediaPickerReturn {
   isGif: boolean;
 
   // Refs
-  fileInputRef: React.RefObject<HTMLInputElement>;
-  imgRef: React.RefObject<HTMLImageElement>;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
+  imgRef: React.RefObject<HTMLImageElement | null>;
 
   // Handlers
   handleIconClick: (e: React.MouseEvent) => void;

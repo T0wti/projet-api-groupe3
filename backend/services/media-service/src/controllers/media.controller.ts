@@ -15,13 +15,13 @@ export const uploadMedia = async (req: Request, res: Response) => {
   const objectName = `${randomUUID()}.${ext}`;
   const mediaType = req.file.mimetype.startsWith('video') ? 'video' : 'image';
 
-    await minioClient.putObject(BUCKET_NAME, objectName, req.file.buffer, req.file.size, {
-      'Content-Type': req.file.mimetype,
-    });
+  await minioClient.putObject(BUCKET_NAME, objectName, req.file.buffer, req.file.size, {
+    'Content-Type': req.file.mimetype,
+  });
 
-    const publicUrl = `${process.env.MINIO_PUBLIC_URL || 'http://localhost:9000'}/${BUCKET_NAME}/${objectName}`;
+  const publicUrl = `${process.env.MINIO_PUBLIC_URL || `http://localhost:9000/${BUCKET_NAME}`}/${objectName}`;
 
-    return res.status(201).json({ type: mediaType, url: publicUrl, object_name: objectName });
+  return res.status(201).json({ type: mediaType, url: publicUrl, object_name: objectName });
 };
 
 /**
@@ -30,6 +30,6 @@ export const uploadMedia = async (req: Request, res: Response) => {
 export const deleteMedia = async (req: Request, res: Response) => {
   const objectName = Array.isArray(req.params.objectName) ? req.params.objectName[0] : req.params.objectName;
 
-    await minioClient.removeObject(BUCKET_NAME, objectName);
-    return res.status(200).json({ message: 'Media deleted successfully.' });
+  await minioClient.removeObject(BUCKET_NAME, objectName);
+  return res.status(200).json({ message: 'Media deleted successfully.' });
 };
