@@ -4,7 +4,7 @@
 
 ---
 
-## 📋 Table des matières
+## Table des matières
 
 1. [Architecture & Authentification](#1-architecture--authentification)
 2. [Auth Service — `/api/auth`](#2-auth-service----apiauth)
