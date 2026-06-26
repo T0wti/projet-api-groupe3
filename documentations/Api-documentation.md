@@ -1,21 +1,21 @@
-# 🌬️💨 Breezy — Documentation des APIs
+# 🌬️💨 Breezy : Documentation des APIs
 
-> Architecture microservices — toutes les requêtes transitent par l'**API Gateway** (`http://localhost:8080`).
+> Architecture microservices, toutes les requêtes transitent par l'**API Gateway** (`http://localhost:8080`).
 
 ---
 
 ## Table des matières
 
 1. [Architecture & Authentification](#1-architecture--authentification)
-2. [Auth Service — `/api/auth`](#2-auth-service----apiauth)
-3. [User Service — `/api/users`](#3-user-service----apiusers)
-4. [Post Service — `/api/posts`](#4-post-service----apiposts)
-5. [Comment Service — `/api/comments`](#5-comment-service----apicomments)
-6. [Post Likes — `/api/post-likes`](#6-post-likes----apipost-likes)
-7. [Comment Likes — `/api/comment-likes`](#7-comment-likes----apicomment-likes)
-8. [Reports — `/api/reports`](#8-reports----apireports)
-9. [Profile Service — `/api/profile`](#9-profile-service----apiprofile)
-10. [Media Service — `/api/media`](#10-media-service----apimedia)
+2. [Auth Service : `/api/auth`](#2-auth-service----apiauth)
+3. [User Service : `/api/users`](#3-user-service----apiusers)
+4. [Post Service : `/api/posts`](#4-post-service----apiposts)
+5. [Comment Service : `/api/comments`](#5-comment-service----apicomments)
+6. [Post Likes : `/api/post-likes`](#6-post-likes----apipost-likes)
+7. [Comment Likes : `/api/comment-likes`](#7-comment-likes----apicomment-likes)
+8. [Reports : `/api/reports`](#8-reports----apireports)
+9. [Profile Service : `/api/profile`](#9-profile-service----apiprofile)
+10. [Media Service : `/api/media`](#10-media-service----apimedia)
 11. [Codes d'erreur communs](#11-codes-derreur-communs)
 
 ---
@@ -51,7 +51,7 @@ Le système utilise **deux tokens** stockés en cookies HTTP-only :
 
 ---
 
-## 2. Auth Service — `/api/auth`
+## 2. Auth Service : `/api/auth`
 
 > **Base URL :** `http://localhost:8080/api/auth`
 
@@ -252,7 +252,7 @@ Modifie l'adresse email de l'utilisateur connecté.
 
 ---
 
-## 3. User Service — `/api/users`
+## 3. User Service : `/api/users`
 
 > **Base URL :** `http://localhost:8080/api/users`
 
@@ -340,9 +340,9 @@ Récupère les informations complètes d'un utilisateur.
 
 Met à jour les informations d'un utilisateur.
 
-**Authentification :** Requise — Propriétaire uniquement (ou `admin`)
+**Authentification :** Requise : Propriétaire uniquement (ou `admin`)
 
-**Body (JSON) — tous les champs sont optionnels :**
+**Body (JSON) : tous les champs sont optionnels :**
 
 | Champ | Type | Description |
 |---|---|---|
@@ -367,7 +367,7 @@ Met à jour les informations d'un utilisateur.
 
 Supprime un compte utilisateur.
 
-**Authentification :** Requise — Propriétaire uniquement (ou `admin`)
+**Authentification :** Requise : Propriétaire uniquement (ou `admin`)
 
 **Réponse 200 :**
 
@@ -381,7 +381,7 @@ Supprime un compte utilisateur.
 
 Modifie le rôle d'un utilisateur.
 
-**Authentification :** Requise — `admin` uniquement
+**Authentification :** Requise : `admin` uniquement
 
 **Body (JSON) :**
 
@@ -397,9 +397,9 @@ Modifie le rôle d'un utilisateur.
 
 Suspend temporairement un compte utilisateur.
 
-**Authentification :** Requise — `moderator` ou `admin`
+**Authentification :** Requise : `moderator` ou `admin`
 
-> ⚠️ Un modérateur ne peut suspendre que des utilisateurs avec le rôle `user`.
+> ! Un modérateur ne peut suspendre que des utilisateurs avec le rôle `user`.
 
 **Body (JSON) :**
 
@@ -416,7 +416,7 @@ Suspend temporairement un compte utilisateur.
 
 Bannit définitivement un compte utilisateur.
 
-**Authentification :** Requise — `moderator` ou `admin`
+**Authentification :** Requise : `moderator` ou `admin`
 
 **Body (JSON) :**
 
@@ -432,13 +432,13 @@ Bannit définitivement un compte utilisateur.
 
 Lève la suspension ou le bannissement d'un utilisateur.
 
-**Authentification :** Requise — `moderator` ou `admin`
+**Authentification :** Requise : `moderator` ou `admin`
 
 **Réponse 200 :** L'objet utilisateur réactivé.
 
 ---
 
-## 4. Post Service — `/api/posts`
+## 4. Post Service : `/api/posts`
 
 > **Base URL :** `http://localhost:8080/api/posts`
 
@@ -593,9 +593,9 @@ Récupère uniquement les replies d'un post.
 
 Met à jour un post existant.
 
-**Authentification :** Requise — Auteur uniquement
+**Authentification :** Requise  Auteur uniquement
 
-**Body (JSON) — tous les champs sont optionnels :**
+**Body (JSON) : tous les champs sont optionnels :**
 
 | Champ | Type | Description |
 |---|---|---|
@@ -619,7 +619,7 @@ Met à jour un post existant.
 
 Supprime un post et nettoie ses médias et tags associés.
 
-**Authentification :** Requise — Auteur, `moderator` ou `admin`
+**Authentification :** Requise : Auteur, `moderator` ou `admin`
 
 **Réponse 200 :**
 
@@ -631,7 +631,7 @@ Supprime un post et nettoie ses médias et tags associés.
 
 ---
 
-## 5. Comment Service — `/api/comments`
+## 5. Comment Service : `/api/comments`
 
 > **Base URL :** `http://localhost:8080/api/comments`
 
@@ -725,7 +725,7 @@ Récupère un commentaire spécifique par son ID.
 
 Modifie un commentaire existant.
 
-**Authentification :** Requise — Auteur uniquement
+**Authentification :** Requise : Auteur uniquement
 
 **Body (JSON) :**
 
@@ -742,7 +742,7 @@ Modifie un commentaire existant.
 
 Supprime un commentaire et toutes ses réponses en cascade.
 
-**Authentification :** Requise — Auteur uniquement
+**Authentification :** Requise : Auteur uniquement
 
 **Réponse 200 :**
 
@@ -754,7 +754,7 @@ Supprime un commentaire et toutes ses réponses en cascade.
 
 ---
 
-## 6. Post Likes — `/api/post-likes`
+## 6. Post Likes : `/api/post-likes`
 
 > **Base URL :** `http://localhost:8080/api/post-likes`
 
@@ -833,7 +833,7 @@ Récupère la liste des utilisateurs ayant liké un post.
 
 ---
 
-## 7. Comment Likes — `/api/comment-likes`
+## 7. Comment Likes : `/api/comment-likes`
 
 > **Base URL :** `http://localhost:8080/api/comment-likes`
 
@@ -913,7 +913,7 @@ Récupère la liste des utilisateurs ayant liké un commentaire.
 
 ---
 
-## 8. Reports — `/api/reports`
+## 8. Reports : `/api/reports`
 
 > **Base URL :** `http://localhost:8080/api/reports`
 
@@ -948,7 +948,7 @@ Signale un post ou un commentaire.
 
 Récupère la liste des signalements.
 
-**Authentification :** Requise — `moderator` ou `admin`
+**Authentification :** Requise : `moderator` ou `admin`
 
 **Query params :**
 
@@ -964,7 +964,7 @@ Récupère la liste des signalements.
 
 Met à jour le statut d'un signalement (traitement par un modérateur).
 
-**Authentification :** Requise — `moderator` ou `admin`
+**Authentification :** Requise : `moderator` ou `admin`
 
 **Body (JSON) :**
 
@@ -980,7 +980,7 @@ Met à jour le statut d'un signalement (traitement par un modérateur).
 
 Récupère tous les signalements ciblant un post spécifique.
 
-**Authentification :** Requise — `moderator` ou `admin`
+**Authentification :** Requise : `moderator` ou `admin`
 
 **Réponse 200 :** Tableau de signalements.
 
@@ -990,13 +990,13 @@ Récupère tous les signalements ciblant un post spécifique.
 
 Récupère tous les signalements ciblant un commentaire spécifique.
 
-**Authentification :** Requise — `moderator` ou `admin`
+**Authentification :** Requise : `moderator` ou `admin`
 
 **Réponse 200 :** Tableau de signalements.
 
 ---
 
-## 9. Profile Service — `/api/profile`
+## 9. Profile Service : `/api/profile`
 
 > **Base URL :** `http://localhost:8080/api/profile`
 
@@ -1006,7 +1006,7 @@ Crée le profil d'un utilisateur. **Appelé automatiquement lors de l'inscriptio
 
 **Authentification :** Requise
 
-**Body (JSON) — optionnel :**
+**Body (JSON) : optionnel :**
 
 | Champ | Type | Description |
 |---|---|---|
@@ -1049,9 +1049,9 @@ Récupère le profil d'un utilisateur ainsi que ses compteurs (followers/followi
 
 Met à jour partiellement un profil utilisateur.
 
-**Authentification :** Requise — Propriétaire uniquement (ou `admin`)
+**Authentification :** Requise : Propriétaire uniquement (ou `admin`)
 
-**Body (JSON) — tous les champs sont optionnels :**
+**Body (JSON) : tous les champs sont optionnels :**
 
 | Champ | Type | Description |
 |---|---|---|
@@ -1066,7 +1066,7 @@ Met à jour partiellement un profil utilisateur.
 
 Supprime un profil et ses compteurs associés.
 
-**Authentification :** Requise — Propriétaire uniquement (ou `admin`)
+**Authentification :** Requise : Propriétaire uniquement (ou `admin`)
 
 **Réponse 200 :**
 
@@ -1180,7 +1180,7 @@ Retourne jusqu'à 3 suggestions d'utilisateurs à suivre (classés par nombre de
 
 ---
 
-## 10. Media Service — `/api/media`
+## 10. Media Service : `/api/media`
 
 > **Base URL :** `http://localhost:8080/api/media`
 
@@ -1220,9 +1220,9 @@ Upload d'un fichier image ou vidéo (stocké dans MinIO / Cloudflare R2).
 
 Supprime un fichier média du stockage.
 
-**Authentification :** Requise — Propriétaire du fichier (ou `moderator` / `admin`)
+**Authentification :** Requise : Propriétaire du fichier (ou `moderator` / `admin`)
 
-**Paramètre d'URL :** `objectName` — le chemin complet retourné lors de l'upload (ex : `user-id/uuid.jpg`).
+**Paramètre d'URL :** `objectName` : le chemin complet retourné lors de l'upload (ex : `user-id/uuid.jpg`).
 
 **Réponse 200 :**
 
@@ -1242,12 +1242,12 @@ Supprime un fichier média du stockage.
 
 | Code HTTP | Signification |
 |---|---|
-| 400 | Bad Request — paramètres manquants ou invalides |
-| 401 | Unauthorized — token absent, invalide ou expiré |
-| 403 | Forbidden — permissions insuffisantes |
-| 404 | Not Found — ressource introuvable |
-| 409 | Conflict — ressource déjà existante (doublon) |
-| 502 | Bad Gateway — échec de communication inter-services |
+| 400 | Bad Request : paramètres manquants ou invalides |
+| 401 | Unauthorized : token absent, invalide ou expiré |
+| 403 | Forbidden : permissions insuffisantes |
+| 404 | Not Found : ressource introuvable |
+| 409 | Conflict : ressource déjà existante (doublon) |
+| 502 | Bad Gateway : échec de communication inter-services |
 
 **Format d'erreur standard :**
 
@@ -1257,4 +1257,4 @@ Supprime un fichier média du stockage.
 
 ---
 
-*Documentation générée à partir du code source — Breezy, Groupe 3*
+*Documentation générée à partir du code source : Breezy, Groupe 3*
